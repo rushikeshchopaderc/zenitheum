@@ -12,7 +12,7 @@ import ProjectDetails from './pages/ProjectDetails';
 
 function App() {
   return (
-    <Router>
+   
       <div className="flex flex-col min-h-screen">
         <Navbar />
         <main className="flex-grow">
@@ -27,7 +27,7 @@ function App() {
         </main>
         <Footer />
       </div>
-    </Router>
+   
   );
 }
 

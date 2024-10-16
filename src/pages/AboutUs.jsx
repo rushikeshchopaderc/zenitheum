@@ -7,7 +7,7 @@ const AboutUs = () => {
 
       <div className="max-w-4xl mx-auto bg-gray-100 shadow-md rounded-lg p-6 text-center">
         <img
-          src="https://via.placeholder.com/150"
+          src="https://th.bing.com/th/id/OIP.cO7-up0OaccX5gROL1h63gHaHa?w=600&h=600&rs=1&pid=ImgDetMain"
           alt="Rushikesh Chopade"
           className="w-40 h-40 rounded-full mx-auto mb-6"
         />
