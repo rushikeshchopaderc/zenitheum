@@ -1,0 +1,12 @@
+/* index.css */
+body {
+  @apply bg-gray-50;
+}
+
+h1, h2, h3, h4 {
+  @apply text-gray-800;
+}
+
+p {
+  @apply text-gray-600;
+}
