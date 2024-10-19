@@ -1,4 +1,4 @@
-# React + Vite
+# Zenitheum : Web3 and AI services for Enterprises. 
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
