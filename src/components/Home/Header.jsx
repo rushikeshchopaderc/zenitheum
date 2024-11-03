@@ -5,7 +5,7 @@ import React from "react";
 
 const Header = () => {
   return (
-    <header className="flex flex-col px-14 pt-80 pb-28 tracking-widest text-white max-md:px-5 max-md:py-24 max-md:mr-2 max-md:max-w-full">
+    <header className="flex flex-col px-14 pt-80 pb-28 tracking-widest text-white max-md:px-5 max-md:py-24 max-md:mr-2 max-md:max-w-full bg-white">
       <div className="flex flex-col self-end max-w-full w-[794px] max-md:mr-2.5">
         <h1 className="mr-7 font-bold text-[156px] max-md:mr-2.5 max-md:max-w-full max-md:text-4xl">
           Zenitheum
