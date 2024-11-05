@@ -20,7 +20,7 @@ const Header = () => {
           AI.
         </h2>
         <p className="self-start text-5xl font-medium mt-[760px] max-md:mt-10 max-md:max-w-full max-md:text-4xl">
-          Zeniteum is a leading Blockchain Analytics and AI solutions firm,
+          Zeniteum is a leading Blockchain Analytics and AI solutions company,
           where we strive to empower businesses with tailored solutions that
           drive growth and efficiency.
         </p>
