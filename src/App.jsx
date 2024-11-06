@@ -8,6 +8,7 @@ import Career from './pages/Career';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer';
 import ProjectDetails from './pages/ProjectDetails';
+// import ProductsPage from './components/Products/ProductsPage';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<><Home /></>} />
+            {/* <Route path="/Products" element={<ProductsPage />} /> */}
             <Route path="/web2" element={<Web2Solutions />} />
             <Route path="/web3" element={<Web3Solutions />} />
             <Route path="/about-us" element={<AboutUs />} />

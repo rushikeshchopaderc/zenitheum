@@ -3,12 +3,14 @@
  */
 import React from "react";
 import NavTab from "./NavTab";
+import Logo from "../../images/Zenitheum_bg_final.png";
 
 const navItems = [
   { label: "Home", isActive: true },
   { label: "Products", isActive: false },
   { label: "Services", isActive: false },
   { label: "Trainings", isActive: false },
+  { type: "logo" }, // Add a new item for the logo
   { label: "Our Clients", isActive: false },
   { label: "About Us", isActive: false },
   { label: "Research", isActive: false },
@@ -17,20 +19,23 @@ const navItems = [
 
 const Navbar = () => {
   return (
-    <header className="flex flex-wrap w-full border-r border-neutral-600 max-md:mr-2 max-md:max-w-full">
-      <nav className="flex flex-wrap items-start text-xl tracking-widest leading-none text-white uppercase whitespace-nowrap max-md:-mr-1 max-md:max-w-full">
-        {navItems.map((item, index) => (
-          <NavTab key={index} label={item.label} isActive={item.isActive} />
-        ))}
+    <header className="flex flex-wrap w-full border-r border-neutral-600 max-md:max-w-full">
+      <nav className="flex flex-wrap items-start text-xl tracking-widest leading-none text-white uppercase whitespace-nowrap max-md:-mr-1 max-md:max-w-full justify-center">
+        {navItems.map((item, index) => {
+          if (item.type === "logo") {
+            return (
+              <div key={index} className="overflow-hidden flex-1 shrink gap-2.5 self-stretch border-r border-b min-h-[100px] max-md:px-5">
+                <img
+                  loading="lazy"
+                  src={Logo}
+                  alt="Company logo"
+                />
+              </div>
+            );
+          }
+          return <NavTab key={index} label={item.label} isActive={item.isActive} />;
+        })}
       </nav>
-      <div className="flex overflow-hidden flex-col items-start px-16 border border-solid bg-zinc-900 border-neutral-700 min-h-[100px] max-md:px-5">
-        <img
-          loading="lazy"
-          src="/Users/rushi/zenitheum/src/images/Zenitheum_bg_final.png"
-          alt="Company logo"
-          className="object-contain aspect-[1.04] w-[99px]"
-        />
-      </div>
     </header>
   );
 };
