@@ -13,7 +13,7 @@ const MergeWithWeb3 = () => {
       </p>
       <img
         loading="lazy"
-        src="https://cdn.builder.io/api/v1/image/assets/TEMP/d2a7a542589fa6b37e6911b6083763460964c25d0a3b9c370338945e0f81ef06?placeholderIfAbsent=true&apiKey=6996dc1fa2444cff9994ea13907adb22"
+        src="/Users/rushi/zenitheum/src/images/blockchain.png"
         alt="Web3 integration illustration"
         className="object-contain grow shrink self-stretch my-auto aspect-[0.81] min-w-[240px] rounded-[101px] w-[565px] max-md:max-w-full"
       />

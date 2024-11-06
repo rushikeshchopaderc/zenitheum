@@ -26,7 +26,7 @@ const Navbar = () => {
       <div className="flex overflow-hidden flex-col items-start px-16 border border-solid bg-zinc-900 border-neutral-700 min-h-[100px] max-md:px-5">
         <img
           loading="lazy"
-          src="https://cdn.builder.io/api/v1/image/assets/TEMP/c5385a9fef09c982d305ab6f993eee649887034b0fb3fffb59e53913ac687d1e?placeholderIfAbsent=true&apiKey=6996dc1fa2444cff9994ea13907adb22"
+          src="/Users/rushi/zenitheum/src/images/Zenitheum_bg_final.png"
           alt="Company logo"
           className="object-contain aspect-[1.04] w-[99px]"
         />
