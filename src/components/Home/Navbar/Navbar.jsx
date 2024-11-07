@@ -41,3 +41,32 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+// const Navbar = () => {
+//   return (
+//     <header className="flex flex-wrap w-full border-r border-neutral-600 max-md:max-w-full">
+//       <nav className="flex flex-wrap items-start text-xl tracking-widest leading-none text-white uppercase whitespace-nowrap max-md:-mr-1 max-md:max-w-full justify-center">
+//         {navItems.map((item, index) => {
+//           if (item.type === "logo") {
+//             return (
+//               <div key={index} className="flex justify-center items-center w-full h-full border-b border-neutral-600 py-4">
+//                 <div className="w-1/2 h-full border-2 border-neutral-600 rounded-md p-2">
+//                   <img
+//                     loading="lazy"
+//                     src={Logo}
+//                     alt="Company logo"
+//                     className="w-full h-full object-contain"
+//                   />
+//                 </div>
+//               </div>
+//             );
+//           }
+//           return <NavTab key={index} label={item.label} isActive={item.isActive} />;
+//         })}
+//       </nav>
+//     </header>
+//   );
+// };
+
+
+// export default Navbar;

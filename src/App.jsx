@@ -1,7 +1,6 @@
 import React from 'react';
-
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './components/Home/Home';
+import Home from './components/Home/HomePage';
 import Navbar from './components/Home/Navbar/Navbar';
 import Footer from './components/Footer';
 import ProductsPage from './components/Products/ProductsPage';
@@ -14,13 +13,13 @@ import CareerPage from './components/Careers/CareersPage.jsx';
 
 function App() {
   return (
-   
+    // <Router>
       <div className="flex flex-col min-h-screen">
         <Navbar />
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<><Home /></>} />
-            <Route path="/Products" element={<><ProductsPage /></>} />
+            <Route path="/" element={<Home />} />
+            <Route path="/Products" element={<ProductsPage />} />
             <Route path="/service" element={<ServicePage />} />
             <Route path="/corporate-trainings" element={<CorporateTrainingsPage />} />
             <Route path="/our-clients" element={<OurClientsPage />} />
@@ -31,7 +30,7 @@ function App() {
         </main>
         <Footer />
       </div>
-   
+    // </Router>
   );
 }
 

@@ -6,7 +6,8 @@ import background from "../../images/zenitheum.png";
 
 const Header = () => {
   return (
-    <header style ={{ backgroundImage: `url(${background})` }} className="flex flex-col px-14 pt-80 pb-28 tracking-widest text-white max-md:px-5 max-md:py-24 max-md:mr-2 max-md:max-w-full">
+    <header style ={{ backgroundImage: `url(${background})`, backgroundSize: "cover", backgroundPosition: "10% center", backgroundRepeat: "no-repeat", opacity: 1}} 
+    className="flex flex-col px-14 pt-80 pb-28 tracking-widest text-white max-md:px-5 max-md:py-24 max-md:mr-2 max-md:max-w-full">
       <div className="flex flex-col self-end max-w-full w-[794px] max-md:mr-2.5">
         <h1 className="mr-7 font-bold text-[156px] max-md:mr-2.5 max-md:max-w-full max-md:text-4xl">
           Zenitheum

@@ -3,6 +3,8 @@
  */
 import React from "react";
 import ProcessStep from "./ProcessStep";
+import background from "../../images/block_analytics2.png";
+
 
 const steps = [
   {
@@ -45,7 +47,8 @@ const steps = [
 
 const HowWeDoIt = () => {
   return (
-    <section className="flex flex-col items-center px-36 mt-8 w-full border border-black border-solid min-h-[1396px] max-md:px-5 max-md:max-w-full">
+    <section style ={{ backgroundImage: `url(${background})`, backgroundSize: "cover", backgroundPosition: "center center", backgroundRepeat: "no-repeat", opacity: 1}} 
+    className="flex flex-col items-center px-36 mt-8 w-full border border-black border-solid min-h-[1396px] max-md:px-5 max-md:max-w-full">
       <div className="flex flex-col justify-center items-center text-white min-h-[151px] max-md:max-w-full">
         <h2 className="text-6xl font-medium leading-none max-md:text-4xl">
           How we do it!

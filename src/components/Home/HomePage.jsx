@@ -3,17 +3,20 @@
  */
 import React from "react";
 import Header from "./Header";
-import ServiceSection from "./ServiceSection";
+import WeHelpBusinesses from "./WeHelpBusiness";
 import MergeWithWeb3 from "./MergeWithWeb3";
 import HowWeDoIt from "./HowWeDoIt";
-
+import BusinessBenifits from "./BusinessBenefits/BusinessBenefits";
+import Footer from "./Footer/Footer";
 const Home = () => {
   return (
     <>
       <Header />
-      <ServiceSection />
+      <WeHelpBusinesses />
       <MergeWithWeb3 />
+      <BusinessBenifits />
       <HowWeDoIt />
+      <Footer />
     </>
   );
 };
