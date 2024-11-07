@@ -3,6 +3,8 @@
  */
 import React from "react";
 import NavTab from "./NavTab";
+import Logo from "../../../images/Zenitheum_removebg.png";
+
 
 const navItems = [
   { label: "home", isActive: false },

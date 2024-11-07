@@ -27,7 +27,7 @@ const services = [
     icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/93433ce0d201a03e51571ce2c97a5591535905046294ba67b7c964ad9d061dcd?placeholderIfAbsent=true&apiKey=6996dc1fa2444cff9994ea13907adb22",
     title: "Corporate Trainings",
     description:
-      "WE offer Corporate Trainings for all roles throughout any organization to stay up-to-date with the ever evolving space of Web3 and AI",
+      "We offer Corporate Trainings for all roles throughout any organization to stay up-to-date with the ever evolving space of Web3 and AI",
   },
 ];
 
