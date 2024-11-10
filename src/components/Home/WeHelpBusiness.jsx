@@ -3,7 +3,7 @@
  */
 import React from "react";
 import ServiceCard from "./ServiceCard1";
-import Image from "../../images/zenitheum.png";
+import Image from "../../images/Zenitheum.png";
 
 const services = [
   {
