@@ -3,7 +3,7 @@
  */
 import React from "react";
 import ServiceCard from "./ServiceCard";
-import background from "../../../images/Zenitheum.png";
+import background from "../../../images/zenitheum.png";
 
 const serviceData = [
   {
