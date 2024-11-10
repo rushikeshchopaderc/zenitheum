@@ -3,16 +3,22 @@
  */
 import React from "react";
 import JobCard from "./JobCard";
+import { useNavigate } from "react-router-dom";
 
 const jobListings = [
-  { title: "Full-Stack Developer", type: "Full-Time", location: "Remote" },
-  { title: "Data Scientist", type: "Full-Time", location: "Remote" },
-  { title: "Web3/AI Consultant", type: "Internship", location: "Remote" },
-  { title: "QA Engineer", type: "Full-Time", location: "Remote" },
-  { title: "Product Manager", type: "Internship", location: "Remote" },
+  { title: "Full-Stack Developer", type: "Full-Time", location: "Remote",buttonlinkpage : "/careers/joblistings" },
+  { title: "Data Scientist", type: "Full-Time", location: "Remote",buttonlinkpage : "/careers/joblistings" },
+  { title: "Web3/AI Consultant", type: "Internship", location: "Remote",buttonlinkpage :"/careers/joblistings" },
+  { title: "QA Engineer", type: "Full-Time", location: "Remote",buttonlinkpage : "/careers/joblistings" },
+  { title: "Product Manager", type: "Internship", location: "Remote",buttonlinkpage : "/careers/joblistings" },
 ];
 
 function JobListings() {
+  const navigate = useNavigate();
+
+  const handleViewServices = () => {
+    navigate("/contactus");
+  };
   return (
     <section
       data-layername="weAreHiring"
@@ -30,9 +36,11 @@ function JobListings() {
         </h2>
         <button
           data-layername="button"
-          className="self-start py-4 pr-8 pl-8 mt-10 text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5"
+          className="self-start py-4 pr-8 pl-8 mt-10 text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200"
+          onClick={handleViewServices}
+          aria-label="Apply Now"
         >
-          APPLY NOW
+          Apply Now
         </button>
       </div>
       <div
@@ -45,6 +53,7 @@ function JobListings() {
             title={job.title}
             type={job.type}
             location={job.location}
+            buttonlinkpage={job.buttonlinkpage}
           />
         ))}
       </div>

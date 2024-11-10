@@ -7,17 +7,19 @@ import WeHelpBusinesses from "./WeHelpBusiness";
 import MergeWithWeb3 from "./MergeWithWeb3";
 import HowWeDoIt from "./HowWeDoIt";
 import BusinessBenifits from "./BusinessBenefits/BusinessBenefits";
-import Footer from "./Footer/Footer";
+import BookAppointment from "./BookAppointment";
+import Footer from "./Footer";
 const Home = () => {
   return (
-    <>
+    <div className="flex overflow-hidden flex-col pb-60 bg-zinc-900 max-md:pb-24">
       <Header />
       <WeHelpBusinesses />
       <MergeWithWeb3 />
       <BusinessBenifits />
       <HowWeDoIt />
+      <BookAppointment />
       <Footer />
-    </>
+    </div>
   );
 };
 
