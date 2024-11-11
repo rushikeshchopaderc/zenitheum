@@ -4,8 +4,13 @@
 import React from "react";
 import Footer from "./Footer";
 import JobContent from "./JobContent";
+import { useEffect } from 'react';
 
 function JobDescription() {
+  useEffect(() => {
+    window.scrollTo(0,0);
+  }, []);
+
   return (
     <div
       data-layername="jobDescription"
@@ -13,7 +18,7 @@ function JobDescription() {
     >
       <main
         data-layername="main"
-        className="flex flex-col mt-0 w-full min-h-[3634px] max-md:max-w-full"
+        className="flex flex-col mt-0 w-full max-md:max-w-full"
       >
         <JobContent />
       </main>

@@ -6,7 +6,10 @@ import logoImage from "../../images/Zenitheum_bg1.png";
 import LocationIcon from "../../images/locationicon.png";
 import ContactIcon from "../../images/contacticon.png";
 import MailIcon from "../../images/mailicon.png";
-
+import InstaIcon from "../../images/instaicon.png";
+import LinkedInIcon from "../../images/linkedinicon.png";
+import TwitterIcon from "../../images/twittericon.png";
+import FacebookIcon from "../../images/facebookicon.png";
 
 const footerLinks = [
   "Home",
@@ -21,19 +24,19 @@ const footerLinks = [
 
 const socialLinks = [
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/6f8347fa28e6c597a51142c106a5c91a112ca54bca0519a6156481fba08c0385?placeholderIfAbsent=true&apiKey=6996dc1fa2444cff9994ea13907adb22",
+    src: FacebookIcon,
     alt: "Facebook",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/9645fbe951416489c3946599f9a4880e5e04f844b6317c3a9d89b9becf558a41?placeholderIfAbsent=true&apiKey=6996dc1fa2444cff9994ea13907adb22",
+    src: TwitterIcon,
     alt: "Twitter",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/c3223b85f47c7bf2e68fecf03b55564b9a609e051329cf465ab3258847705a83?placeholderIfAbsent=true&apiKey=6996dc1fa2444cff9994ea13907adb22",
+    src: InstaIcon,
     alt: "Instagram",
   },
   {
-    src: "https://cdn.builder.io/api/v1/image/assets/TEMP/0b92c1b5d24a4ac2cb2eaf6260a93a8a0fca4d8f0fdc0dbafd494f700b5efbf5?placeholderIfAbsent=true&apiKey=6996dc1fa2444cff9994ea13907adb22",
+    src:  LinkedInIcon,
     alt: "LinkedIn",
   },
 ];

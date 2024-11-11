@@ -34,7 +34,7 @@ function App() {
           <Route path="/services/aiservices" element={<AIServicePage />} />
           <Route path="/research/researchpublications" element={<ResearchPublicationsPage />} />
           <Route path="/careers/joblistings" element={<JobListingsPage />} />
-          <Route path="/contactus" element={<ContactUsPage />} />
+          <Route path="/contactus" element={<ContactUsPage />} scrollToTop />
         </Routes>
       </main>
     </div>

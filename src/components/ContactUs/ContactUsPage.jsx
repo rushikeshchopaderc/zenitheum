@@ -4,9 +4,13 @@
 import React from "react";
 import ContactForm from "./ContactForm";
 import Footer from "./Footer";
-import SocialLinks from "./SocialLinks";
+import { useEffect } from 'react';
 
 function ContactUs() {
+  useEffect(() => {
+    window.scrollTo(0,0);
+  }, []);
+
   return (
     <main className="flex overflow-hidden flex-col pb-52 bg-zinc-900 max-md:pb-24">
       <section className="flex z-10 flex-col self-end pb-5 -mt-20 max-w-full text-white w-[125px]">
@@ -38,12 +42,6 @@ function ContactUs() {
         <ContactForm />
       </section>
       <Footer />
-      <SocialLinks className="flex z-10 flex-wrap gap-6 items-start self-end mt-0 mr-28 max-md:mr-2.5" />
-      <div className="flex items-end -mt-6 ml-32 w-full text-base text-white max-md:max-w-full">
-        <p className="min-w-[240px]">
-          Copyright © 2024. All rights reserved by Zenitheum
-        </p>
-      </div>
     </main>
   );
 }

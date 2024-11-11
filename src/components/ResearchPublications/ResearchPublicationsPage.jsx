@@ -4,8 +4,12 @@
 import React from "react";
 import ResearchExperience from "./ResearchExperience";
 import Footer from "./Footer";
+import { useEffect } from 'react';
 
 function ResearchPublications() {
+  useEffect(() => {
+    window.scrollTo(0,0);
+  }, []);
   return (
     <div
       data-layername="researchPublications"

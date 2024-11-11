@@ -42,6 +42,7 @@ function CoreValues() {
           className="justify-center py-4 pr-8 pl-8 mt-10 text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200"
           onClick={handleViewServices}
           aria-label="Get in Touch"
+          
         >
           Get in Touch
         </button>
