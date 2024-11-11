@@ -30,7 +30,7 @@ const Navbar = () => {
       } border-b border-zinc-700 max-w-full`}
     >
       <nav
-        className={`flex items-center justify-center text-center text-lg tracking-widest leading-none uppercase whitespace-nowrap w-full border-b bg-zinc-900 border-zinc-700 max-md:max-w-full text-white`}
+        className={"flex items-center justify-center text-center text-md tracking-widest leading-none uppercase whitespace-nowrap w-fit border-b bg-zinc-900 border-zinc-700 max-md:max-w-full text-white"}
       >
         {navItems.map((item, index) => {
             const isActive = currentPage === item.to;
@@ -40,13 +40,13 @@ const Navbar = () => {
                 return (
                     <div
                         data-layername="logoFrame"
-                        className="flex overflow-hidden flex-col px-16 border border-solid bg-zinc-900 border-neutral-700 min-h-[100px] min-w-[240px] w-[245px] max-md:px-5"
+                        className="flex flex-col px-20 border border-solid bg-zinc-900 border-neutral-700 h-[68px] min-w-[240px] w-[245px] max-md:px-5"
                     >
                         <img
                             loading="lazy"
                             src={Logo}
                             alt="Company logo"
-                            className="object-contain aspect-[1.04] w-[99px]"
+                            className="object-center aspect-[1.04] w-[76px]"
                         />
                     </div>
                 );
