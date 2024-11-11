@@ -13,20 +13,20 @@ function CoreValues() {
   return (
     <section
       data-layername="letsWorkTogether"
-      className="flex overflow-hidden justify-center items-center px-28 py-11 w-full text-white min-h-[553px] max-md:px-5 max-md:max-w-full"
+      className="flex overflow-hidden justify-center items-center px-28 py-20 w-full text-white  max-md:px-5 max-md:max-w-full"
     >
       <div
-        data-layername="divCtaH1stLine"
-        className="flex overflow-hidden flex-col flex-1 shrink justify-center items-center self-stretch my-auto w-full basis-0 min-w-[240px] max-md:max-w-full"
+        data-layername="CoreValuesContainer"
+        className="flex overflow-hidden flex-col flex-1 shrink justify-center items-center self-stretch my-auto w-[75%] basis-0 min-w-[240px] max-md:max-w-full"
       >
         <h2
-          data-layername="ourCoreValues"
+          data-layername="CoreValuesHeader"
           className="text-9xl font-medium leading-none text-center max-md:max-w-full max-md:text-4xl"
         >
           Our Core Values
         </h2>
         <p
-          data-layername="weAreCommittedToIntegrityInnovationAndCollaborationBelievingThatThesePrinciplesDriveProgressBothWithinOurCompanyAndForOurClientsWeBelieveInContinuousLearningAndAdaptabilityEnsuringThatWeStayAtTheForefrontOfTechnologyByFosteringACultureOfInclusivityAndRespectWeEmpowerOurTeamToPushBoundariesAndChallengeTheStatusQuoUltimatelyDeliveringExceptionalResultsThatAlignWithOurClientsGoals"
+          data-layername="Description"
           className="mt-16 text-2xl text-center w-[986px] max-md:mt-10 max-md:max-w-full"
         >
           We are committed to integrity, innovation, and collaboration,

@@ -6,7 +6,7 @@ import React from "react";
 
 function CTASection() {
   return (
-    <section className="flex overflow-hidden flex-col justify-center items-center text-white">
+    <section className="flex py-20 overflow-hidden flex-col justify-center items-center text-white">
       <h1 className="self-stretch text-9xl font-medium leading-none text-center max-md:max-w-full max-md:text-4xl">
         Get your AI solution today...
       </h1>
@@ -17,7 +17,7 @@ function CTASection() {
         connectivity. Contact us now for a personalized consultation, and
         together, let's build a brighter tomorrow. Your success awaits!
       </p>
-      <button className="py-4 pr-8 pl-8 mt-16 text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5 max-md:mt-10">
+      <button className="justify-center text-center py-4 w-fit pr-8 pl-8 mt-10 text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200">
         Book a Service
       </button>
     </section>

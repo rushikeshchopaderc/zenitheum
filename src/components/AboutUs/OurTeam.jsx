@@ -39,11 +39,11 @@ function OurTeam() {
   return (
     <section
       data-layername="ourTeam"
-      className="flex relative gap-10 pr-16 pl-16 mt-32 w-full text-white border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10 max-md:max-w-full"
+      className="flex relative gap-10 pr-16 pl-16 py-40 w-full text-white border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10 max-md:max-w-full"
     >
       <div
-        data-layername="divWNode99Feaec272B08085F1A2Bbf1C421530E9671Bbb9"
-        className="flex z-0 flex-wrap items-start h-full min-w-[240px] w-[1203px] max-md:max-w-full"
+        data-layername="ImageContainer"
+        className="flex z-0 flex-wrap items-start h-full min-w-[240px] w-[65%] max-md:max-w-full"
       >
         <div
           className="flex relative grow shrink items-start border border-solid border-zinc-700 min-h-[456px] min-w-[240px] w-[962px] max-md:max-w-full"
@@ -59,7 +59,7 @@ function OurTeam() {
               loading="lazy"
               src={teamMembers[currentIndex].image}
               alt={`${teamMembers[currentIndex].name} - ${teamMembers[currentIndex].position}`}
-              className="object-contain z-0 rounded-xl aspect-[1.32] min-w-[240px] w-[601px] max-md:max-w-full"
+              className="object-cover z-0 rounded-xl aspect-[1.32] min-w-[240px] w-[601px] max-md:max-w-full"
             />
             <button
               className="text-7xl cursor-pointer"
@@ -75,13 +75,13 @@ function OurTeam() {
             <div data-layername="divSCardText" className="flex flex-col">
               <div
                 data-layername={teamMembers[currentIndex].name.toLowerCase().replace(" ", "")}
-                className="gap-2.5 self-start px-2.5 py-1.5 text-3xl font-medium leading-none bg-zinc-900"
+                className="gap-2.5 self-start px-2.5 py-1.5 text-3xl font-medium leading-none"
               >
                 {teamMembers[currentIndex].name}
               </div>
               <div
                 data-layername="pSCardParagraph"
-                className="px-2.5 mt-2.5 text-lg leading-loose bg-zinc-900"
+                className="px-2.5 mt-2.5 text-lg leading-loose"
               >
                 {teamMembers[currentIndex].position}
               </div>
@@ -90,8 +90,8 @@ function OurTeam() {
         </div>
       </div>
       <div
-        data-layername="divWNode8F724A5176B938647BdeF393B3359C9D9671Bbb9"
-        className="flex z-0 flex-col justify-center my-auto min-h-[708px] min-w-[240px] w-[486px] max-md:max-w-full"
+        data-layername="TeamTextContainer"
+        className="flex z-0 flex-col justify-center my-auto min-w-[240px] w-[35%] max-md:max-w-full"
       >
         <h2
           data-layername="ourTeam"
@@ -100,7 +100,7 @@ function OurTeam() {
           Our Team
         </h2>
         <p
-          data-layername="ourDiverseAndDynamicTeamIsTheHeartOfOurSuccessComprisingExceptionalTalentsFromVariousAreasOfExpertiseWeUniteUnderACommonVisionToDriveInnovationAndExcellenceWithDeepExpertiseInBlockchainDataEngineeringAndAiOurCollaborativeSpiritFuelsGroundbreakingSolutionsThatPropelOurClientsTowardsTheirGoalsTogetherWeAreCommittedToShapingABrighterFutureEmpoweredByTechnologyAndFosteringMeaningfulConnectionsOnAGlobalScale"
+          data-layername="Description"
           className="mt-24 text-2xl max-md:mt-10 max-md:max-w-full"
         >
           Our diverse and dynamic team is the heart of our success. Comprising

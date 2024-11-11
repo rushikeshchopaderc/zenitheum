@@ -45,14 +45,14 @@ function Footer() {
   return (
     <footer
       data-layername="footer"
-      className="flex flex-col mt-32 w-full max-md:mt-10 max-md:max-w-full"
+      className="flex flex-col w-full max-md:mt-10 max-md:max-w-full"
     >
       <div
-        data-layername="divFooterContainer"
+        data-layername="FooterContainer"
         className="flex flex-col h-[427px] w-full max-md:max-w-full"
       >
         <div
-          data-layername="divFooterLinkBlock"
+          data-layername="FooterLinkBlock"
           className="flex flex-wrap self-center py-px w-full border-t border-b border-zinc-700 max-md:max-w-full"
         >
           <div className="flex flex-col px-28 py-5 text-white border-r border-zinc-700 min-w-[240px] w-[649px] max-md:px-5 max-md:max-w-full">
@@ -74,7 +74,7 @@ function Footer() {
               </div>
             </div>
             <p
-              data-layername="zeniteumIsALeadingBlockchainAnalyticsAndAiSolutionsFirmWhereWeStriveToEmpowerBusinessesWithTailoredSolutionsThatDriveGrowthAndEfficiency"
+              data-layername="Description"
               className="mt-5 text-3xl font-medium tracking-widest"
             >
               A Leading Blockchain Analytics and AI solutions company,

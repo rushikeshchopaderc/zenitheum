@@ -33,7 +33,7 @@ const ServiceSection = ({
         <p className="mt-10 text-2xl max-md:max-w-full">{description}</p>
         <button
           data-layername="button"
-          className="justify-center py-4 pr-8 pl-8 mt-10 text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200"
+          className="justify-center text-center py-4 w-fit pr-8 pl-8 mt-10 text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200"
           onClick={handleViewServices}
           aria-label={buttonText}
         >

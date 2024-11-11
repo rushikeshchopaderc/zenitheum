@@ -20,8 +20,8 @@ function ServiceSection({
 
   const contentSection = (
     <div
-      data-layername="divWNode8F724A5176B938647BdeF393B3359C9D9671Bbb9"
-      className="flex flex-col grow shrink justify-center self-stretch my-auto min-w-[240px] w-[389px] max-md:max-w-full"
+      data-layername="ContentContainer"
+      className="flex flex-col grow shrink justify-center self-stretch w-[25%] max-md:max-w-full"
     >
       <h2
         data-layername={title.toLowerCase().replace(/\s+/g, "-")}
@@ -37,7 +37,7 @@ function ServiceSection({
       </p>
       <button
           data-layername="button"
-          className="justify-center py-4 pr-8 pl-8 mt-10 text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200"
+          className="justify-center text-center py-4 w-fit pr-8 pl-8 mt-10 text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200"
           onClick={handleViewServices}
           aria-label={buttonText}
         >
@@ -51,14 +51,14 @@ function ServiceSection({
       loading="lazy"
       src={imageSrc}
       alt={imageAlt}
-      className="object-contain grow shrink self-stretch my-auto aspect-[1.45] min-w-[240px] rounded-[101px] w-[1186px] max-md:max-w-full"
+      className="object-cover grow shrink self-stretch aspect-[1.47] w-[45%] rounded-[101px] max-md:max-w-full"
     />
   );
 
   return (
     <section
       data-layername={title.toLowerCase().replace(/\s+/g, "-")}
-      className="flex flex-wrap gap-10 items-center pr-32 pl-24 max-w-full text-white border-t border-b border-zinc-700 w-[1920px] max-md:px-5"
+      className="flex flex-wrap items-center px-16 py-24 gap-10 w-full text-white border-t border-b border-zinc-700 max-md:px-5"
     >
       {imageFirst ? (
         <>
