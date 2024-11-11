@@ -40,7 +40,7 @@ function MeetTheFounder() {
           Zenitheum
         </p>
         <a
-          href="https://www.linkedin.com/company/zenitheum"
+          href="https://www.linkedin.com/in/rushikesh3388/"
           target="_blank"
           rel="noopener noreferrer"
           data-layername="button"

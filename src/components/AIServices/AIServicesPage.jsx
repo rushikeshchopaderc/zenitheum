@@ -9,8 +9,12 @@ import Footer from "./Footer";
 import GenAI from "../../images/genai.png";
 import BussImage from "../../images/data_analytics.png";
 import AIImage from "../../images/ML2.png";
+import { useEffect } from "react";
 
 function AIServices() {
+  useEffect(() => {
+    window.scrollTo(0,0);
+  })
   const services = [
     {
       title: "GenAI Innovations",

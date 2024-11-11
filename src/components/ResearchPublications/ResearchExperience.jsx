@@ -6,27 +6,13 @@ import ResearchPaper from "./ResearchPaper";
 import ResearchImage from "../../images/research_paper.png";
 function ResearchExperience() {
   const researchPapers = [
-    { title: "OpenAI's GPT-3/ChatGPT: Suggests & Correct" },
-    {
-      title:
-        "Addressing Class Imbalance Problem in Semantic Segmentation using Binary Focal Loss",
-    },
-    {
-      title:
-        "Cyclical Learning Rates (CLR'S) for Improving Training Accuracies and Lowering Computational Cost",
-    },
-    {
-      title:
-        "K-fold Semi-supervised Self-learning Technique for Image Disease Localization",
-    },
-    { title: "Neural Networks for Predicting Severity of Ovarian Carcinomas" },
-    {
-      title: "Single shot detector application for image disease localization",
-    },
-    {
-      title:
-        "Machine learning for identification and characterization of molecular gene signatures in progression of benign tumors",
-    },
+    { title: "OpenAI's GPT-3/ChatGPT: Suggests & Correct", PaperUrl:"https://ieeexplore.ieee.org/document/10698683/authors#authors" },
+    { title: "Addressing Class Imbalance Problem in Semantic Segmentation using Binary Focal Loss", PaperUrl:"https://link.springer.com/chapter/10.1007/978-981-97-3559-4_28"},
+    { title: "Cyclical Learning Rates (CLR'S) for Improving Training Accuracies and Lowering Computational Cost", PaperUrl:"https://link.springer.com/chapter/10.1007/978-3-031-34960-7_23#citeas"},
+    { title: "K-fold Semi-supervised Self-learning Technique for Image Disease Localization", PaperUrl:"https://link.springer.com/chapter/10.1007/978-981-19-9819-5_49"},
+    { title: "Neural Networks for Predicting Severity of Ovarian Carcinomas", PaperUrl:"https://link.springer.com/chapter/10.1007/978-981-19-7660-5_7" },
+    { title: "Single shot detector application for image disease localization", PaperUrl:"https://www.biorxiv.org/content/10.1101/2021.09.21.461307v1"},
+    { title:"Machine learning for identification and characterization of molecular gene signatures in progression of benign tumors", PaperUrl:"https://dl.acm.org/doi/abs/10.1145/3469213.3469214"}
   ];
 
   return (
@@ -55,7 +41,9 @@ function ResearchExperience() {
             className="object-contain mt-24 max-w-full aspect-[1.58] w-[1246px] max-md:mt-10"
           />
           {researchPapers.map((paper, index) => (
-            <ResearchPaper key={index} title={paper.title} />
+            <ResearchPaper key={index} 
+            title={paper.title} 
+            PaperUrl={paper.PaperUrl} />
           ))}
         </div>
       </div>

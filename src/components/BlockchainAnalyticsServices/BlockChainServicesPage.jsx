@@ -5,9 +5,12 @@ import React from "react";
 import BlockchainAnalyticsServices from "./BlockchainAnalyticsServices";
 import Footer from "./Footer";
 import LetsWorkTogether from "./LetsWorkTogether";
-
+import { useEffect } from "react";
 
 function Services() {
+  useEffect(() => {
+    window.scrollTo(0,0);
+  })
   return (
     <div
       data-layername="services"

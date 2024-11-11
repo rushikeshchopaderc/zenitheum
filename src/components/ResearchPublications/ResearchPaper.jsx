@@ -3,11 +3,11 @@
  */
 import React from "react";
 
-function ResearchPaper({ title }) {
+function ResearchPaper({ title,PaperUrl }) {
   return (
     <div
       data-layername="divWNode8F724A5176B938647BdeF393B3359C9D9671Bbb9"
-      className="flex flex-wrap gap-10 justify-center items-center mt-24 max-w-full min-h-[84px] w-[1544px] max-md:mt-10"
+      className="flex flex-row gap-10 justify-center items-center mt-24 max-w-full min-h-[84px] w-[1544px] max-md:mt-10"
     >
       <div
         data-layername="paperTitle"
@@ -15,12 +15,15 @@ function ResearchPaper({ title }) {
       >
         {title}
       </div>
-      <button
+      <a
+        href={PaperUrl}
+        target="_blank"
+        rel="noopener noreferrer"
         data-layername="button"
-        className="self-stretch py-4 pr-8 pl-8 my-auto text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5"
+        className="self-start py-4 pr-8 pl-8 mt-4 text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5 max-md:mt-10 ml-5"
       >
-        View Research Paper
-      </button>
+        View Publication
+      </a>
     </div>
   );
 }

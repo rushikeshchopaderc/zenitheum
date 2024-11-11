@@ -31,12 +31,15 @@ function LifeAtZenitheum() {
           lives of our employees and find ourselves in an urge to create a
           healthy work environment. Be a part of our visionary team.
         </p>
-        <button
+        <a
+          href="https://www.linkedin.com/company/zenitheum"
+          target="_blank"
+          rel="noopener noreferrer"
           data-layername="button"
           className="self-start py-4 pr-8 pl-8 mt-24 text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5 max-md:mt-10"
         >
           Follow on linkedin
-        </button>
+        </a>
       </div>
       <img
         loading="lazy"
