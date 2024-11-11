@@ -3,7 +3,7 @@
  */
 import React from "react";
 
-const ServiceCard = ({ icon, title, description }) => {
+const ServiceCard = ({title, description }) => {
   return (
     <div className="flex overflow-hidden grow shrink justify-center items-center self-stretch py-24 pr-28 pl-28 my-auto border-l border-zinc-700 min-h-[456px] min-w-[240px] w-[426px] max-md:px-5 max-md:max-w-full">
       <div className="flex flex-col flex-1 shrink self-stretch my-auto w-full basis-0 max-w-[300px] min-w-[240px]">

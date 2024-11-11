@@ -10,32 +10,32 @@ import logoImage from "../../../images/testiment_logo.png";
 
 const testimonialData = [
   {
-    logoSrc:{logoImage},
+    logoSrc:logoImage,
     content:
       "Rushikesh worked with us to deliver our first Gemini Academy Training to 40+ Singaporean learners supporting us in content adaptation and training delivery. He was extremely collaborative, thoughtful, and proactive throughout the entire project. He demonstrated strong expertise in foundational AI knowledge in preparing the content, and did a great job in delivering the training in an engaging and confident manner. I would highly recommend Rushikesh to any organization, and would welcome working with him again on future projects.",
     name: "Gregory Satvinit",
-    title: "Managing Director, TechHalo, Singapore",
-    imageSrc:{GregImage},
+    title: "M.D., TechHalo, Singapore",
+    imageSrc:GregImage,
     imageAlt: "Gregory Satvinit",
     shadowColor: "rgba(93,93,255,1)",
   },
   {
-    logoSrc:{logoImage},
+    logoSrc:logoImage,
     content:
       "I would highly recommend the services offered by Zenitheum to the clients who seek expertise in the Web3 and Blockchain Domain. The team is highly skilled and innovative in their approach. Their dedication to the project and after-sell services are remarkable...",
     name: "Deepak Vasman",
-    title: "Chief Business Officer, Density, Bangalore.",
-    imageSrc:{DepImage},
+    title: "Chief Business Officer, Density",
+    imageSrc:DepImage,
     imageAlt: "Deepak Vasman",
     shadowColor: "rgba(93,93,255,1)",
   },
   {
-    logoSrc:{logoImage},
+    logoSrc:logoImage,
     content:
       "Zenitheum is an innovative leader in cutting edge Machine Learning and AI Technology. The team has innovated novel solutions for our business problems like addressing class imbalance in computer vision, implementing cyclical-learning-rate technique for computation cost optimization and saving training time. Their novel semi-supervised algorithm showcased 42x improved results over existing self-learning SSL algorithm. The product developments have led multiple peer reviewed journals like Springer. Zenitheum is an integral part of ChestAi's application development, and marketing. I strongly recommend Zenitheum for cost effective service with superior results.",
     name: "Shrikant Pawar",
     title: "Founder, ChestAi, USA.",
-    imageSrc:{ShriImage},
+    imageSrc:ShriImage,
     imageAlt: "Shrikant Pawar",
     shadowColor: "rgba(93,93,255,1)",
   },
@@ -45,22 +45,24 @@ const TestimonialSection = () => {
   return (
     <section
       data-layername="testimonials"
-      className="overflow-hidden pr-6 bg-zinc-900 max-md:pr-5"
+      className="overflow-hidden pr-20 bg-zinc-900 max-md:pr-5"
     >
       <div className="flex gap-5 max-md:flex-col">
         <div
           data-layername="column"
-          className="flex flex-col w-[78%] max-md:ml-0 max-md:w-full"
+          className="flex flex-col w-[75%] max-md:ml-0 max-md:w-full"
         >
           <div className="flex flex-wrap grow gap-10 justify-center items-center py-48 shadow-2xl max-md:py-24 max-md:mt-10 max-md:max-w-full">
-            {testimonialData.map((testimonial, index) => (
-              <TestimonialCard key={index} {...testimonial} />
-            ))}
+            <div className="grid grid-cols-3 gap-5 px-24 max-md:grid-cols-1">
+              {testimonialData.map((testimonial, index) => (
+                <TestimonialCard key={index} {...testimonial} />
+              ))}
+            </div>
           </div>
         </div>
         <aside
           data-layername="column"
-          className="flex flex-col ml-5 w-[22%] max-md:ml-0 max-md:w-full"
+          className="flex flex-col ml-5 w-[25%] max-md:ml-0 max-md:w-full"
         >
           <div
             data-layername="divWNode8F724A5176B938647BdeF393B3359C9D9671Bbb9"
