@@ -12,22 +12,14 @@ function ContactUs() {
   }, []);
 
   return (
-    <main className="flex overflow-hidden flex-col pb-52 bg-zinc-900 max-md:pb-24">
-      <section className="flex z-10 flex-col self-end pb-5 -mt-20 max-w-full text-white w-[125px]">
-        <h1 className="overflow-hidden z-10 gap-2.5 self-stretch text-3xl">
-          Your Logo Here
-        </h1>
-        <h2 className="self-end mt-0 text-xl tracking-widest leading-none uppercase">
-          About Us
-        </h2>
-      </section>
-      <section className="flex flex-col items-center mt-5 w-full max-md:max-w-full">
-        <div className="flex overflow-hidden justify-center items-center max-w-full text-center text-white min-h-[553px] w-[1920px]">
-          <div className="flex overflow-hidden flex-col justify-center self-stretch my-auto min-h-[553px] w-[1920px] max-md:max-w-full">
+    <main className="flex overflow-hidden flex-col py-20 bg-zinc-900 max-md:pb-24">
+      <section className="flex flex-col items-center w-full max-md:max-w-full">
+        <div className="flex overflow-hidden justify-center items-center w-full text-center text-white">
+          <div className="flex overflow-hidden flex-col justify-center self-stretch w-full max-md:max-w-full">
             <h2 className="text-9xl font-medium leading-none max-md:max-w-full max-md:text-4xl">
-              Get a Product/Service
+              Get in Touch
             </h2>
-            <p className="self-center mt-16 text-2xl w-[986px] max-md:mt-10 max-md:max-w-full">
+            <p className="self-center mt-16 text-2xl w-[75%] max-md:mt-10 max-md:max-w-full">
               We're just one step away from connecting with you! Whether you
               have questions about our services, want to discuss a potential
               collaboration, or need personalized technology solutions, our team

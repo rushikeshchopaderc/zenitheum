@@ -14,11 +14,11 @@ function BookTraining() {
   return (
     <section
       data-layername="letsWorkTogether"
-      className="flex overflow-hidden justify-center items-center w-full text-white min-h-[553px] max-md:max-w-full"
+      className="flex overflow-hidden py-20 flex-col justify-center items-center w-full text-white max-md:max-w-full"
     >
       <div
         data-layername="divCtaH1stLine"
-        className="flex overflow-hidden flex-col justify-center items-center self-stretch my-auto min-h-[553px] w-[1920px] max-md:max-w-full"
+        className="flex overflow-hidden flex-col justify-center items-center self-stretch  w-[100%] max-md:max-w-full"
       >
         <h2
           data-layername="bookATrainingSessionToday"
@@ -28,7 +28,7 @@ function BookTraining() {
         </h2>
         <p
           data-layername="takeTheFirstStepTowardsATransformativeFutureByPartneringWithUsTodayExploreOurCuttingEdgeSolutionsInBlockchainDataEngineeringAndAiAndExperienceThePowerOfInnovationAndSeamlessConnectivityContactUsNowForAPersonalizedConsultationAndTogetherLetsBuildABrighterTomorrowYourSuccessAwaits"
-          className="mt-16 text-2xl text-center w-[986px] max-md:mt-10 max-md:max-w-full"
+          className="mt-16 text-2xl text-center w-[75%] max-md:mt-10 max-md:max-w-full"
         >
           Take the first step towards a transformative future by partnering with
           us today. Explore our cutting-edge solutions in Blockchain, Data

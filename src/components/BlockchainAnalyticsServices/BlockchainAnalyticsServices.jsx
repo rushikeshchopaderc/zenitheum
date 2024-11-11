@@ -92,9 +92,12 @@ const BlockchainAnalyticsServices = () => {
           title="Merge Web3 into your business to..."
           description="Increase Brand Engagement by building your own NFT collection
                 and adopt revenue sharing model instead of traditional marketing
-                models. \nExpand businesses to regions facing restricted limited internet
-                access. \nGive your customers power over their data offering enhanced
-                brand trust and greater engagement. \nOptimize business operations like budgeting, supply chain
+                models. 
+                Expand businesses to regions facing restricted limited internet
+                access.
+                Give your customers power over their data offering enhanced
+                brand trust and greater engagement.
+                Optimize business operations like budgeting, supply chain
                 management, manufacturing, and auditing with Web3 integration"
           buttonText="Explore the scope"
           imageSrc={Web3Image}

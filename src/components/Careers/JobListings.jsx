@@ -21,12 +21,12 @@ function JobListings() {
   };
   return (
     <section
-      data-layername="weAreHiring"
-      className="flex flex-wrap gap-10 items-center pl-32 mt-32 w-full border-t border-b border-zinc-700 max-w-[1920px] max-md:pl-5 max-md:mt-10 max-md:max-w-full"
+      data-layername="Container"
+      className="flex flex-wrap gap-5 items-center pl-32 w-full border-t border-b border-zinc-700  max-md:pl-5 max-md:mt-10 max-md:max-w-full"
     >
       <div
-        data-layername="divWNode8F724A5176B938647BdeF393B3359C9D9671Bbb9"
-        className="flex flex-col grow shrink justify-center self-stretch my-auto text-white min-w-[240px] w-[389px] max-md:max-w-full"
+        data-layername="HiringBlock"
+        className="flex flex-col grow shrink justify-center self-stretch my-auto text-white w-[25%] max-md:max-w-full"
       >
         <h2
           data-layername="weAreHiring"
@@ -44,8 +44,8 @@ function JobListings() {
         </button>
       </div>
       <div
-        data-layername="divWNode99Feaec272B08085F1A2Bbf1C421530E9671Bbb9"
-        className="flex flex-wrap grow shrink justify-center items-center self-stretch my-auto border-l border-zinc-700 min-w-[240px] w-[1106px] max-md:max-w-full"
+        data-layername="JobPostsContainer"
+        className="flex flex-wrap grow shrink justify-center items-center self-stretch border-l border-zinc-700 w-[55%] max-md:max-w-full"
       >
         {jobListings.map((job, index) => (
           <JobCard

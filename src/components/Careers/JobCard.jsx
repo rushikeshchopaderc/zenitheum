@@ -13,7 +13,7 @@ function JobCard({ title, type, location, buttonlinkpage }) {
   };
 
   return (
-    <div className="flex flex-wrap grow shrink gap-2.5 justify-center items-center self-stretch py-5 pr-16 my-auto border-b border-zinc-700 min-w-[240px] w-[962px] max-md:max-w-full">
+    <div className="flex flex-wrap grow shrink gap-2.5 justify-center items-center self-stretch py px-10 my-auto border-b border-zinc-700 min-w-[240px] w-[962px] max-md:max-w-full">
       <div
         data-layername="divServiceCard"
         className="flex overflow-hidden flex-1 shrink items-start self-stretch px-10 py-5 my-auto basis-0 min-w-[240px] max-md:px-5 max-md:max-w-full"

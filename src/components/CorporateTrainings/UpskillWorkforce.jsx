@@ -7,21 +7,21 @@ import UpskillImage from "../../images/training1.jpg"
 function UpskillWorkforce() {
   return (
     <section
-      data-layername="upskillYourWorkforce"
-      className="flex flex-wrap gap-10 items-center pr-16 pl-16 mt-32 w-full text-white border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10 max-md:max-w-full"
+      data-layername="TextImageContainer"
+      className="flex flex-wrap gap-10 items-center px-20 py-20 w-full text-white border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10 max-md:max-w-full"
     >
       <div
-        data-layername="divWNode8F724A5176B938647BdeF393B3359C9D9671Bbb9"
-        className="flex flex-col grow shrink justify-center self-stretch pt-20 my-auto min-w-[240px] w-[389px] max-md:max-w-full"
+        data-layername="UpskillContainer"
+        className="flex flex-col grow shrink justify-center self-stretch w-[25%] max-md:max-w-full"
       >
         <h2
-          data-layername="upskillYourWorkforce"
+          data-layername="UpskillHeader"
           className="self-start text-6xl font-medium text-center leading-[76px] max-md:max-w-full max-md:text-4xl max-md:leading-[52px]"
         >
           Upskill your workforce
         </h2>
         <div
-          data-layername="bookOurEmployeeTrainingSessionWithHandsOnExperienceAboutLatestGenAiDevelopmentsLikeClaudeGeminiChatGptAndTheirIntegrationIntoYourDailyLifeForEnhancedProductivityUseOfMachineLearningAndDeepLearningTechniquesToAutomateStandardOperatingProceduresLatestWeb3DevelopmentsWithFamilarityToItsConceptsItsApplicationInVariousDomainsAndItsScopeIntoYourWork"
+          data-layername="Description"
           className="mt-7 text-2xl max-md:max-w-full"
         >
           <br />
@@ -56,7 +56,7 @@ function UpskillWorkforce() {
         loading="lazy"
         src={UpskillImage}
         alt="Upskill your workforce illustration"
-        className="object-contain grow shrink self-stretch my-auto aspect-[1.43] min-w-[240px] rounded-[100px] w-[1069px] max-md:max-w-full"
+        className="object-cover grow shrink self-stretch w-[55%] aspect-[1.47] rounded-[100px] max-md:max-w-full"
       />
     </section>
   );

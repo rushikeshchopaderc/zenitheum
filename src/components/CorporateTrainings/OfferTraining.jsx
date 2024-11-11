@@ -8,26 +8,26 @@ function OfferTraining() {
   return (
     <section
       data-layername="offerTrainingAcross"
-      className="flex flex-wrap gap-10 items-center pl-14 mt-32 w-full text-white border-t border-b border-zinc-700 max-md:pl-5 max-md:mt-10 max-md:max-w-full"
+      className="flex flex-wrap gap-20 items-center px-12 py-20 w-full text-white border-t border-b border-zinc-700 max-md:pl-5 max-md:mt-10 max-md:max-w-full"
     >
       <img
         loading="lazy"
         src={TrainImage}
         alt="Training programs illustration"
-        className="object-contain self-stretch my-auto aspect-[1.51] min-w-[240px] rounded-[100px] w-[1136px] max-md:max-w-full"
+        className="object-cover self-stretch aspect-[1.47] w-[60%] rounded-[100px]  max-md:max-w-full"
       />
       <div
-        data-layername="divWNode8F724A5176B938647BdeF393B3359C9D9671Bbb9"
-        className="flex flex-col justify-center self-stretch my-auto min-h-[828px] min-w-[240px] w-[602px] max-md:max-w-full"
+        data-layername="WeOfferContainer"
+        className="flex flex-col justify-center self-stretch w-[35%] max-md:max-w-full"
       >
         <h2
-          data-layername="weOfferTrainingProgramsToClientsAcross"
+          data-layername="WeOfferHeading"
           className="text-6xl font-medium leading-[76px] max-md:max-w-full max-md:text-4xl max-md:leading-[52px]"
         >
           We offer training programs to clients across...
         </h2>
         <div
-          data-layername="variousSectorsBankingHealthcareEducationMarketingAndSalesEngineeringEnergyEtcVariousLevelsOfManagementSeniorLevelManagementMidLevelManagementTeamLeadsTeamMembersEtcVariousSkillLevelsFamiliarUnfamilierToAiAndBlockchainExpertBeginnerTechnicalNonTechnicalRolesVariousJobRolesProductManagersDataScientistsDataAnalystsWebDevelopersSoftwareEngineersDevOpsEngineersConsultantsClientFacingProfessionalsEtcVariousDepartmentsHumanResourcesFinanceSalesMarketingResearchAndDevelopmentItEtc"
+          data-layername="Description"
           className="text-2xl max-md:max-w-full"
         >
           Various Sectors: Banking, Healthcare, Education, Marketing and Sales,
