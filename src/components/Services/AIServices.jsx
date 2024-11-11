@@ -10,14 +10,14 @@ const AIServicesSection = () => {
   };
 
   return (
-    <section className="flex flex-wrap gap-10 items-center pr-28 pl-20 text-white border-t border-b border-zinc-700 max-md:px-5">
+    <section className="flex flex-wrap gap-20 items-center px-20 py-28 w-full text-white border-t border-b border-zinc-700 max-md:px-5">
       <img
         loading="lazy"
         src={AiImage}
         alt="AI Services illustration"
-        className="object-contain grow shrink self-stretch my-auto aspect-[1.11] min-w-[240px] rounded-[105px] w-[1042px] max-md:max-w-full"
+        className="object-cover grow shrink self-stretch my-auto aspect-[1.47] w-[55%] rounded-[100px] max-md:max-w-full"
       />
-      <div className="flex flex-col grow shrink justify-center self-stretch my-auto min-w-[240px] w-[389px] max-md:max-w-full">
+      <div className="flex flex-col grow shrink justify-center self-stretch w-[25%] max-md:max-w-full">
         <h2 className="text-6xl font-medium leading-none max-md:max-w-full max-md:text-4xl">
           AI Services
         </h2>

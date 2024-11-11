@@ -14,11 +14,11 @@ function LetsWorkTogether() {
   };
   return (
     <main className="flex overflow-hidden justify-center items-center text-white">
-      <section className="flex overflow-hidden flex-col justify-center items-center self-stretch my-auto min-h-[553px] w-[1920px] max-md:max-w-full">
+      <section className="flex overflow-hidden my-20 flex-col justify-center items-center self-stretch max-md:max-w-full">
         <h1 className="self-stretch text-9xl font-medium leading-none text-center max-md:max-w-full max-md:text-4xl">
           Book a service today...
         </h1>
-        <p className="mt-16 text-2xl text-center w-[986px] max-md:mt-10 max-md:max-w-full">
+        <p className="mt-16 text-2xl text-center max-md:mt-10 w-[75%] max-md:max-w-full">
         Take the first step towards a transformative future by partnering with us today. Explore our cutting-edge solutions in Blockchain, Data Engineering, and AI, and experience the power of innovation and seamless connectivity. Contact us now for a personalized consultation, and together, let's build a brighter tomorrow. Your success awaits!
         </p>
         <button

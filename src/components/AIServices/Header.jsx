@@ -11,11 +11,11 @@ function Header() {
     >
       <div
         data-layername="divCta"
-        className="flex overflow-hidden justify-center items-center w-[75%] py-20 max-md:px-5 max-md:py-24"
+        className="flex overflow-hidden justify-center items-center w-full max-md:px-5 max-md:py-24"
       >
         <div
-          data-layername="divCtaH1stLine"
-          className="flex overflow-hidden flex-col flex-1 shrink justify-center items-center self-stretch my-auto w-full basis-0 min-w-[240px] max-md:max-w-full"
+          data-layername="AIServiceContainer"
+          className="flex overflow-hidden flex-col flex-1 shrink justify-center items-center self-stretch w-[75%] py-20  basis-0 max-md:max-w-full"
         >
           <h1
             data-layername="aiServicesHeader"

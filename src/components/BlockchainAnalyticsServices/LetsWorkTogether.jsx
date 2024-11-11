@@ -11,12 +11,12 @@ function LetsWorkTogether() {
     navigate('/contactus'); 
   };
   return (
-    <main className="flex overflow-hidden justify-center items-center pt-5 pb-12 text-white">
-      <section className="flex overflow-hidden flex-col justify-center items-center self-stretch my-auto min-h-[567px] w-[1920px] max-md:max-w-full">
+    <main className="flex overflow-hidden justify-center items-center text-white">
+      <section className="flex overflow-hidden flex-col justify-center py-20 items-center self-stretch max-md:max-w-full">
         <h1 className="self-stretch text-9xl font-medium text-center leading-[144px] max-md:max-w-full max-md:text-4xl max-md:leading-[50px]">
-          Get Blockchain Analytics service for your business...
+           Explore Blockchain Integration
         </h1>
-        <p className="mt-9 text-2xl text-center w-[986px] max-md:max-w-full">
+        <p className="mt-9 text-2xl text-center w-[65%] max-md:max-w-full">
           Take the first step towards a transformative future by partnering with
           us today. Explore our cutting-edge solutions in Blockchain, Data
           Engineering, and AI, and experience the power of innovation and
@@ -29,7 +29,7 @@ function LetsWorkTogether() {
           onClick={handleViewServices}
           aria-label="Book a Service"
         >
-          Book A Service
+          Get in Touch
         </button>
       </section>
     </main>

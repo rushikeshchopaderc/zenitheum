@@ -14,7 +14,7 @@ const BlockchainAnalyticsServices = () => {
   return (
     <div
       data-layername="blockchainAnalyticsServices"
-      className="flex overflow-hidden flex-col pb-52 bg-zinc-900 max-md:pb-24"
+      className="flex overflow-hidden flex-col bg-zinc-900 max-md:pb-24"
     >
       <main
         data-layername="main"
@@ -22,25 +22,25 @@ const BlockchainAnalyticsServices = () => {
       >
         <header
           data-layername="header"
-          className="flex flex-col items-center w-full text-center text-white max-w-[1920px] max-md:max-w-full"
+          className="flex flex-col items-center text-center text-white w-full py-20 max-md:max-w-full"
         >
           <div
-            data-layername="divCta"
-            className="flex overflow-hidden justify-center items-center py-20 pr-28 pl-28 w-full min-h-[553px] max-md:px-5"
+            data-layername="TextAndServiceSectionContainer"
+            className="flex overflow-hidden justify-center items-center w-full max-md:px-5"
           >
             <div
-              data-layername="divCtaH1stLine"
-              className="flex overflow-hidden flex-col flex-1 shrink justify-center self-stretch my-auto w-full basis-0 min-w-[240px] max-md:max-w-full"
+              data-layername="TextContainer"
+              className="flex overflow-hidden flex-col flex-1 shrink justify-center self-stretch basis-0  max-md:max-w-full"
             >
               <h1
-                data-layername="blockchainAnalyticsServices"
+                data-layername="BlockchainHeader"
                 className="text-9xl font-medium leading-none max-md:max-w-full max-md:text-4xl"
               >
                 Blockchain Analytics Services
               </h1>
               <p
-                data-layername="blockchainAnalyticsServicesAtZenitheumOfferInnovativeSolutionsTailoredToMeetTheEvolvingDemandsOfTheDigitalLandscapeOurAdvancedOfferingsIncludeCustomizableSmartContractsThatEmpowerYourBusinessWithEnhancedDataInsightsWithAFocusOnBlockchainDataVisualizationAndCustomAnalyticsSolutionsWeEnsureThatYourOrganizationCanMakeInformedDecisionsBackedByRobustDataAnalysis"
-                className="self-center mt-16 text-2xl w-[986px] max-md:mt-10 max-md:max-w-full"
+                data-layername="Description"
+                className="self-center mt-16 text-2xl w-[75%] max-md:mt-10 max-md:max-w-full"
               >
                 Blockchain Analytics services at Zenitheum offer innovative
                 solutions tailored to meet the evolving demands of the digital

@@ -7,25 +7,25 @@ function Header() {
   return (
     <header
       data-layername="header"
-      className="flex flex-col items-center w-full text-center text-white max-w-[1920px] max-md:max-w-full"
+      className="flex flex-col items-center w-full text-center text-white max-md:max-w-full"
     >
       <div
         data-layername="divCta"
-        className="flex overflow-hidden justify-center items-center py-28 pr-28 pl-28 w-full min-h-[553px] max-md:px-5 max-md:py-24"
+        className="flex overflow-hidden justify-center items-center w-full max-md:px-5 max-md:py-24"
       >
         <div
           data-layername="divCtaH1stLine"
-          className="flex overflow-hidden flex-col flex-1 shrink justify-center items-center self-stretch my-auto w-full basis-0 min-w-[240px] max-md:max-w-full"
+          className="flex overflow-hidden flex-col flex-1 shrink justify-center items-center self-stretch my-20  basis-0 min-w-[240px] max-md:max-w-full"
         >
           <h1
-            data-layername="services"
+            data-layername="servicesHeader"
             className="text-9xl font-medium leading-none max-md:max-w-full max-md:text-4xl"
           >
             Services
           </h1>
           <p
-            data-layername="whetherItAiOrBlockchainOrBothWeDoItAllDiscoverTheTangibleImpactOfOurExpertiseInBlockchainDataEngineeringAndAiThroughOurShowcaseOfRemarkableServicesFromCuttingEdgeSolutionsForBusinessesToInnovativeApplicationsThatDriveSocialChangeEachServiceEmbodiesOurCommitmentToExcellenceAndInnovation"
-            className="mt-16 text-2xl w-[986px] max-md:mt-10 max-md:max-w-full"
+            data-layername="Description"
+            className="mt-16 text-2xl w-[60%] max-md:mt-10 max-md:max-w-full"
           >
             Whether it AI or Blockchain or both, we do it all. Discover the
             tangible impact of our expertise in Blockchain, Data Engineering,

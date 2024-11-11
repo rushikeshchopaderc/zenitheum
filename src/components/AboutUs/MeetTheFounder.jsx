@@ -8,11 +8,11 @@ function MeetTheFounder() {
   return (
     <section
       data-layername="meetTheFounder"
-      className="flex flex-wrap gap-10 items-center pr-16 pl-16 py-16 w-full border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10 max-md:max-w-full"
+      className="flex flex-wrap gap-10 items-center px-20 py-20 w-full border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10 max-md:max-w-full"
     >
       <div
         data-layername="FounderText"
-        className="flex flex-col grow shrink justify-center self-stretch my-auto text-white min-w-[240px] w-[25%] max-md:max-w-full"
+        className="flex flex-col grow shrink justify-center self-stretch text-white min-w-[240px] w-[25%] max-md:max-w-full"
       >
         <h2
           data-layername="FounderHeading"
@@ -51,13 +51,13 @@ function MeetTheFounder() {
       </div>
       <div
         data-layername="ImageLayer"
-        className="flex flex-wrap grow shrink items-start self-stretch pt-7 pb-16 my-auto min-h-[912px] min-w-[240px] w-[1024px] max-md:max-w-full"
+        className="flex flex-wrap grow shrink items-start self-stretch w-[55%] max-md:max-w-full"
       >
         <img
           loading="lazy"
           src={founderImage}
           alt="Founder of Zenitheum"
-          className="object-cover grow shrink aspect-[1.47] min-w-[240px] rounded-[100px] w-[75%]"
+          className="object-cover grow shrink aspect-[1.47] min-w-[240px] rounded-[100px]"
         />
       </div>
     </section>
