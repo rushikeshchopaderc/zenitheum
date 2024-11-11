@@ -14,7 +14,7 @@ const TestimonialCard = ({
 }) => {
   return (
     <article
-      className={`flex relative flex-col grow shrink justify-center self-stretch py-14 pr-5 pl-11 my-auto bg-white min-h-[437px] min-w-[240px] rounded-[41px_12px_12px_12px] shadow-[15px_22px_0px_${shadowColor}] max-md:pl-5 max-md:max-w-full`}
+      className={`flex relative flex-col grow shrink justify-center self-stretch py-14 pr-5 pl-11 my-auto bg-slate-200 min-h-[437px] min-w-[240px] rounded-[41px_12px_12px_12px] shadow-[15px_22px_0px_${shadowColor}] max-md:pl-5 max-md:max-w-full`}
     >
       <header className="flex z-0 flex-col items-start w-full">
         <img

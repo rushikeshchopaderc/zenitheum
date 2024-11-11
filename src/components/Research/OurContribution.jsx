@@ -14,21 +14,21 @@ function OurContribution() {
 
   return (
     <section
-      data-layername="ourContribution"
-      className="flex flex-wrap gap-10 items-center pr-16 pl-32 mt-32 w-full border-t border-b border-zinc-700 min-h-[913px] max-md:px-5 max-md:mt-10 max-md:max-w-full"
+      data-layername="TextImageContainer"
+      className="flex flex-wrap items-center gap-10 px-20 py-20 w-full border-t border-b border-zinc-700 min-h-[913px] max-md:px-5 max-md:mt-10 max-md:max-w-full"
     >
       <div
-        data-layername="divWNode8F724A5176B938647BdeF393B3359C9D9671Bbb9"
-        className="flex flex-col grow shrink justify-center self-stretch my-auto text-white min-w-[240px] w-[389px] max-md:max-w-full"
+        data-layername="ContributionContainer"
+        className="flex flex-col grow shrink justify-center w-[25%] self-stretch text-white max-md:max-w-full"
       >
         <h2
-          data-layername="ourContribution"
+          data-layername="ourContributionHeader"
           className="text-6xl font-medium leading-[76px] max-md:max-w-full max-md:text-4xl max-md:leading-[52px]"
         >
           Our Contribution...
         </h2>
         <p
-          data-layername="weAreEnthusiasticAboutFiguringOutInnovativeSolutionsToTheProblemsAtHandWeHavePublishedSomeOfTheSolutionsWithSignificantImpactAsResearchPapersThisIsOurWayOfGivingBackToTheCommunity"
+          data-layername="Description"
           className="mt-10 text-2xl max-md:max-w-full"
         >
           We are enthusiastic about figuring out innovative solutions to the
@@ -50,7 +50,7 @@ function OurContribution() {
         loading="lazy"
         src={Research}
         alt="Our Contribution Illustration"
-        className="object-contain grow shrink self-stretch my-auto aspect-[1.03] min-w-[240px] rounded-[100px] w-[967px] max-md:max-w-full"
+        className="object-cover grow shrink self-stretch aspect-[1.47]  rounded-[100px] w-[45%] max-md:max-w-full"
       />
     </section>
   );

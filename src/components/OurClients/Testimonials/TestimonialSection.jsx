@@ -45,15 +45,15 @@ const TestimonialSection = () => {
   return (
     <section
       data-layername="testimonials"
-      className="overflow-hidden pr-20 bg-zinc-900 max-md:pr-5"
+      className="overflow-hidden bg-zinc-900 max-md:pr-5"
     >
-      <div className="flex gap-5 max-md:flex-col">
+      <div className="flex gap-10 py-20 px-20 max-md:flex-col">
         <div
           data-layername="column"
           className="flex flex-col w-[75%] max-md:ml-0 max-md:w-full"
         >
-          <div className="flex flex-wrap grow gap-10 justify-center items-center py-48 shadow-2xl max-md:py-24 max-md:mt-10 max-md:max-w-full">
-            <div className="grid grid-cols-3 gap-5 px-24 max-md:grid-cols-1">
+          <div className="flex flex-wrap grow gap-4 justify-center items-center h-[800px] rounded-[100px] shadow-2xl shadow-slate-500 border-y-gray-300 max-md:py-24 max-md:mt-10 max-md:max-w-full">
+            <div className="grid grid-cols-3 gap-10 px-12 max-md:grid-cols-1 ">
               {testimonialData.map((testimonial, index) => (
                 <TestimonialCard key={index} {...testimonial} />
               ))}
@@ -62,20 +62,20 @@ const TestimonialSection = () => {
         </div>
         <aside
           data-layername="column"
-          className="flex flex-col ml-5 w-[25%] max-md:ml-0 max-md:w-full"
+          className="flex flex-col w-[25%] max-md:ml-0 max-md:w-full"
         >
           <div
-            data-layername="divWNode8F724A5176B938647BdeF393B3359C9D9671Bbb9"
-            className="flex flex-col grow justify-center text-white min-h-[1057px] max-md:mt-10"
+            data-layername="TestimonialContainer"
+            className="flex flex-col grow justify-center text-white max-md:mt-10"
           >
             <h2
-              data-layername="clientTestimonials"
+              data-layername="TestimonialsHeader"
               className="text-6xl font-medium leading-[76px] max-md:text-4xl max-md:leading-[52px]"
             >
               Client Testimonials
             </h2>
             <p
-              data-layername="clientSatisfactionIsOfUtmostImportanceToUsWeBelieveInBuildingLongTermRelationshipsWithOurClientsThroughSuperiorServicesAndAccountableAferSellSupport"
+              data-layername="Description"
               className="mt-12 text-2xl max-md:mt-10"
             >
               Client satisfaction is of utmost importance to us... We believe in

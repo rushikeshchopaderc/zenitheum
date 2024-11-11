@@ -44,7 +44,7 @@ function Footer() {
   return (
     <footer
       data-layername="footer"
-      className="flex flex-col mt-32 w-full max-md:mt-10 max-md:max-w-full"
+      className="flex flex-col w-full max-md:mt-10 max-md:max-w-full"
     >
       <div
         data-layername="divFooterContainer"

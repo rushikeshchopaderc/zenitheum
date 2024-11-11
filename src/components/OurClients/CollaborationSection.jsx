@@ -11,7 +11,7 @@ function CollaborationSection() {
     navigate('/contactus'); 
   };
   return (
-    <section className="flex overflow-hidden flex-col justify-center items-center text-white">
+    <section className="flex overflow-hidden flex-col py-20 justify-center items-center text-white">
       <h1 className="text-9xl font-medium leading-none text-center max-md:max-w-full max-md:text-4xl">
         Let's Collaborate...
       </h1>

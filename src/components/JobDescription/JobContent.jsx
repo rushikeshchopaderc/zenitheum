@@ -11,15 +11,15 @@ function JobContent() {
       className="flex flex-col w-full text-white max-md:max-w-full"
     >
       <div
-        data-layername="frame"
-        className="flex overflow-hidden justify-center items-center px-28 pt-20 w-full min-h-[2912px] max-md:px-5 max-md:max-w-full"
+        data-layername="JDBlock"
+        className="flex overflow-hidden justify-center items-center py-20 w-full max-md:px-5 max-md:max-w-full"
       >
         <div
-          data-layername="content"
-          className="flex overflow-hidden flex-col flex-1 shrink justify-center items-center self-stretch my-auto w-full basis-0 min-h-[2750px] min-w-[240px] max-md:max-w-full"
+          data-layername="JDContainer"
+          className="flex overflow-hidden w-full flex-col flex-1 shrink justify-center items-center self-stretch basis-0 max-md:max-w-full"
         >
           <h1
-            data-layername="web3AiConsultantAtZenitheum"
+            data-layername="JD Heading"
             className="self-stretch text-9xl font-medium text-center leading-[144px] max-md:max-w-full max-md:text-4xl max-md:leading-[50px]"
           >
             Web3/AI Consultant at Zenitheum
@@ -31,7 +31,7 @@ function JobContent() {
             className="object-contain mt-20 max-w-full aspect-[1.69] w-[1014px] max-md:mt-10"
           />
           <div
-            data-layername="jobDescriptionWeAreLookingForAPassionateAndMotivatedWeb3AndAiResearchConsultantInternToJoinOurTeamTheIdealCandidateWillHaveAKeenInterestInTheLatestDevelopmentsInArtificialIntelligenceAiOrWeb3TechnologiesYouWillPrimarilyFocusOnResearchingVariousDomainsSuchAsDeFiDecentralizedFinanceDeSoDecentralizedSocialNetworksBlockchainAnalyticsAndOtherEmergingFieldsTheRoleInvolvesDocumentingFindingsAnalyzingDataAndCreatingPresentationsForBothTechnicalAndNonTechnicalStakeholdersThisInternshipOffersAUniqueOpportunityToExploreCuttingEdgeTechnologiesAndGainHandsOnExperienceInAiAndWeb3WhileContributingToTheStrategicResearchEffortsOfOurOrganizationKeyResponsibilitiesResearchAndAnalysisConductInDepthResearchOnVariousAiMainsIncludingButNotLimitedToDeFiDeSoBlockchainAnalyticsAndOtherDecentralizedTechnologiesStayUpdatedWithTheLatestTrendsDevelopmentsAndInnovationsInAiAndBlockchainTechnologyAnalyzeAndSummarizeComplexTechnicalInformationAndInsightsForVariousTargetAudiencesDocumentationAndReportingOrganizeAndDocumentAllGatheredResearchInAStructuredAndClearMannerPrepareDetailedReportsAndWhitePapersBasedOnResearchFindingsEnsureAllDocumentationIsUpToDateAndEasilyAccessibleToTheTeamPresentationDevelopmentCreateEngagingAndInformativePresentationsBasedOnResearchFindingsForBothTechnicalAndNonTechnicalAudiencesTailorContentToSuitDifferentAudiencesFromExecutivesToEngineersHighlightingTheImpactOfWeb3AndAiTechnologiesCollaborationWorkCloselyWithSeniorConsultantsAndExpertsToDevelopInDepthInsightsEngageInCollaborativeDiscussionsToEnhanceTheScopeAndDepthOfResearchProjectsQualificationsCurrentlyPursuingOrRecentlyCompletedADegreeInComputerScienceDataScienceAiBlockchainTechnologyOrRelatedFieldsBasicUnderstandingOfAiBlockchainTechnologiesAndWeb3ApplicationsDeFiDeSoEtcStrongAnalyticalAndResearchSkillsWithTheAbilityToSynthesizeInformationEffectivelyProficiencyInTechnicalWritingAndTheAbilityToPresentComplexIdeasClearlyFamiliarityWithPresentationToolsSuchAsPowerPointGoogleSlidesEtcExcellentCommunicationSkillsWithTheAbilityToAdaptContentForBothTechnicalAndNonTechnicalAudiencesSelfMotivatedAndCapableOfWorkingIndependentlyAsWellAsInATeamEnvironmentPreferredSkillsBasicKnowledgeOfProgrammingLanguagesSuchAsPythonSolidityOrJavaScriptUnderstandingOfBlockchainPlatformsSuchAsEthereumBitcoinOrOthersFamiliarityWithAiConceptsSuchAsMachineLearningNaturalLanguageProcessingOrComputerVisionWhatWeOfferHandsOnExperienceWorkingWithCuttingEdgeTechnologiesInAiAndWeb3MentorshipFromIndustryExpertsInAiBlockchainAndDecentralizedSystemsOpportunityToContributeToResearchThatWillShapeFutureBusinessStrategiesFlexibleWorkingEnvironmentWithRemoteWorkOptionsIfYouArePassionateAboutExploringTheIntersectionOfAiAndWeb3AndEagerToContributeToInnovativeResearchWeEncourageYouToApply"
+            data-layername="JDContent"
             className="mt-20 text-2xl max-md:mt-10 max-md:max-w-full"
           >
             <h2 className="text-6xl font-bold leading-[52px]">

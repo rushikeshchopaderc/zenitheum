@@ -12,11 +12,11 @@ const CallToAction = () => {
     navigate('/contactus'); 
   };
   return (
-    <section className="flex overflow-hidden flex-col justify-center items-center text-white">
+    <section className="flex overflow-hidden py-20 flex-col justify-center items-center text-white">
       <h1 className="text-9xl font-medium leading-none text-center max-md:max-w-full max-md:text-4xl">
         Get the Product...
       </h1>
-      <p className="mt-16 text-2xl text-center w-[986px] max-md:mt-10 max-md:max-w-full">
+      <p className="mt-16 text-2xl text-center w-[75%] max-md:mt-10 max-md:max-w-full">
         Take the first step towards a transformative future by partnering with
         us today. Explore our cutting-edge solutions in Blockchain, Data
         Engineering, and AI, and experience the power of innovation and seamless

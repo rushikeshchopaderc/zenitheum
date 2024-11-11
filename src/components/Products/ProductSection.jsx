@@ -10,15 +10,15 @@ function ProductSection({
   imageAlt,
   isReversed,
 }) {
-  const containerClasses = `flex flex-wrap gap-10 items-center pr-24 pl-32 mt-32 max-w-full text-white border-t border-b border-zinc-700 w-[1920px] max-md:px-5 max-md:mt-10 ${
+  const containerClasses = `flex flex-wrap gap-20 px-20 py-20 justify-center items-center max-w-full text-white border-t border-b border-zinc-700 w-[1920px] max-md:px-5 max-md:mt-10 ${
     isReversed ? "flex-row-reverse" : ""
   }`;
 
   return (
     <section className={containerClasses}>
       <div
-        data-layername="divWNode8F724A5176B938647BdeF393B3359C9D9671Bbb9"
-        className="flex flex-col grow shrink justify-center self-stretch my-auto min-w-[240px] w-[389px] max-md:max-w-full"
+        data-layername="TitleContainer"
+        className="flex flex-col grow shrink justify-center self-stretch w-[25%] max-md:max-w-full"
       >
         <h2 className="text-6xl font-medium leading-[76px] max-md:max-w-full max-md:text-4xl max-md:leading-[52px]">
           {title}
@@ -29,7 +29,7 @@ function ProductSection({
         loading="lazy"
         src={imageSrc}
         alt={imageAlt}
-        className="object-contain grow shrink self-stretch my-auto aspect-[1.04] min-w-[240px] rounded-[100px] w-[1009px] max-md:max-w-full"
+        className="object-cover grow shrink self-stretch aspect-[1.47] rounded-[100px] w-[55%] max-md:max-w-full"
       />
     </section>
   );

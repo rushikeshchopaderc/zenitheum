@@ -7,25 +7,25 @@ function Header() {
   return (
     <header
       data-layername="header"
-      className="flex flex-col items-center mt-0 w-full text-center text-white max-md:max-w-full"
+      className="flex flex-col items-center w-full text-center text-white max-md:max-w-full"
     >
       <div
         data-layername="divCta"
-        className="flex overflow-hidden justify-center items-center py-20 pr-28 pl-28 max-w-full min-h-[553px] w-[1920px] max-md:px-5"
+        className="flex overflow-hidden justify-center items-center py-20 max-w-full w-full max-md:px-5"
       >
         <div
-          data-layername="divCtaH1stLine"
-          className="flex overflow-hidden flex-col flex-1 shrink justify-center items-center self-stretch my-auto w-full basis-0 min-w-[240px] max-md:max-w-full"
+          data-layername="ResearchContainer"
+          className="flex overflow-hidden flex-col flex-1 shrink justify-center items-center self-stretch w-full basis-0 max-md:max-w-full"
         >
           <h1
-            data-layername="ourResearch"
+            data-layername="ourResearchHeader"
             className="text-9xl font-medium leading-none max-md:max-w-full max-md:text-4xl"
           >
             Our Research
           </h1>
           <p
-            data-layername="atZenitheumInnovationMeetsKnowledgeDiveIntoTheWorldOfBlockchainDataEngineeringAndAiWithOurTransformativeResearchOurResearchTeamNeverGivesUpWhatsoeverMayBeTheObstacleInAnyProjectWeConquerItAndOfferTheResearchToTheCommunityStayUpdatedWithOurLatestAdvancementsAndDiscoverHowInnovationIsTakingPlaceAtZenitheumIfYouAreAKeenResearcherJoinUsOnThisOdysseyAndContributeToTheEndlessPossibilitiesOfResearchHappyReadingAndLetsEmbarkOnThisQuestForKnowledgeTogether"
-            className="mt-16 text-2xl w-[986px] max-md:mt-10 max-md:max-w-full"
+            data-layername="Description"
+            className="mt-16 text-2xl w-[85%] max-md:mt-10 max-md:max-w-full"
           >
             At Zenitheum, innovation meets knowledge. Dive into the world of
             Blockchain, Data Engineering, and AI with our transformative

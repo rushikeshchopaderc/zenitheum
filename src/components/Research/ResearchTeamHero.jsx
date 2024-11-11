@@ -11,7 +11,7 @@ function ResearchTeamHero(){
 
   return(
     
-    <section className="flex overflow-hidden flex-col justify-center items-center text-white">
+    <section className="flex overflow-hidden my-20 flex-col justify-center items-center text-white">
       <h1 className="self-stretch text-9xl font-medium text-center leading-[144px] max-md:max-w-full max-md:text-4xl max-md:leading-[50px]">
         Join our Research Team...
       </h1>

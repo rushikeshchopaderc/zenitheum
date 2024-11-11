@@ -22,23 +22,23 @@ function ResearchExperience() {
     >
       <div
         data-layername="frame"
-        className="flex overflow-hidden justify-center items-center px-28 pt-20 w-full min-h-[2912px] max-md:px-5 max-md:max-w-full"
+        className="flex overflow-hidden justify-center items-center w-full max-md:px-5 max-md:max-w-full"
       >
         <div
-          data-layername="content"
-          className="flex overflow-hidden flex-col flex-1 shrink justify-center items-center self-stretch my-auto w-full basis-0 min-h-[2750px] min-w-[240px] max-md:max-w-full"
+          data-layername="ResearchContainer"
+          className="flex overflow-hidden flex-col flex-1 my-40 shrink justify-center items-center self-stretch w-full basis-0 max-md:max-w-full"
         >
           <h1
-            data-layername="ourResearchExperienceInAiMl"
+            data-layername="ResearchHeading"
             className="self-stretch text-9xl font-medium text-center leading-[144px] max-md:max-w-full max-md:text-4xl max-md:leading-[50px]"
           >
-            Our Research Experience in AI-ML
+            Our Research Experience
           </h1>
           <img
             loading="lazy"
             src={ResearchImage}
             alt="AI-ML Research Experience Illustration"
-            className="object-contain mt-24 max-w-full aspect-[1.58] w-[1246px] max-md:mt-10"
+            className="object-cover mt-24 w-[60%] aspect-[1.67] rounded-[100px] max-md:mt-10"
           />
           {researchPapers.map((paper, index) => (
             <ResearchPaper key={index} 

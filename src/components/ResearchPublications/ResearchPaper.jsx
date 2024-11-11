@@ -6,12 +6,12 @@ import React from "react";
 function ResearchPaper({ title,PaperUrl }) {
   return (
     <div
-      data-layername="divWNode8F724A5176B938647BdeF393B3359C9D9671Bbb9"
-      className="flex flex-row gap-10 justify-center items-center mt-24 max-w-full min-h-[84px] w-[1544px] max-md:mt-10"
+      data-layername="PaperContainer"
+      className="flex flex-row gap-10 justify-center items-center mt-24 max-w-full w-[1544px] max-md:mt-10"
     >
       <div
         data-layername="paperTitle"
-        className="grow shrink self-stretch my-auto text-xl font-medium leading-[76px] max-md:max-w-full"
+        className="grow shrink self-stretch text-xl font-medium leading-[76px] max-md:max-w-full"
       >
         {title}
       </div>
