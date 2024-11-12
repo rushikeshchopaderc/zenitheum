@@ -14,7 +14,7 @@ function ContactForm() {
     <div>
       <form
         className="flex overflow-hidden flex-col items-center p-16 max-w-full w-[916px] max-md:px-5"
-        action="https://script.google.com/macros/s/AKfycbznTmDG0wIICL4L_HS7e4DBerQXB9kWIJUoSQCI5OF2aHTQJog5SBKrSkOW4jCOqFDp/exec"
+        action="https://script.google.com/macros/s/AKfycbzJM8vVflXUysW0D629f8iUaYF29cL3aJbA4xHbkS-hcHX0h0vGNe4Lu-xl3hwFxmXg/exec"
         method="post"
       >
         <div className="flex flex-col w-full text-2xl">
