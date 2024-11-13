@@ -30,7 +30,9 @@ const Navbar = () => {
       } border-b border-zinc-700 max-w-full`}
     >
       <nav
-        className={"flex items-center justify-around w-fit text-center text-lg tracking-widest leading-none uppercase whitespace-nowrap border-b bg-zinc-900 border-zinc-700 max-md:max-w-full text-white"}
+        // className={"flex items-center justify-around w-fit text-center text-lg tracking-widest leading-none uppercase whitespace-nowrap border-b bg-zinc-900 border-zinc-700 max-md:max-w-full text-white"}
+        className="flex justify-around w-full text-lg h-[68px] bg-zinc-900 border-b border-zinc-700 text-white"
+
       >
         {navItems.map((item, index) => {
             const isActive = currentPage === item.to;
@@ -38,17 +40,17 @@ const Navbar = () => {
 
             if (item.type === "logo") {
                 return (
-                    <div
-                        data-layername="logoFrame"
-                        className="flex flex-col px-16 border justfy-around border-solid bg-zinc-900 border-neutral-700 max-md:px-5"
-                    >
-                        <img
-                            loading="lazy"
-                            src={Logo}
-                            alt="Company logo"
-                            className="object-contain aspect-[2.7]"
-                        />
-                    </div>
+                <div
+                  data-layername="logoFrame"
+                  className="flex px-16 justify-around border border-solid bg-zinc-900 border-neutral-700 h-[68px]"
+                >
+                  <img
+                    loading="lazy"
+                    src={Logo}
+                    alt="Company logo"
+                    className="aspect-[1.04] w-[76px]"
+                  />
+                </div>
                 );
             }
             return (
