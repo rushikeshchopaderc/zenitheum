@@ -46,7 +46,7 @@ const Navbar = () => {
                             loading="lazy"
                             src={Logo}
                             alt="Company logo"
-                            className="object-cover aspect-[2.5]"
+                            className="object-contain aspect-[2.7]"
                         />
                     </div>
                 );
