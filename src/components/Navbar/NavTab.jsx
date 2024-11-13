@@ -4,7 +4,7 @@
 import React from "react";
 
 const NavTab = ({ label, isActive }) => {
-  const baseClasses = "overflow-hidden flex-1 shrink gap-2.5 self-stretch py-6 px-14 w-full border-b min-h-[100px] max-md:px-5 ";
+  const baseClasses = "overflow-hidden flex-1 shrink gap-2.5 self-stretch py-6 px-14 border-b min-h-[100px] max-md:px-5 ";
   const activeClasses = "text-blue-700 bg-white border-zinc-900";
   const inactiveClasses = "bg-zinc-900 border-zinc-700";
 
