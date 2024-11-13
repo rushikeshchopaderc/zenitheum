@@ -3,7 +3,7 @@
  */
 import React from "react";
 import StepCard from "./StepCard";
-import background from "../../../images/block_analytics2.png";
+import background from "../../../images/homepage_bg.png";
 
 const steps = [
   {
@@ -54,17 +54,17 @@ function HowWeDoIt() {
         backgroundRepeat: "no-repeat",
         opacity: 1,
       }}
-      className="flex flex-col items-center px-36 border border-black border-solid max-md:px-5">
+      className="flex flex-col items-center px-20 py-24 border border-black border-solid max-md:px-5">
       <header className="flex flex-col justify-center items-center text-white min-h-[151px] max-md:max-w-full">
         <h1 className="text-6xl font-medium leading-none max-md:text-4xl">
           How we do it!
         </h1>
-        <p className="mt-4 text-2xl leading-none text-center max-md:max-w-full">
+        <p className="mt-16 text-4xl leading-none text-center max-md:max-w-full">
           A detailed description of our practical approach to the problem
           statement
         </p>
       </header>
-      <main className="flex flex-col mt-16 max-w-full rounded-none w-[1200px] max-md:mt-10">
+      <main className="flex flex-col mt-32 rounded-none w-[70%] max-md:mt-10">
         <div className="max-md:max-w-full">
           <div className="flex flex-wrap gap-5 max-md:flex-col">
             {steps.map((step, index) => (

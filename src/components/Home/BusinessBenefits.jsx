@@ -3,7 +3,7 @@
  */
 import React from "react";
 import ServiceCard from "./ServiceCard";
-import background from "../../images/zenitheum.png";
+import background from "../../images/homepage_bg2.png";
 
 const serviceData = [
   {
@@ -31,12 +31,12 @@ const serviceData = [
 const BusinessBenefits = () => {
   return (
     <main style ={{ backgroundImage: `url(${background})`, backgroundSize: "cover", backgroundPosition: "center center", backgroundRepeat: "no-repeat", opacity: 0.8}} 
-    className="flex flex-wrap gap-10 items-center pl-32 border-t border-b border-zinc-700 max-md:pl-5">
-      <h2 className="grow shrink self-stretch my-auto text-6xl font-medium text-white leading-[76px] min-w-[240px] w-[389px] max-md:max-w-full max-md:text-4xl max-md:leading-[52px]">
+    className="flex flex-wrap gap-10 py-16 items-center pl-32 border-t border-b border-zinc-700 max-md:pl-5">
+      <h2 className="grow shrink self-stretch w-[20%] my-auto text-6xl font-medium text-white leading-[76px]  max-md:max-w-full max-md:text-4xl max-md:leading-[52px]">
         What's in it for your business?
       </h2>
-      <div className="flex flex-wrap grow shrink items-start self-stretch my-auto min-w-[240px] w-[1106px] max-md:max-w-full">
-        <div className="flex flex-wrap min-w-[240px] w-[1203px] max-md:max-w-full">
+      <div className="flex flex-wrap w-[60%] grow shrink justify-center items-start self-stretch max-md:max-w-full">
+        <div className="flex flex-wrap w-full max-md:max-w-full">
           {serviceData.slice(0, 2).map((service, index) => (
             <ServiceCard
               key={index}
@@ -45,7 +45,7 @@ const BusinessBenefits = () => {
             />
           ))}
         </div>
-        <div className="flex overflow-hidden flex-wrap flex-1 shrink justify-center items-center pt-0.5 w-full border-t border-l basis-0 border-zinc-700 h-[457px] min-w-[240px] max-md:max-w-full">
+        <div className="flex flex-wrap w-[60%] grow shrink justify-center items-start self-stretch max-md:max-w-full">
           {serviceData.slice(2).map((service, index) => (
             <ServiceCard
               key={index + 2}

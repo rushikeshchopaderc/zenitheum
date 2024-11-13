@@ -12,12 +12,12 @@ function BookAppointment() {
     navigate('/contactus'); 
 };
   return (
-    <section className="flex overflow-hidden justify-center items-center px-28 py-14 text-white max-md:px-5">
-      <div className="flex overflow-hidden flex-col flex-1 shrink justify-center items-center self-stretch my-auto w-full basis-0 min-w-[240px] max-md:max-w-full">
+    <section className="flex overflow-hidden justify-center items-center px-28 py-20 text-white max-md:px-5">
+      <div className="flex overflow-hidden flex-col flex-1 shrink justify-center items-center self-stretch w-full basis-0 min-w-[240px] max-md:max-w-full">
         <h1 className="text-9xl font-medium leading-none text-center max-md:max-w-full max-md:text-4xl">
           Book an Appointment
         </h1>
-        <p className="mt-16 text-2xl text-center w-[986px] max-md:mt-10 max-md:max-w-full">
+        <p className="mt-16 text-2xl text-center w-[65%] max-md:mt-10 max-md:max-w-full">
           Take the first step towards a transformative future by partnering with
           us today. Explore our cutting-edge solutions in Blockchain, Data
           Engineering, and AI, and experience the power of innovation and
