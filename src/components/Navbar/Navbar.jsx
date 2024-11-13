@@ -40,7 +40,7 @@ const Navbar = () => {
                 return (
                     <div
                         data-layername="logoFrame"
-                        className="flex flex-col px-20 border justfy-around border-solid bg-zinc-900 border-neutral-700 max-md:px-5"
+                        className="flex flex-col px-16 border justfy-around border-solid bg-zinc-900 border-neutral-700 max-md:px-5"
                     >
                         <img
                             loading="lazy"
