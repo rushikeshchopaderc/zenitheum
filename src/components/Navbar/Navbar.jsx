@@ -30,7 +30,7 @@ const Navbar = () => {
       } border-b border-zinc-700 max-w-full`}
     >
       <nav
-        className={"flex items-center justify-around w-[100%] text-center text-md tracking-widest leading-none uppercase whitespace-nowrap border-b bg-zinc-900 border-zinc-700 max-md:max-w-full text-white"}
+        className={"flex items-center justify-around w-fit text-center text-lg tracking-widest leading-none uppercase whitespace-nowrap border-b bg-zinc-900 border-zinc-700 max-md:max-w-full text-white"}
       >
         {navItems.map((item, index) => {
             const isActive = currentPage === item.to;
