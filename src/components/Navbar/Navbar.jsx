@@ -25,7 +25,7 @@ const Navbar = () => {
 
   return (
     <header
-      className={`top-0 left-0 w-full ${
+      className={`${
         currentPage === "/" ? "bg-white" : "bg-zinc-900"
       } border-b border-zinc-700 max-w-full`}
     >
@@ -40,7 +40,7 @@ const Navbar = () => {
                 return (
                     <div
                         data-layername="logoFrame"
-                        className="flex flex-col px-20 border justfy-between border-solid bg-zinc-900 border-neutral-700 max-md:px-5"
+                        className="flex flex-col px-20 border justfy-around border-solid bg-zinc-900 border-neutral-700 max-md:px-5"
                     >
                         <img
                             loading="lazy"
