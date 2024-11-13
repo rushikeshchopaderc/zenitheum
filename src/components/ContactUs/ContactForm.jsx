@@ -14,7 +14,7 @@ function ContactForm() {
     <div>
       <form
         className="flex overflow-hidden flex-col items-center p-16 max-w-full w-[916px] max-md:px-5"
-        action="https://script.google.com/macros/s/AKfycbzlYYJWwKn28smF5S-hetrJ-2G0Ss8fzORR3bcyZ-VFaCjdLii4qCSc_G07IiRVsk7Q/exec"
+        action="https://script.google.com/macros/s/AKfycbzS1zCWKZUpAeziKKihKB5Cm29pcfqPpO5oI_o620zuABspOsZRapMQTi9R56XOjSsI/exec"
         method="post"
       >
         <div className="flex flex-col w-full text-2xl">
@@ -68,7 +68,7 @@ function ContactForm() {
           Submit
         </button>
         {showPopup && (
-          <div className="bg-white py-20 px-20 border border-gray-300 rounded-md shadow-md">
+          <div className="bg-white py-20 px-20 border border-gray-300 rounded-[65px] shadow-md">
             <p>Thanks for connecting with us! Our team will get in touch with you shortly.</p>
           </div>
         )}
