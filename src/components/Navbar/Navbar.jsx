@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import NavTab from "./NavTab";
 import Logo from "../../images/Zenitheum_removebg.png";
 import { Link, useLocation } from "react-router-dom";
+import { FaBars, FaTimes } from "react-icons/fa";
 
 const navItems = [
   { label: "Home", to: "/", isActive: true },
@@ -17,10 +18,12 @@ const navItems = [
 
 const Navbar = () => {
   const [currentPage, setCurrentPage] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
     setCurrentPage(location.pathname);
+    setMenuOpen(false); // Close menu on page change
   }, [location.pathname]);
 
   return (
@@ -29,37 +32,41 @@ const Navbar = () => {
         currentPage === "/" ? "bg-white" : "bg-zinc-900"
       } border-b border-zinc-700 max-w-full`}
     >
-      <nav
-        // className={"flex items-center justify-around w-fit text-center text-lg tracking-widest leading-none uppercase whitespace-nowrap border-b bg-zinc-900 border-zinc-700 max-md:max-w-full text-white"}
-        className="flex justify-around w-full text-lg h-[68px] bg-zinc-900 border-b border-zinc-700 text-white"
+      <div className="flex justify-between items-center h-16 px-4 bg-zinc-900 text-white">
+        <Link to="/" className="flex items-center">
+          <img src={Logo} alt="Company logo" className="w-12 h-auto" />
+        </Link>
 
-      >
-        {navItems.map((item, index) => {
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="text-white md:hidden focus:outline-none"
+        >
+          {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+        </button>
+
+        <nav
+          className={`${
+            menuOpen ? "block" : "hidden"
+          } md:flex md:items-center w-full md:w-auto md:space-x-6`}
+        >
+          {navItems.map((item, index) => {
             const isActive = currentPage === item.to;
             const navTabClass = isActive ? 'bg-white' : '';
 
-            if (item.type === "logo") {
-                return (
-                <div
-                  data-layername="logoFrame"
-                  className="flex px-16 justify-around border border-solid bg-zinc-900 border-neutral-700 h-[68px]"
-                >
-                  <img
-                    loading="lazy"
-                    src={Logo}
-                    alt="Company logo"
-                    className="aspect-[1.04] w-[76px]"
-                  />
-                </div>
-                );
-            }
+            // if (item.type === "logo") return null; // Skip logo in nav items
+
             return (
-                <Link key={index} to={item.to} className="hover:text-blue-700 transition duration-300 ease-in-out">
-                    <NavTab label={item.label} isActive={isActive} className={navTabClass} />
-                </Link>
+              <Link
+                key={index}
+                to={item.to}
+                className="hover:text-blue-700 transition duration-300 ease-in-out block md:inline-block"
+              >
+                <NavTab label={item.label} isActive={isActive} className={navTabClass} />
+              </Link>
             );
-        })}
-      </nav>
+          })}
+        </nav>
+      </div>
     </header>
   );
 };
