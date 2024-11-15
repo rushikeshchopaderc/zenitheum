@@ -32,8 +32,8 @@ const Navbar = () => {
         currentPage === "/" ? "bg-white" : "bg-zinc-900"
       } border-b border-zinc-700 max-w-full`}
     >
-      <div className="flex justify-between items-center w-[100%] bg-zinc-900 text-white md:flex md:justify-around">
-        <div className="hidden md:flex md:items-center md:justify-around">
+      <div className="flex justify-center items-center w-[100%] bg-zinc-900 text-white md:flex md:justify-around">
+        <div className="flex gap-8 md:gap-4">
           {navItems.slice(0, 4).map((item, index) => (
             <Link
               key={index}
@@ -44,12 +44,12 @@ const Navbar = () => {
             </Link>
           ))}
         </div>
-        <div className="md:flex md:items-center md:justify-center">
+        <div className="flex items-center justify-center md:flex md:items-center md:justify-center">
           <Link to="/" className="flex items-center justify-center">
-            <img src={Logo} alt="Company logo" className="w-12 justify-around items-center h-auto" />
+            <img src={Logo} alt="Company logo" className="object-cover md:w-12 items-center h-auto scale-150" />
           </Link>
         </div>
-        <div className="hidden md:flex md:items-center md-justify-around">
+        <div className="flex gap-8 md:gap-4">
           {navItems.slice(5).map((item, index) => (
             <Link
               key={index}

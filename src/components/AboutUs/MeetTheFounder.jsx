@@ -8,21 +8,21 @@ function MeetTheFounder() {
   return (
     <section
       data-layername="meetTheFounder"
-      className="flex flex-wrap gap-10 items-center px-20 py-20 w-full border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10 max-md:max-w-full"
+      className="flex gap-10 items-center px-10 py-20 w-full border-t border-b border-zinc-700"
     >
       <div
         data-layername="FounderText"
-        className="flex flex-col grow shrink justify-center self-stretch text-white min-w-[240px] w-[25%] max-md:max-w-full"
+        className="flex flex-col grow shrink justify-center w-[55%]  text-white"
       >
         <h2
           data-layername="FounderHeading"
-          className="text-6xl font-medium leading-[76px] max-md:max-w-full max-md:text-4xl max-md:leading-[52px]"
+          className="text-6xl font-medium leading-[76px] max-md:text-4xl max-md:leading-[52px]"
         >
           Meet the Founder!
         </h2>
         <p
           data-layername="Description"
-          className="mt-24 text-2xl max-md:mt-10 max-md:max-w-full"
+          className="mt-12 text-2xl max-md:mt-10 "
         >
           My vision to steer Zenitheum to the forefront of the blockchain and AI
           solutions industry comes from my background as a Data Scientist. With
@@ -51,13 +51,13 @@ function MeetTheFounder() {
       </div>
       <div
         data-layername="ImageLayer"
-        className="flex flex-wrap grow shrink items-start self-stretch w-[55%] max-md:max-w-full"
+        className="flex grow shrink items-start w-[45%]"
       >
         <img
           loading="lazy"
           src={founderImage}
           alt="Founder of Zenitheum"
-          className="object-cover grow shrink aspect-[1.47] min-w-[240px] rounded-[100px]"
+          className="object-cover grow shrink aspect-[1.2] rounded-[100px]"
         />
       </div>
     </section>

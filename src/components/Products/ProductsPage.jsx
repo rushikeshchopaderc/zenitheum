@@ -21,7 +21,7 @@ const products = [
   {
     title: "Portfolio Management Toolkit",
     description: 
-      "Offering a tailored Crypto Portfolio Management Guide, Zenitheum empowers personal investors to navigate the complexities of the cryptocurrency market. With a focus on maximizing returns while minimizing risks, our guide is the best starting point for your analysis. If you have any further queries/ need more clarity/ periodic revamping of the portfolio, we deliver free after-sales services that enable clients to make informed investment decisions with greater confidence, ensuring their portfolios are well-balanced and aligned with market trends. Let us guide you through the ever-evolving landscape of crypto investments, providing the support and expertise necessary to thrive in this digital era.",
+      "Zenitheum empowers personal investors to navigate the complexities of the cryptocurrency market. With a focus on maximizing returns while minimizing risks, our guide is the best starting point for your analysis. If you have any further queries/ need more clarity/ periodic revamping of the portfolio, we deliver free after-sales services that enable clients to make informed investment decisions with greater confidence, ensuring their portfolios are well-balanced and aligned with market trends.",
     imageSrc: PortImage,
     imageAlt: "Portfolio Management Toolkit interface",
     isReversed: true,
@@ -36,7 +36,7 @@ function ProductsPage() {
     >
       <main
         data-layername="main"
-        className="flex flex-col w-full max-md:max-w-full"
+        className="flex flex-col w-full"
       >
         <Header />
         {products.map((product, index) => (

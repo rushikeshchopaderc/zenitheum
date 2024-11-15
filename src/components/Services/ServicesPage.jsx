@@ -12,11 +12,11 @@ function Services() {
   return (
     <div
       data-layername="services"
-      className="flex overflow-hidden flex-col pb-40 bg-zinc-900 max-md:pb-24"
+      className="flex overflow-hidden flex-col pb-40 bg-zinc-900 "
     >
       <main
         data-layername="main"
-        className="flex flex-col w-full max-md:max-w-full"
+        className="flex flex-col w-full "
       >
         <Header />
         <BlockchainAnalyticsServices />

@@ -8,43 +8,43 @@ function OfferTraining() {
   return (
     <section
       data-layername="offerTrainingAcross"
-      className="flex flex-wrap gap-20 items-center px-12 py-20 w-full text-white border-t border-b border-zinc-700 max-md:pl-5 max-md:mt-10 max-md:max-w-full"
+      className="flex gap-10 items-center px-11 py-20 text-white border-t border-b border-zinc-700"
     >
       <img
         loading="lazy"
         src={TrainImage}
         alt="Training programs illustration"
-        className="object-cover self-stretch aspect-[1.47] w-[60%] rounded-[100px]  max-md:max-w-full"
+        className="object-cover aspect-[1.04] w-[40%] rounded-[100px]"
       />
       <div
         data-layername="WeOfferContainer"
-        className="flex flex-col justify-center self-stretch w-[35%] max-md:max-w-full"
+        className="flex flex-col justify-center w-[60%]"
       >
         <h2
           data-layername="WeOfferHeading"
-          className="text-6xl font-medium leading-[76px] max-md:max-w-full max-md:text-4xl max-md:leading-[52px]"
+          className="text-6xl font-medium leading-[76px] max-md:text-4xl"
         >
-          We offer training programs to clients across...
+          Our Trainings Span Across...
         </h2>
         <div
           data-layername="Description"
-          className="text-2xl max-md:max-w-full"
+          className="text-2xl mt-12"
         >
-          Various Sectors: Banking, Healthcare, Education, Marketing and Sales,
+          1. Various Sectors: Banking, Healthcare, Education, Marketing and Sales,
           Engineering, Energy, etc
           <br />
-          Various levels of management: Senior-level management, Mid-level
-          Management, Team Leads, Team Members, etc.
+          2. Various levels of management: Senior/Mid-level
+          Management, TLs and Team Members, etc.
           <br />
-          Various skill levels: Familiar/Unfamilier to AI and Blockchain,
-          Expert/Beginner, Technical/Non-Technical roles
+          3. Various skill levels: Familiar/Unfamilier to AI and Blockchain,
+          Expert/Beginner, Tech/Non-Tech roles
           <br />
-          Various Job Roles: Product Managers, Data Scientists, Data Analysts,
+          4. Various Departments: Human Resources, Finance, Sales, Marketing,
+          R&D, IT, etc.
+          <br />
+          5. Various Job Roles: Product Managers, Data Scientists, Data Analysts,
           Web Developers, Software Engineers, DevOps Engineers, Consultants,
           Client Facing Professionals, etc.
-          <br />
-          Various Departments: Human Resources, Finance, Sales, Marketing,
-          Research and Development, IT, etc.
         </div>
       </div>
     </section>

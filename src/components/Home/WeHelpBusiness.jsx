@@ -32,13 +32,13 @@ const serviceData = [
 const ServiceSection = () => {
   return (
     <main 
-    style ={{ backgroundImage: `url(${background})`, backgroundSize: "cover", backgroundPosition: "center center", backgroundRepeat: "no-repeat", opacity: 1}}
-    className="flex flex-wrap gap-10 py-24 items-center pl-32 border-t border-b border-zinc-700 max-md:pl-5">
-      <h2 className="grow shrink self-stretch w-[20%] my-auto text-6xl font-medium text-white leading-[76px] max-md:max-w-full max-md:text-4xl max-md:leading-[52px]">
+    style ={{ backgroundImage: `url(${background})`, backgroundSize: "cover", backgroundPosition: "center 50%", backgroundRepeat: "no-repeat", opacity: 1}}
+    className="flex gap-10 py-24 items-center border-t border-b border-zinc-700 max-md:pl-5">
+      <h2 className="grow shrink w-[20%] ml-20 my-auto text-6xl font-medium text-white leading-[76px] max-md:text-4xl max-md:leading-[52px]">
         We Help Businesses Grow by offering...
       </h2>
-      <div className="flex flex-wrap w-[60%] grow shrink justify-center items-start self-stretch max-md:max-w-full">
-        <div className="flex flex-wrap w-full max-md:max-w-full">
+      <div className="flex w-[60%] flex-wrap">
+        <div className="flex grow shrink justify-center items-start">
           {serviceData.slice(0, 2).map((service, index) => (
             <ServiceCard
               key={index}
@@ -47,7 +47,7 @@ const ServiceSection = () => {
             />
           ))}
         </div>
-        <div className="flex flex-wrap w-[60%] grow shrink justify-center items-start self-stretch max-md:max-w-full">
+        <div className="flex grow shrink justify-center items-start">
           {serviceData.slice(2).map((service, index) => (
             <ServiceCard
               key={index + 2}

@@ -18,19 +18,19 @@ function ResearchExperience() {
   return (
     <section
       data-layername="researchExperience"
-      className="flex flex-col w-full text-white max-md:max-w-full"
+      className="flex flex-col w-full text-white"
     >
       <div
         data-layername="frame"
-        className="flex overflow-hidden justify-center items-center w-full max-md:px-5 max-md:max-w-full"
+        className="flex overflow-hidden px-20 justify-center items-center w-full max-md:px-5"
       >
         <div
           data-layername="ResearchContainer"
-          className="flex overflow-hidden flex-col flex-1 my-40 shrink justify-center items-center self-stretch w-full basis-0 max-md:max-w-full"
+          className="flex overflow-hidden flex-col flex-1 my-40 shrink justify-center items-center self-stretch w-full basis-0"
         >
           <h1
             data-layername="ResearchHeading"
-            className="self-stretch text-9xl font-medium text-center leading-[144px] max-md:max-w-full max-md:text-4xl max-md:leading-[50px]"
+            className="self-stretch text-9xl font-medium text-center leading-[144px] max-md:text-4xl max-md:leading-[50px]"
           >
             Our Research Experience
           </h1>
@@ -38,7 +38,7 @@ function ResearchExperience() {
             loading="lazy"
             src={ResearchImage}
             alt="AI-ML Research Experience Illustration"
-            className="object-cover mt-24 w-[60%] aspect-[1.67] rounded-[100px] max-md:mt-10"
+            className="object-cover mt-24 w-[80%] aspect-[1.67] rounded-[100px] max-md:mt-10"
           />
           {researchPapers.map((paper, index) => (
             <ResearchPaper key={index} 

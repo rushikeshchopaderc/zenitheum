@@ -8,40 +8,37 @@ function OurProjects() {
   return (
     <section
       data-layername="ourProjects"
-      className="flex flex-wrap px-20 py-20 items-center w-full text-white border-t border-b border-zinc-700 max-md:pr-5 max-md:mt-10 max-md:max-w-full"
+      className="flex gap-10 px-10 py-20 items-center w-full text-white border-t border-b border-zinc-700 max-md:pr-5 max-md:mt-10"
     >
       <div
         data-layername="ImageTextContainer"
-        className="flex flex-wrap grow shrink gap-20 w-[25%] items-start self-stretch max-md:max-w-full"
+        className="flex grow shrink gap-20 w-[65%] items-start"
       >
         <div
           data-layername="DeliveryContainer"
-          className="flex flex-col justify-center self-stretch"
+          className="flex flex-col justify-center"
         >
           <h2
             data-layername="DeliveriesHeading"
-            className="text-6xl font-medium leading-[76px] max-md:max-w-full max-md:text-4xl max-md:leading-[52px]"
+            className="text-6xl font-medium leading-[76px] max-md:text-4xl max-md:leading-[52px]"
           >
             Our Noteworthy Deliveries..
           </h2>
           <div
             data-layername="Description"
-            className="mt-16 text-2xl max-md:mt-10 max-md:max-w-full"
+            className="mt-12 text-2xl max-md:mt-10"
           >
-            Hands-on Training Session about Google Gemini's optimal usage
+            1. Hands-on Training Session about Google Gemini's optimal usage
             techniques and limitations of GenAI models.
             <br />
             -In collaboration with: TechHalo, Singapore.
             <br />
-            <br />
-            Development of Computer Vision algorithms for Image classification
+            2. Development of Computer Vision algorithms for Image classification
             and localization of 18 diseases from Chest-Xray Images
             <br />- In collaboration with: ChestAI, USA.
             <br />
-            <br />
-            Developing Image GenAI algorithms for COVID-19 classification
+            3. Developing Image GenAI algorithms for COVID-19 classification
             <br />- In collaboration with: UNIRC, Italy.
-            <br />
           </div>
         </div>
       </div>
@@ -49,7 +46,7 @@ function OurProjects() {
         loading="lazy"
         src={DeliveryImage}
         alt="Project showcase"
-        className="object-cover grow shrink self-stretch aspect-[1.47] rounded-[100px] w-[35%] max-md:max-w-full"
+        className="object-cover grow shrink aspect-[1.04] rounded-[100px] w-[45%]"
       />
     </section>
   );

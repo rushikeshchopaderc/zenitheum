@@ -7,11 +7,11 @@ function ResearchPaper({ title,PaperUrl }) {
   return (
     <div
       data-layername="PaperContainer"
-      className="flex flex-row gap-10 justify-center items-center mt-24 max-w-full w-[1544px] max-md:mt-10"
+      className="flex flex-row gap-10 justify-center items-center mt-24 w-[100%] max-md:mt-10"
     >
       <div
         data-layername="paperTitle"
-        className="grow shrink self-stretch text-xl font-medium leading-[76px] max-md:max-w-full"
+        className="grow shrink text-lg font-medium leading-[76px]"
       >
         {title}
       </div>

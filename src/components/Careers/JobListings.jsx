@@ -22,11 +22,11 @@ function JobListings() {
   return (
     <section
       data-layername="Container"
-      className="flex flex-wrap gap-5 items-center pl-32 w-full border-t border-b border-zinc-700  max-md:pl-5 max-md:mt-10 max-md:max-w-full"
+      className="flex gap-5 items-center pl-32 w-full border-t border-b border-zinc-700  max-md:pl-5 max-md:mt-10"
     >
       <div
         data-layername="HiringBlock"
-        className="flex flex-col grow shrink justify-center self-stretch my-auto text-white w-[25%] max-md:max-w-full"
+        className="flex flex-col grow shrink justify-center w-[25%] my-auto text-white  max-md:max-w-full"
       >
         <h2
           data-layername="weAreHiring"
@@ -45,7 +45,7 @@ function JobListings() {
       </div>
       <div
         data-layername="JobPostsContainer"
-        className="flex flex-wrap grow shrink justify-center items-center self-stretch border-l border-zinc-700 w-[55%] max-md:max-w-full"
+        className="flex flex-wrap grow shrink justify-center items-center w-[75%] border-l border-zinc-700 "
       >
         {jobListings.map((job, index) => (
           <JobCard

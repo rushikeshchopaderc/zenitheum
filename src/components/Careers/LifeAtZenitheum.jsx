@@ -9,11 +9,11 @@ function LifeAtZenitheum() {
   return (
     <section
       data-layername="lifeAtZenitheum"
-      className="flex flex-wrap gap-10 items-center px-20 py-28 w-full text-white border-t border-b border-zinc-700 max-w-[1920px] max-md:pl-5 max-md:mt-10 max-md:max-w-full"
+      className="flex gap-10 items-center px-20 py-28 w-full text-white border-t border-b border-zinc-700 max-w-[1920px] max-md:pl-5 max-md:mt-10 max-md:max-w-full"
     >
       <div
         data-layername="lifeAtZ"
-        className="flex flex-col grow shrink justify-center self-stretch w-[25%] max-md:max-w-full"
+        className="flex flex-col grow shrink justify-center w-[30%] max-md:max-w-full"
       >
         <h2
           data-layername="lifeAtZenitheum"
@@ -23,7 +23,7 @@ function LifeAtZenitheum() {
         </h2>
         <p
           data-layername="weBelieveWorkingCanBeFunWeMakeEffortsToMakeItFunWorkIsWhereYouSpendMostOfYourDayAtAndHenceNeedsToBeEnjoyedAtZenitheumWeCelebrateWorkWeValueBothPersonalAndProfessionalLivesOfOurEmployeesAndFindOurselvesInAnUrgeToCreateAHealthyWorkEnvironmentBeAPartOfOurVisionaryTeam"
-          className="mt-24 text-2xl max-md:mt-10 max-md:max-w-full"
+          className="mt-12 text-2xl max-md:mt-10 max-md:max-w-full"
         >
           We believe working can be fun. We make efforts to make it fun. Work is
           where you spend most of your day at and hence needs to be enjoyed. At
@@ -36,7 +36,7 @@ function LifeAtZenitheum() {
           target="_blank"
           rel="noopener noreferrer"
           data-layername="button"
-          className="self-start py-4 pr-8 pl-8 mt-24 text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5 max-md:mt-10"
+          className="self-start py-4 pr-8 pl-8 mt-12 text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5 max-md:mt-10"
         >
           Follow on linkedin
         </a>
@@ -45,7 +45,7 @@ function LifeAtZenitheum() {
         loading="lazy"
         src={LifeImage}
         alt="Life at Zenitheum"
-        className="object-cover grow shrink self-stretch aspect-[1.47] w-[55%] rounded-[100px] max-md:max-w-full"
+        className="object-cover grow shrink aspect-[1.47] w-[50%] rounded-[100px] max-md:max-w-full"
       />
     </section>
   );

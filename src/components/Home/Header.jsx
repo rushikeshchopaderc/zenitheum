@@ -6,23 +6,23 @@ import background from "../../images/zenitheum.png";
 
 const Header = () => {
   return (
-    <header style ={{ backgroundImage: `url(${background})`, backgroundSize: "cover", backgroundPosition: "10% center", backgroundRepeat: "no-repeat", opacity: 1}} 
-    className="flex flex-col px-14 pt-80 pb-28 tracking-widest text-white max-md:px-5 max-md:py-24 max-md:mr-2 max-md:max-w-full">
-      <div className="flex flex-col text-center self-end max-w-full w-[794px] max-md:mr-2.5">
-        <h1 className="mr-7 font-bold text-[156px] max-md:mr-2.5 max-md:max-w-full max-md:text-4xl">
+    <header style ={{ backgroundImage: `url(${background})`, backgroundSize: "cover", backgroundPosition: "center center", backgroundRepeat: "no-repeat", opacity: 1}} 
+    className="flex flex-col px-12 tracking-widest text-white max-md:px-5 max-md:py-24 max-md:mr-2">
+      <div className="flex flex-col mt-60 text-center self-end w-[794px] max-md:mr-2.5">
+        <h1 className="mr-7 font-bold text-[156px] max-md:mr-2.5 max-md:text-4xl">
           Zenitheum
         </h1>
-        <p className="mt-20 text-5xl max-md:mt-10 max-md:max-w-full max-md:text-4xl">
-          Delivering Web3 and AI-ML solutions to help businessess grow...
+        <p className="mt-20 text-5xl max-md:mt-10 max-md:text-4xl">
+          Delivering Web3 and AI-ML solutions to help businesses grow...
         </p>
       </div>
-      <div className="flex flex-col mt-40 mb-0 w-full max-w-[1749px] max-md:mt-10 max-md:mb-2.5 max-md:max-w-full">
-        <h2 className="self-end text-6xl font-bold text-center max-md:max-w-full max-md:text-4xl">
+      <div className="flex flex-col mt-60 mb-20 w-full">
+        <h2 className="self-end text-6xl font-bold text-center  max-md:text-4xl">
           Revolutionize your business by unleashing the power of Blockchain and
           AI.
         </h2>
-        <p className="self-start text-5xl text-center font-medium mt-[650px] max-md:mt-10 max-md:max-w-full max-md:text-4xl">
-          Zeniteum is a leading Blockchain Analytics and AI solutions company,
+        <p className="self-start text-5xl text-center font-medium mt-[60%] max-md:mt-10 max-md:text-4xl">
+          Zenitheum is a leading Blockchain Analytics and AI solutions company,
           where we strive to empower businesses with tailored solutions that
           drive growth and efficiency.
         </p>

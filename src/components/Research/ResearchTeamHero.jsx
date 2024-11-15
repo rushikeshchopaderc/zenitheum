@@ -12,10 +12,10 @@ function ResearchTeamHero(){
   return(
     
     <section className="flex overflow-hidden my-20 flex-col justify-center items-center text-white">
-      <h1 className="self-stretch text-9xl font-medium text-center leading-[144px] max-md:max-w-full max-md:text-4xl max-md:leading-[50px]">
+      <h1 className="self-stretch text-9xl font-medium text-center leading-[144px]  max-md:text-4xl max-md:leading-[50px]">
         Join our Research Team...
       </h1>
-      <p className="mt-16 text-2xl text-center w-[986px] max-md:mt-10 max-md:max-w-full">
+      <p className="mt-16 text-2xl text-center w-[80%] max-md:mt-10">
         Passionate about research? Love to dive deep into this ever expanding ocean
         of AI and web3? You are most welcome to join our research team at Zenitheum.
         Get your hands dirty to get to the roots of the complex technology

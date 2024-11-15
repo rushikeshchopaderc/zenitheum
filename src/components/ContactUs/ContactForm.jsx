@@ -27,7 +27,7 @@ const ContactForm = () => {
   // };
 
   return (
-    <div className="flex overflow-hidden flex-col justify-center py-20 items-center self-stretch w-full max-md:max-w-full">
+    <div className="flex overflow-hidden flex-col justify-center py-20 items-center">
       <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdKHjHf7BMGaNejNM6il4OnuBO4ZIQ9TJciPtb9U29M4biaAQ/viewform?embedded=true" width="1024" height="1024">Loading…</iframe>
       {/* <form 
         className="flex overflow-hidden flex-col items-center p-16 max-w-full w-[916px] max-md:px-5"

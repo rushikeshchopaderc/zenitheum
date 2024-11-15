@@ -22,10 +22,10 @@ const ServiceSection = ({
 
   return (
     <div
-      className={`flex flex-wrap gap-20 py-24 px-20 items-center text-white border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10`}
+      className={`flex gap-10 py-24 px-20 items-center text-white border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10`}
     >
       <div
-        className={`flex flex-col grow shrink justify-center w-[25%] self-stretch min-w-[240px] max-md:max-w-full ${contentClass}`}
+        className={`flex flex-col grow shrink justify-center w-[35%] self-stretch min-w-[240px] max-md:max-w-full ${contentClass}`}
       >
         <h2 className="text-6xl font-medium leading-[76px] max-md:max-w-full max-md:text-4xl max-md:leading-[52px]">
           {title}
@@ -44,7 +44,7 @@ const ServiceSection = ({
         loading="lazy"
         src={imageSrc}
         alt={imageAlt}
-        className={`object-cover grow shrink self-stretch w-[45%] aspect-[1.47] min-w-[240px] rounded-[100px] max-md:max-w-full ${imageClass}`}
+        className={`object-cover grow shrink self-stretch w-[35%] aspect-[1.47] min-w-[240px] rounded-[100px] max-md:max-w-full ${imageClass}`}
       />
     </div>
   );

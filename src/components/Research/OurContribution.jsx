@@ -15,11 +15,11 @@ function OurContribution() {
   return (
     <section
       data-layername="TextImageContainer"
-      className="flex flex-wrap items-center gap-10 px-20 py-20 w-full border-t border-b border-zinc-700 min-h-[913px] max-md:px-5 max-md:mt-10 max-md:max-w-full"
+      className="flex items-center gap-10 px-20 py-20 w-full border-t border-b border-zinc-700 min-h-[913px] max-md:px-5 max-md:mt-10 max-md:max-w-full"
     >
       <div
         data-layername="ContributionContainer"
-        className="flex flex-col grow shrink justify-center w-[25%] self-stretch text-white max-md:max-w-full"
+        className="flex flex-col grow shrink justify-center w-[25%] text-white max-md:max-w-full"
       >
         <h2
           data-layername="ourContributionHeader"
@@ -50,7 +50,7 @@ function OurContribution() {
         loading="lazy"
         src={Research}
         alt="Our Contribution Illustration"
-        className="object-cover grow shrink self-stretch aspect-[1.47]  rounded-[100px] w-[45%] max-md:max-w-full"
+        className="object-cover grow shrink aspect-[1.47]  rounded-[100px] w-[45%] max-md:max-w-full"
       />
     </section>
   );

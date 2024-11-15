@@ -39,11 +39,11 @@ function OurTeam() {
   return (
     <section
       data-layername="ourTeam"
-      className="flex relative gap-10 pr-16 pl-16 py-40 w-full text-white border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10 max-md:max-w-full"
+      className="flex relative gap-20 px-10 py-20 w-full text-white border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10 max-md:max-w-full"
     >
       <div
         data-layername="ImageContainer"
-        className="flex z-0 flex-wrap items-start h-full min-w-[240px] w-[65%] max-md:max-w-full"
+        className="flex z-0 flex-wrap items-start h-full w-[55%] max-md:max-w-full"
       >
         <div
           className="flex relative grow shrink items-start border border-solid border-zinc-700 min-h-[456px] min-w-[240px] w-[962px] max-md:max-w-full"
@@ -91,7 +91,7 @@ function OurTeam() {
       </div>
       <div
         data-layername="TeamTextContainer"
-        className="flex z-0 flex-col justify-center my-auto min-w-[240px] w-[35%] max-md:max-w-full"
+        className="flex z-0 flex-col justify-center my-auto w-[45%] max-md:max-w-full"
       >
         <h2
           data-layername="ourTeam"
@@ -101,7 +101,7 @@ function OurTeam() {
         </h2>
         <p
           data-layername="Description"
-          className="mt-24 text-2xl max-md:mt-10 max-md:max-w-full"
+          className="mt-12 text-2xl max-md:mt-10 max-md:max-w-full"
         >
           Our diverse and dynamic team is the heart of our success. Comprising
           exceptional talents from various areas of expertise, we unite under a

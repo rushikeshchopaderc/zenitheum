@@ -13,9 +13,9 @@ function BlockchainAnalyticsServices() {
   };
 
   return (
-    <section className="flex flex-wrap gap-10 items-center px-20 py-20 w-full text-white border-t border-b border-zinc-700 max-md:px-5">
-      <div className="flex flex-col grow shrink justify-center self-stretch my-auto w-[25%] max-md:max-w-full">
-        <h1 className="text-6xl font-medium leading-[76px] max-md:max-w-full max-md:text-4xl max-md:leading-[52px]">
+    <section className="flex gap-10 items-center px-20 py-20 w-full text-white border-t border-b border-zinc-700 max-md:px-5">
+      <div className="flex flex-col grow shrink justify-center self-stretch my-auto w-[25%]">
+        <h1 className="text-6xl font-medium leading-[76px] max-md:text-4xl max-md:leading-[52px]">
           Blockchain Analytics Services
         </h1>
         <p className="mt-10 text-2xl max-md:max-w-full">
@@ -35,7 +35,7 @@ function BlockchainAnalyticsServices() {
         loading="lazy"
         src={BlockImage}
         alt="Blockchain Analytics Services Illustration"
-        className="object-cover grow shrink self-stretch my-10 w-[65%] aspect-[1.47] rounded-[100px] w-[967px] max-md:max-w-full"
+        className="object-cover grow shrink self-stretch my-10 w-[55%] aspect-[1.47] rounded-[100px]]"
       />
     </section>
   );

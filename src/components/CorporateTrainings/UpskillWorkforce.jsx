@@ -8,44 +8,38 @@ function UpskillWorkforce() {
   return (
     <section
       data-layername="TextImageContainer"
-      className="flex flex-wrap gap-10 items-center px-20 py-20 w-full text-white border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10 max-md:max-w-full"
+      className="flex gap-10 items-center px-10 py-20 w-full text-white border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10"
     >
       <div
         data-layername="UpskillContainer"
-        className="flex flex-col grow shrink justify-center self-stretch w-[25%] max-md:max-w-full"
+        className="flex flex-col grow shrink justify-center w-[60%]"
       >
         <h2
           data-layername="UpskillHeader"
-          className="self-start text-6xl font-medium text-center leading-[76px] max-md:max-w-full max-md:text-4xl max-md:leading-[52px]"
+          className="self-start text-6xl font-medium text-center leading-[76px] max-md:text-4xl max-md:leading-[52px]"
         >
-          Upskill your workforce
+          Upskill workforce with Sessions about...
         </h2>
         <div
           data-layername="Description"
-          className="mt-7 text-2xl max-md:max-w-full"
+          className="mt-7 text-2xl"
         >
-          <br />
-          <span className="text-4xl">
-            Book our Employee Training Session with hands-on experience about:
-          </span>
-          <br />
-          <br />
           <ul>
             <li>
-              Latest GenAI developments like Claude, Gemini, ChatGPT and their
+              1. Latest GenAI developments like Claude, Gemini, ChatGPT and their
               integration into your daily life for enhanced productivity.
             </li>
           </ul>
           <ul>
             <li>
-              Use of Machine Learning and Deep Learning techniques to automate
+              2. Use of Machine Learning and Deep Learning techniques to automate
               Standard operating procedures.
             </li>
           </ul>
-          <br />
+          
           <ul>
             <li>
-              Latest Web3 developments with familarity to its concepts, its
+              3. Latest Web3 developments with familarity to its concepts, its
               application in various domains and its scope into your work.
             </li>
           </ul>
@@ -56,7 +50,7 @@ function UpskillWorkforce() {
         loading="lazy"
         src={UpskillImage}
         alt="Upskill your workforce illustration"
-        className="object-cover grow shrink self-stretch w-[55%] aspect-[1.47] rounded-[100px] max-md:max-w-full"
+        className="object-cover grow shrink w-[40%] aspect-[1.04] rounded-[100px]"
       />
     </section>
   );

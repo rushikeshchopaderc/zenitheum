@@ -5,13 +5,13 @@ import React from "react";
 
 const ServiceCard = ({ title, description }) => {
   return (
-    <section className="flex overflow-hidden flex-1 shrink  px-32 py-10 justify-center text-start items-start self-start basis-0 border-zinc-700 max-md:px-5 max-md:py-24 max-md:max-w-full">
-      <div className="flex flex-col flex-1 shrink self-stretch basis-0">
+    <section className="flex overflow-hidden flex-1 shrink px-10 py-10 justify-center text-center basis-0 border-zinc-700 max-md:px-5 max-md:py-24">
+      <div className="flex flex-col flex-1 shrink basis-0">
         <div className="flex flex-col w-full">
-          <h3 className="text-3xl font-medium leading-none text-zinc-300">
+          <h3 className="text-3xl text-center font-medium leading-none text-zinc-300">
             {title}
           </h3>
-          <p className=" mt-10 w-full  text-lg leading-7 text-white">
+          <p className=" mt-10 w-full text-lg leading-7 text-white">
             {description}
           </p>
         </div>

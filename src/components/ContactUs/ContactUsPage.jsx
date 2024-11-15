@@ -12,14 +12,14 @@ function ContactUs() {
   }, []);
 
   return (
-    <main className="flex overflow-hidden flex-col py-20 bg-zinc-900 max-md:pb-24">
-      <section className="flex flex-col items-center w-full max-md:max-w-full">
+    <main className="flex overflow-hidden flex-col bg-zinc-900">
+      <section className="flex flex-col items-center py-20 w-full">
         <div className="flex overflow-hidden justify-center items-center w-full text-center text-white">
-          <div className="flex overflow-hidden flex-col justify-center self-stretch w-full max-md:max-w-full">
-            <h2 className="text-9xl font-medium leading-none max-md:max-w-full max-md:text-4xl">
+          <div className="flex overflow-hidden flex-col justify-center self-stretch w-full">
+            <h2 className="text-9xl font-medium leading-none max-md:text-4xl">
               Get in Touch
             </h2>
-            <p className="self-center mt-16 text-2xl w-[75%] max-md:mt-10 max-md:max-w-full">
+            <p className="self-center mt-16 text-2xl w-[75%] max-md:mt-10">
               We're just one step away from connecting with you! Whether you
               have questions about our services, want to discuss a potential
               collaboration, or need personalized technology solutions, our team

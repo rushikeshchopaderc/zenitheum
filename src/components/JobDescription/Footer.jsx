@@ -36,7 +36,7 @@ const socialLinks = [
     alt: "Instagram",
   },
   {
-    src:  LinkedInIcon,
+    src: LinkedInIcon,
     alt: "LinkedIn",
   },
 ];
@@ -45,37 +45,37 @@ function Footer() {
   return (
     <footer
       data-layername="footer"
-      className="flex flex-col w-full max-md:mt-10 max-md:max-w-full"
+      className="flex flex-col w-full max-md:mt-10"
     >
       <div
-        data-layername="divFooterContainer"
-        className="flex flex-col h-[427px] w-full max-md:max-w-full"
+        data-layername="FooterContainer"
+        className="flex flex-col w-full"
       >
         <div
-          data-layername="divFooterLinkBlock"
-          className="flex flex-wrap self-center py-px w-full border-t border-b border-zinc-700 max-md:max-w-full"
+          data-layername="FooterLinkBlock"
+          className="flex flex-wrap self-center py-px w-full border-t border-b border-zinc-700"
         >
-          <div className="flex flex-col px-28 py-5 text-white border-r border-zinc-700 min-w-[240px] w-[649px] max-md:px-5 max-md:max-w-full">
+          <div className="flex flex-col px-10 py-5 text-white border-r border-zinc-700 w-[35%] max-md:px-5">
             <div
               data-layername="isolationMode"
-              className="flex overflow-hidden gap-x-10 justify-center items-center self-start text-5xl whitespace-nowrap max-md:text-4xl"
+              className="flex overflow-hidden gap-x-10 justify-center items-start self-start text-5xl whitespace-nowrap max-md:text-4xl"
             >
               <img
                 loading="lazy"
                 src={logoImage}
                 alt="Zenitheum logo"
-                className="object-contain shrink-0 self-stretch my-auto aspect-[0.98] w-[86px]"
+                className="object-contain aspect-[0.98] w-16"
               />
               <div
                 data-layername="zenitheum"
-                className="self-stretch my-auto max-xl:text-6xl font-bold italic "
+                className="self-stretch my-auto max-xl:text-4xl font-bold italic "
               >
                 Zenitheum...
               </div>
             </div>
             <p
-              data-layername="zeniteumIsALeadingBlockchainAnalyticsAndAiSolutionsFirmWhereWeStriveToEmpowerBusinessesWithTailoredSolutionsThatDriveGrowthAndEfficiency"
-              className="mt-5 text-3xl font-medium tracking-widest"
+              data-layername="Description"
+              className="mt-5 text-2xl font-medium tracking-widest"
             >
               A Leading Blockchain Analytics and AI solutions company,
               where we strive to empower businesses with tailored solutions that
@@ -84,13 +84,13 @@ function Footer() {
           </div>
           <div
             data-layername="divWNodeEa35C4Ee7A8203Fd1856Fadec6D71926C6D71913"
-            className="flex flex-col flex-1 shrink self-start basis-[234px] min-w-[240px] max-md:max-w-full"
+            className="flex flex-col flex-1 shrink self-start basis-[234px] w-[65%]"
           >
             <nav
               data-layername="divFooterLinkWrapper"
-              className="flex flex-col justify-center px-12 py-6 w-full text-2xl leading-none text-white border-b border-zinc-700 max-md:px-5 max-md:max-w-full"
+              className="flex flex-col justify-center px-12 py-6 w-full text-xl leading-none text-white border-b border-zinc-700 max-md:px-5 max-md:max-w-full"
             >
-            <ul className="flex flex-wrap gap-10 justify-between items-start w-full max-md:max-w-full">
+            <ul className="flex justify-between items-start w-full">
               {footerLinks.map((link, index) => (
                 <li
                   key={index}
@@ -104,10 +104,10 @@ function Footer() {
               ))}
             </ul>
             </nav>
-            <div className="flex flex-wrap items-start w-full max-md:max-w-full">
+            <div className="flex items-start">
               <address
                 data-layername="divSCardBlock"
-                className="flex flex-col flex-1 shrink self-stretch p-5 border-r basis-0 border-zinc-700 min-w-[240px] max-md:max-w-full"
+                className="flex flex-col flex-1 shrink self-stretch p-5 border-r basis-0 border-zinc-700"
               >
                 <div
                   data-layername="divSCardIcon"
@@ -142,7 +142,7 @@ function Footer() {
               </address>
               <div
                 data-layername="divSCardBlock"
-                className="flex flex-col flex-1 shrink px-5 pt-5 pb-32 border-r basis-0 border-zinc-700 min-h-[304px] min-w-[240px] max-md:pb-24 max-md:max-w-full"
+                className="flex flex-col flex-1 shrink px-5 pt-5 pb-32 border-r basis-0 border-zinc-700 max-md:pb-24"
               >
                 <div
                   data-layername="divSCardIcon"
@@ -161,7 +161,7 @@ function Footer() {
                 >
                   <h3
                     data-layername="ourHotline"
-                    className="text-3xl font-medium leading-none text-zinc-300"
+                    className="text-3xl font-medium leading-none text-zinc-300 "
                   >
                     Our Hotline...
                   </h3>
@@ -175,7 +175,7 @@ function Footer() {
               </div>
               <div
                 data-layername="divSCardBlock"
-                className="flex flex-col flex-1 shrink px-5 pt-5 pb-10 border-r basis-0 border-zinc-700 min-h-[304px] min-w-[240px] max-md:max-w-full"
+                className="flex flex-col flex-1 shrink px-5 pt-5 pb-10 border-r basis-0 border-zinc-700"
               >
                 <div
                   data-layername="divSCardIcon"
@@ -223,11 +223,11 @@ function Footer() {
         </div>
         <div
           data-layername="divFppterRightsBox"
-          className="flex flex-wrap flex-1 gap-5 justify-center items-end px-28 mt-2.5 size-full max-md:px-5 max-md:max-w-full"
+          className="flex flex-wrap flex-1 gap-5 justify-center items-end px-28 mt-2.5 size-full max-md:px-5"
         >
           <div
             data-layername="divFooterRightsWrapper"
-            className="flex flex-1 shrink items-end text-base text-white basis-0 min-w-[240px] max-md:max-w-full"
+            className="flex flex-1 shrink items-end text-base text-white basis-0"
           >
             <p data-layername="div" className="min-w-[240px]">
               Copyright © 2024. All rights reserved by Zenitheum

@@ -8,31 +8,31 @@ function JobContent() {
   return (
     <section
       data-layername="jd"
-      className="flex flex-col w-full text-white max-md:max-w-full"
+      className="flex flex-col w-full text-white "
     >
       <div
         data-layername="JDBlock"
-        className="flex overflow-hidden justify-center items-center py-20 w-full max-md:px-5 max-md:max-w-full"
+        className="flex overflow-hidden justify-center items-center py-20 px-20 w-full max-md:px-5 "
       >
         <div
           data-layername="JDContainer"
-          className="flex overflow-hidden w-full flex-col flex-1 shrink justify-center items-center self-stretch basis-0 max-md:max-w-full"
+          className="flex overflow-hidden w-full flex-col flex-1 shrink justify-center items-center basis-0 "
         >
           <h1
             data-layername="JD Heading"
-            className="self-stretch text-9xl font-medium text-center leading-[144px] max-md:max-w-full max-md:text-4xl max-md:leading-[50px]"
+            className="self-stretch text-9xl font-medium text-center leading-[144px] max-md:text-4xl max-md:leading-[50px]"
           >
-            Web3/AI Consultant at Zenitheum
+            Web3 Consultant at Zenitheum
           </h1>
           <img
             loading="lazy"
             src={JDImage}
             alt="Job description illustration"
-            className="object-contain mt-20 max-w-full aspect-[1.69] w-[1014px] max-md:mt-10"
+            className="object-cover mt-20  aspect-[1.69] w-[1014px] max-md:mt-10"
           />
           <div
             data-layername="JDContent"
-            className="mt-20 text-2xl max-md:mt-10 max-md:max-w-full"
+            className="mt-20 text-2xl max-md:mt-10"
           >
             <h2 className="text-6xl font-bold leading-[52px]">
               Job Description:

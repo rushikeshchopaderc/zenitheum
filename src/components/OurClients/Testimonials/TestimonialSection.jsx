@@ -45,15 +45,15 @@ const TestimonialSection = () => {
   return (
     <section
       data-layername="testimonials"
-      className="overflow-hidden bg-zinc-900 max-md:pr-5"
+      className="overflow-hidden py-20 bg-zinc-900 max-md:pr-5"
     >
-      <div className="flex gap-10 py-20 px-20 max-md:flex-col">
+      <div className="flex gap-10 max-md:flex-col">
         <div
           data-layername="column"
-          className="flex flex-col w-[75%] max-md:ml-0 max-md:w-full"
+          className="flex flex-col w-[70%]"
         >
-          <div className="flex flex-wrap grow gap-4 justify-center items-center h-[800px] rounded-[100px] shadow-2xl shadow-slate-500 border-y-gray-300 max-md:py-24 max-md:mt-10 max-md:max-w-full">
-            <div className="grid grid-cols-3 gap-10 px-12 max-md:grid-cols-1 ">
+          <div className="flex grow justify-center items-center py-10 px-10 rounded-[100px] shadow-2xl shadow-slate-500 border-y-gray-300 max-md:py-24 max-md:mt-10">
+            <div className="grid grid-cols-3 gap-10">
               {testimonialData.map((testimonial, index) => (
                 <TestimonialCard key={index} {...testimonial} />
               ))}
@@ -62,7 +62,7 @@ const TestimonialSection = () => {
         </div>
         <aside
           data-layername="column"
-          className="flex flex-col w-[25%] max-md:ml-0 max-md:w-full"
+          className="flex flex-col w-[25%]"
         >
           <div
             data-layername="TestimonialContainer"

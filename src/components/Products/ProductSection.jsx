@@ -10,7 +10,7 @@ function ProductSection({
   imageAlt,
   isReversed,
 }) {
-  const containerClasses = `flex flex-wrap gap-20 px-20 py-20 justify-center items-center max-w-full text-white border-t border-b border-zinc-700 w-[1920px] max-md:px-5 max-md:mt-10 ${
+  const containerClasses = `flex gap-10 px-10 py-20 justify-center items-center text-white border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10 ${
     isReversed ? "flex-row-reverse" : ""
   }`;
 
@@ -18,18 +18,18 @@ function ProductSection({
     <section className={containerClasses}>
       <div
         data-layername="TitleContainer"
-        className="flex flex-col grow shrink justify-center self-stretch w-[25%] max-md:max-w-full"
+        className="flex flex-col grow shrink justify-center w-[50%]"
       >
-        <h2 className="text-6xl font-medium leading-[76px] max-md:max-w-full max-md:text-4xl max-md:leading-[52px]">
+        <h2 className="text-6xl font-medium leading-[76px] max-md:text-4xl max-md:leading-[52px]">
           {title}
         </h2>
-        <p className="mt-10 text-2xl max-md:max-w-full">{description}</p>
+        <p className="mt-10 text-2xl ">{description}</p>
       </div>
       <img
         loading="lazy"
         src={imageSrc}
         alt={imageAlt}
-        className="object-cover grow shrink self-stretch aspect-[1.47] rounded-[100px] w-[55%] max-md:max-w-full"
+        className="object-cover grow shrink aspect-[1.2] rounded-[100px] w-[45%]"
       />
     </section>
   );
