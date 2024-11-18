@@ -12,7 +12,11 @@ import CareerPage from './components/Careers/CareersPage';
 import BlockchainServicesPage from './components/BlockchainAnalyticsServices/BlockChainServicesPage';
 import AIServicePage from './components/AIServices/AIServicesPage';
 import ContactUsPage from './components/ContactUs/ContactUsPage';
-import JobListingsPage from './components/JobDescription/JobDescriptionPage';
+import BackendJobListingsPage from './components/JobDescription/BackendDeveloper/JobDescriptionPage';
+import DSJobListingsPage from './components/JobDescription/DataScientist/JobDescriptionPage';
+import AIBAJobListingsPage from './components/JobDescription/AIBusinessAnalyst/JobDescriptionPage';
+import Web3BAJobListingsPage from './components/JobDescription/Web3BusinessAnalyst/JobDescriptionPage';
+import SolDevJobListingsPage from './components/JobDescription/SolidityDeveloper/JobDescriptionPage';
 import ResearchPublicationsPage from './components/ResearchPublications/ResearchPublicationsPage';
 
 
@@ -33,7 +37,11 @@ function App() {
           <Route path="/services/blockchainservicespage" element={<BlockchainServicesPage />} />
           <Route path="/services/aiservices" element={<AIServicePage />} />
           <Route path="/research/researchpublications" element={<ResearchPublicationsPage />} />
-          <Route path="/careers/joblistings" element={<JobListingsPage />} />
+          <Route path="/careers/joblistings-backend" element={<BackendJobListingsPage />} />
+          <Route path="/careers/joblistings-datascientist" element={<DSJobListingsPage />} />
+          <Route path="/careers/joblistings-aibusinessanalyst" element={<AIBAJobListingsPage />} />
+          <Route path="/careers/joblistings-web3businessanalyst" element={<Web3BAJobListingsPage />} />
+          <Route path="/careers/joblistings-solditydeveloper" element={<SolDevJobListingsPage />} />
           <Route path="/contactus" element={<ContactUsPage />} scrollToTop />
         </Routes>
       </main>

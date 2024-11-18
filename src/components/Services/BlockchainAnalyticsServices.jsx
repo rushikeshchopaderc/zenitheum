@@ -35,7 +35,7 @@ function BlockchainAnalyticsServices() {
         loading="lazy"
         src={BlockImage}
         alt="Blockchain Analytics Services Illustration"
-        className="object-cover grow shrink self-stretch my-10 w-[55%] aspect-[1.47] rounded-[100px]]"
+        className="object-cover grow shrink self-stretch my-10 w-[55%] aspect-[1.47] rounded-[100px]"
       />
     </section>
   );
