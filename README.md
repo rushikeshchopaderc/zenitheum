@@ -1,8 +1,12 @@
 # Zenitheum : Web3 and AI services for Enterprises. 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This contains the source code for the Application build in React and Tailwind CSS for my web3 startup. 
 
-Currently, two official plugins are available:
+There are three main folders:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1) SRC: The src folder contains all the code, images and config files. It has 3 subfolders:
+- components: This has all the react and css code for all the pages.
+- images: This folder contains all the images used in the website
+
+2) public: This contains the icon that is visible on vite tab on the browser
+   
