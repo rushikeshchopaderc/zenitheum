@@ -25,7 +25,7 @@ function LifeAtZenitheum() {
           data-layername="weBelieveWorkingCanBeFunWeMakeEffortsToMakeItFunWorkIsWhereYouSpendMostOfYourDayAtAndHenceNeedsToBeEnjoyedAtZenitheumWeCelebrateWorkWeValueBothPersonalAndProfessionalLivesOfOurEmployeesAndFindOurselvesInAnUrgeToCreateAHealthyWorkEnvironmentBeAPartOfOurVisionaryTeam"
           className="mt-12 text-2xl max-md:mt-10 max-md:max-w-full"
         >
-          We believe working can be fun. We make efforts to make it fun. Work is
+          We believe working should be fun. We make efforts to make it fun. Work is
           where you spend most of your day at and hence needs to be enjoyed. At
           Zenitheum, we celebrate work. We value both personal and professional
           lives of our employees and find ourselves in an urge to create a
