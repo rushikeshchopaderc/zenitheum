@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^1.7.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.3.0",
@@ -28,7 +29,7 @@
     "globals": "^15.9.0",
     "postcss": "^8.4.47",
     "react-snap": "^1.23.0",
-    "tailwindcss": "^3.4.14",
+    "tailwindcss": "^3.4.17",
     "vite": "^5.4.8"
   }
 }

@@ -18,6 +18,7 @@ import AIBAJobListingsPage from './components/JobDescription/AIBusinessAnalyst/J
 import Web3BAJobListingsPage from './components/JobDescription/Web3BusinessAnalyst/JobDescriptionPage';
 import SolDevJobListingsPage from './components/JobDescription/SolidityDeveloper/JobDescriptionPage';
 import ResearchPublicationsPage from './components/ResearchPublications/ResearchPublicationsPage';
+import TradingViewWidget from './pages/TradingView';
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/demo" element={<TradingViewWidget />} />
           <Route path="/services" element={<ServicePage />} />
           <Route path="/trainings" element={<CorporateTrainingsPage />} />
           <Route path="/clients" element={<OurClientsPage />} />

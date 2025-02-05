@@ -13,7 +13,9 @@ function ProductSection({
   const containerClasses = `flex gap-10 px-10 py-20 justify-center items-center text-white border-t border-b border-zinc-700 max-md:px-5 max-md:mt-10 ${
     isReversed ? "flex-row-reverse" : ""
   }`;
+  const handleClick=()=>{
 
+  }
   return (
     <section className={containerClasses}>
       <div
@@ -24,6 +26,20 @@ function ProductSection({
           {title}
         </h2>
         <p className="mt-10 text-2xl ">{description}</p>
+        {title==='Algorithmic Trading Bot'? <>
+          <a href="/demo">
+            <button
+                data-layername="button"
+                className="justify-center py-4 pr-8 pl-8 mt-10 text-base uppercase bg-blue-700 rounded-[65px] max-md:px-5 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200"
+                // onClick={handleClick}
+                aria-label="Book a Demo"
+              >
+            
+              Try A Demo
+          
+            </button>
+          </a>
+        </>:<></>}
       </div>
       <img
         loading="lazy"
