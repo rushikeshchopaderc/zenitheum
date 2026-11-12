@@ -23,9 +23,27 @@ describe("Cloudflare worker", () => {
     assert.equal(await seen.text(), "{\"a\":1}");
   });
 
-  it("answers 502 JSON when the API is down and 503 when unconfigured", async () => {
+  it("retries while the API wakes up, replaying the upload body", async () => {
+    const bodies = [];
+    let calls = 0;
+    globalThis.fetch = async (req) => { bodies.push(await req.text()); calls += 1; return calls < 3 ? new Response("<html>Service waking</html>", { status: 503, headers: { "content-type": "text/html" } }) : new Response("{\"ok\":true}", { status: 201, headers: { "content-type": "application/json" } }); };
+    const res = await worker.fetch(new Request("https://site.test/api/applications", { method: "POST", body: "payload" }), env({ RETRY_PAUSE_MS: 1 }));
+    assert.equal(res.status, 201);
+    assert.deepEqual(bodies, ["payload", "payload", "payload"]);
+  });
+
+  it("never passes HTML errors to the app, and passes real JSON errors through", async () => {
+    globalThis.fetch = async () => new Response("<html>bad gateway</html>", { status: 502, headers: { "content-type": "text/html" } });
+    const res = await worker.fetch(new Request("https://site.test/api/contact", { method: "POST", body: "x" }), env({ RETRIES: 2, RETRY_PAUSE_MS: 1 }));
+    assert.equal(res.status, 503);
+    assert.equal((await res.json()).error, "api_unreachable");
+    globalThis.fetch = async () => Response.json({ ok: false, error: "validation_failed" }, { status: 400 });
+    assert.equal((await worker.fetch(new Request("https://site.test/api/contact", { method: "POST", body: "x" }), env())).status, 400);
+  });
+
+  it("answers 503 JSON when the API is down or unconfigured", async () => {
     globalThis.fetch = async () => { throw new Error("down"); };
-    assert.equal((await worker.fetch(new Request("https://site.test/api/health"), env())).status, 502);
+    assert.equal((await worker.fetch(new Request("https://site.test/api/health"), env({ RETRY_PAUSE_MS: 1 }))).status, 503);
     assert.equal((await worker.fetch(new Request("https://site.test/api/health"), env({ API_ORIGIN: "" }))).status, 503);
   });
 });

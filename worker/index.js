@@ -24,10 +24,28 @@ export default {
     headers.set("x-forwarded-proto", "https");
     if (request.headers.get("cf-ipcountry")) headers.set("cf-ipcountry", request.headers.get("cf-ipcountry"));
 
-    try {
-      return await fetch(new Request(target, { method: request.method, headers, body: ["GET", "HEAD"].includes(request.method) ? undefined : request.body, redirect: "manual", duplex: "half" }));
-    } catch {
-      return Response.json({ ok: false, error: "api_unreachable", message: "The server is starting up or unavailable. Please try again in a minute." }, { status: 502 });
+    // Render's free service sleeps when idle and answers with an HTML error page while it wakes (30-60 s).
+    // Buffer the body so the request can be replayed, retry while it wakes, and never hand HTML to the app.
+    const body = ["GET", "HEAD"].includes(request.method) ? undefined : await request.arrayBuffer();
+    const attempts = request.method === "GET" || request.method === "HEAD" ? 2 : Number(env.RETRIES ?? 8);
+    const pause = Number(env.RETRY_PAUSE_MS ?? 8000);
+    for (let i = 1; i <= attempts; i += 1) {
+      try {
+        const upstream = await fetch(new Request(target, { method: request.method, headers, body, redirect: "manual" }));
+        const json = (upstream.headers.get("content-type") || "").includes("json");
+        const waking = [502, 503, 504].includes(upstream.status) || (upstream.status >= 500 && !json) || (upstream.status === 404 && !json);
+        if (!waking || i === attempts) {
+          if (!waking || json) return upstream;
+          break;
+        }
+      } catch {
+        if (i === attempts) break;
+      }
+      await new Promise((resolve) => setTimeout(resolve, pause));
     }
+    return Response.json(
+      { ok: false, error: "api_unreachable", message: "Our server is waking up or unavailable. Please try again in a minute." },
+      { status: 503 }
+    );
   },
 };

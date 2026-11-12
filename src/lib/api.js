@@ -17,7 +17,7 @@ export class ApiError extends Error {
 
 async function request(path, options = {}) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 20000);
+  const timer = setTimeout(() => controller.abort(), 90000); // the free API host can take a minute to wake
 
   let response;
   try {
@@ -59,3 +59,11 @@ export const postForm = (path, formData) => {
   Object.entries(getTrackingIds()).forEach(([key, value]) => formData.set(key, value));
   return request(path, { method: "POST", body: formData });
 };
+
+/** Wake the API (free hosts sleep when idle) while the visitor is still filling in a form. Fire-and-forget. */
+let warmed = false;
+export function warmUp() {
+  if (warmed || typeof fetch === "undefined") return;
+  warmed = true;
+  fetch("/api/health", { cache: "no-store" }).catch(() => {});
+}

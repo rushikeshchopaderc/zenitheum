@@ -1,5 +1,6 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { track } from "../lib/analytics";
+import { warmUp } from "../lib/api";
 
 /**
  * Small form-state helper for the API-backed forms: controlled values, server
@@ -13,6 +14,7 @@ export function useApiForm(initial, { formName } = {}) {
   const [message, setMessage] = useState("");
   const [reference, setReference] = useState("");
   const started = useRef(false);
+  useEffect(() => warmUp(), []);
 
   const markStarted = useCallback(() => {
     if (formName && !started.current) {
