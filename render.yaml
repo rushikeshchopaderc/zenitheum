@@ -1,0 +1,23 @@
+# Render Blueprint: the Node API (tier 2). The database is Neon (tier 3), the website is Cloudflare (tier 1).
+services:
+  - type: web
+    name: zenitheum-api
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci --omit=dev
+    startCommand: node server/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY        # Cloudflare Worker + Render's proxy = two hops
+        value: "2"
+      - key: DATABASE_URL       # paste the Neon connection string (pooled) in the Render dashboard
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD     # 12+ characters; remove after the first start
+        sync: false

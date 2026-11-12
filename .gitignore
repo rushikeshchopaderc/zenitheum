@@ -27,3 +27,4 @@ dist-ssr
 .env
 server/data/
 backups/
+.neon

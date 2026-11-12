@@ -5,10 +5,12 @@ import { SITE } from "../shared/site.js";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 // Load .env from the project root if there is one. Real environment variables win.
-try {
-  process.loadEnvFile?.(path.join(root, ".env"));
-} catch {
-  /* no .env file — that is fine */
+for (const name of [".env", ".env.local"]) {
+  try {
+    process.loadEnvFile?.(path.join(root, name)); // real environment variables always win
+  } catch {
+    /* file not present — that is fine */
+  }
 }
 
 const toInt = (value, fallback) => {

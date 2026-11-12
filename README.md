@@ -96,6 +96,31 @@ neutralised with a leading apostrophe so a hostile "name" typed into a public fo
    arrives as a pre-qualified lead.
 5. SQL is also fine: see `database/README.md` for ready-made queries.
 
+## Deploying for free (Cloudflare + Render + Neon)
+
+```
+ visitors ──▶ Cloudflare Worker (site + /api proxy) ──▶ Render (Node API) ──▶ Neon (PostgreSQL)
+```
+
+| Tier | Service | What you do |
+| --- | --- | --- |
+| Data | **Neon** (free Postgres) | Already created with `neon init` (project `zenitheum`, Singapore). Its connection strings are in your local `.env.local` (never committed). Open the console from `neon.com` → Projects → zenitheum. |
+| API | **Render** (free web service) | Render dashboard → *New* → *Blueprint* → pick this GitHub repo (it reads `render.yaml`). Fill in `DATABASE_URL` (the **pooled** string from `.env.local`), `ADMIN_EMAIL`, `ADMIN_PASSWORD` (12+ characters). Deploy, then copy the service address, e.g. `https://zenitheum-api.onrender.com`. |
+| Site | **Cloudflare** | Put that address in `wrangler.jsonc` → `API_ORIGIN`, commit, push. Cloudflare's build command is `npm run build`, the deploy command `npx wrangler deploy`. Remove ADMIN_PASSWORD from Render afterwards. |
+
+Good to know: Render's free service sleeps after ~15 minutes without traffic, so the first request afterwards takes up to a minute (the forms
+show a friendly message meanwhile). The database tables are created automatically on the API's first start. Check the free-tier limits on each
+provider's pricing page: they change.
+
+**R2 is not a database.** Cloudflare R2 stores files only. It could later hold resumes if the database fills up; today they live in Postgres.
+
+### Looking at your data (no coding needed)
+
+- **Admin console:** `https://your-site/admin`, sign in. Leads, applications, visits, campaigns, CSV downloads.
+- **Raw tables:** Neon console → your project → *Tables* (spreadsheet-like) or *SQL Editor* (type `select * from contacts;`).
+- **Is the API alive?** open `https://your-site/api/health` in a browser: you should see `"status":"ok"`.
+- **Logs and errors:** Render dashboard → your service → *Logs*. Cloudflare dashboard → Workers → zenitheum → *Logs*.
+
 ## Privacy by design
 
 - Analytics are **first-party** (our server only) and **opt-in**: nothing is stored or sent until the visitor accepts the banner; Do Not Track
