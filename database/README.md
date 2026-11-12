@@ -12,18 +12,18 @@ same without starting the server.
 
 ## Tables
 
-| Table | Holds | Notes |
-| --- | --- | --- |
-| `contacts` | Enquiries from prospective customers | `topic`, `segment`, `chip`, `volume`, pipeline `status`, `notes`; marketing attribution copied from the visit (`channel`, `utm_*`, `referrer_host`, `landing_path`) |
-| `applications` | Job applications | `job_slug`, `track`, pipeline `status`, `notes`, same attribution columns |
-| `application_files` | The uploaded resume (`bytea`) | One per application; deleted with it; SHA-256 stored |
-| `subscribers` | The early-access list | e-mail unique and lower-case; `active` / `unsubscribed` |
-| `visitors` | One row per browser that accepted analytics | random id, first-touch channel / campaign |
-| `sessions` | One row per visit (30 minutes of inactivity ends one) | channel, UTM, device, browser, OS, screen, language, time zone |
-| `page_views` | Pages viewed in a session | path, title, time on page, deepest scroll |
-| `events` | Named actions | `cta_click`, `form_start`, `form_submit`, `form_error` … with small JSON `props` |
-| `milestones` | The public milestone chart | status and dates edited in the console; `edited` stops re-seeding from overwriting them |
-| `admin_users`, `admin_sessions`, `audit_log` | Console access | password hash (scrypt), only the SHA-256 of each session token, every sensitive action |
+| Table                                              | Holds                                                 | Notes                                                                                                                                                                                   |
+| -------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `contacts`                                       | Enquiries from prospective customers                  | `topic`, `segment`, `chip`, `volume`, pipeline `status`, `notes`; marketing attribution copied from the visit (`channel`, `utm_*`, `referrer_host`, `landing_path`) |
+| `applications`                                   | Job applications                                      | `job_slug`, `track`, pipeline `status`, `notes`, same attribution columns                                                                                                       |
+| `application_files`                              | The uploaded resume (`bytea`)                       | One per application; deleted with it; SHA-256 stored                                                                                                                                    |
+| `subscribers`                                    | The early-access list                                 | e-mail unique and lower-case; `active` / `unsubscribed`                                                                                                                             |
+| `visitors`                                       | One row per browser that accepted analytics           | random id, first-touch channel / campaign                                                                                                                                               |
+| `sessions`                                       | One row per visit (30 minutes of inactivity ends one) | channel, UTM, device, browser, OS, screen, language, time zone                                                                                                                          |
+| `page_views`                                     | Pages viewed in a session                             | path, title, time on page, deepest scroll                                                                                                                                               |
+| `events`                                         | Named actions                                         | `cta_click`, `form_start`, `form_submit`, `form_error` … with small JSON `props`                                                                                             |
+| `milestones`                                     | The public milestone chart                            | status and dates edited in the console; `edited` stops re-seeding from overwriting them                                                                                               |
+| `admin_users`, `admin_sessions`, `audit_log` | Console access                                        | password hash (scrypt), only the SHA-256 of each session token, every sensitive action                                                                                                  |
 
 Conventions: ids that leave the system are UUIDs; every timestamp is `timestamptz` (UTC); no raw IP address is stored anywhere; a lead
 copies its attribution at insert time so reports survive the analytics retention window; status vocabularies are enforced by `CHECK`
@@ -75,3 +75,6 @@ WHERE c.ref = 'ZT-1A2B3C4D' ORDER BY pv.occurred_at;
   The enquiry itself stays, minus the link to the visit.
 - **Delete a lead or application entirely:** the delete buttons in the console; the resume goes with its application.
 - **Retention:** the API deletes sessions (and their page views and events) older than `ANALYTICS_RETENTION_DAYS` every six hours.
+
+
+For Neon, use the password as Rcrush@zenitheum1
