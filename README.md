@@ -1,17 +1,5 @@
 # Zenitheum — fabless semiconductor company
 
-<<<<<<< HEAD
-This contains the source code for the Application build in React and Tailwind CSS for my web3 startup. 
-
-There are three main folders:
-
-1) SRC: The src folder contains all the code, images and config files. It has 3 subfolders:
-- components: This has all the react and css code for all the pages.
-- images: This folder contains all the images used in the website
-
-2) public: This contains the icon that is visible on vite tab on the browser
-   
-=======
 Website, API and database for Zenitheum, a fabless semiconductor startup based at Dipali Nagar, Khamgaon, Maharashtra.
 It designs two chips with the customers who will use them — **ZT-AFE1**, a 24-bit analog sensor front-end, and
 **ZT-SEC1**, a digital secure-authentication chip — on a 13-month roadmap, December 2026 → December 2027.
@@ -237,4 +225,3 @@ with fallbacks where newer features are used (`overflow: clip`, container-query 
 - Sections use `overflow-clip`, not `overflow-hidden`, so `position: sticky` (the milestone and roadmap rulers) keeps working inside them.
 - The embedded dev database (PGlite) can be open in only one process; a lock file prevents a second one (for example `npm run inbox` while
   `npm run dev` runs) from damaging it. Set `DATABASE_URL` to a PostgreSQL server to avoid the restriction.
->>>>>>> 6d0f021 (Semiconductor V1)
