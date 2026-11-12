@@ -4,32 +4,71 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -k -n web,api -c blue,cyan \"vite\" \"node --watch server/index.js\"",
+    "dev:web": "vite",
+    "dev:api": "node --watch server/index.js",
     "build": "vite build",
+    "start": "node server/index.js",
+    "preview": "vite preview",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "test": "node --test server/test/*.test.js",
+    "db:migrate": "node server/scripts/migrate.js",
+    "db:import-legacy": "node server/scripts/import-legacy.js",
+    "admin:create": "node server/scripts/admin-create.js",
+    "inbox": "node server/scripts/inbox.js"
   },
   "dependencies": {
+<<<<<<< HEAD
     "axios": "^1.7.9",
+=======
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/sora": "^5.3.0",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.4",
+    "helmet": "^8.3.0",
+    "multer": "^2.5.0",
+    "nodemailer": "^10.5.0",
+    "pg": "^8.23.1",
+>>>>>>> 6d0f021 (Semiconductor V1)
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.3.0",
     "react-router-dom": "^6.27.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.16",
     "@eslint/js": "^9.11.1",
     "@types/react": "^18.3.10",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^9.2.5",
     "eslint": "^9.11.1",
     "eslint-plugin-react": "^7.37.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.12",
     "globals": "^15.9.0",
     "postcss": "^8.4.47",
+<<<<<<< HEAD
     "react-snap": "^1.23.0",
     "tailwindcss": "^3.4.17",
+=======
+    "tailwindcss": "^3.4.14",
+>>>>>>> 6d0f021 (Semiconductor V1)
     "vite": "^5.4.8"
-  }
+  },
+  "description": "Zenitheum — fabless semiconductor company. React front end, Node/Express API, PostgreSQL.",
+  "engines": {
+    "node": ">=20.12"
+  },
+  "browserslist": [
+    "Chrome >= 90",
+    "Edge >= 90",
+    "Firefox >= 90",
+    "Safari >= 14.1",
+    "iOS >= 14.5",
+    "not dead",
+    "not op_mini all"
+  ]
 }

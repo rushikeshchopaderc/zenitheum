@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Zenitheum API (secrets, the embedded dev database, legacy flat files)
+.env
+server/data/
+backups/
