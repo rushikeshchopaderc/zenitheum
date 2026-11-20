@@ -11,7 +11,7 @@ import OrderForm from "../forms/OrderForm";
 import QuestionForm from "../forms/QuestionForm";
 
 const TABS = [
-  { id: "demo", label: "Book a demo", blurb: "A 30-minute Google Meet call: see how the chip connects to your device and what we can tailor." },
+  { id: "demo", label: "Book a demo", blurb: "A short call: see how the chip connects to your device and what we can tailor. Tell us a day that suits you and we will confirm by email." },
   { id: "order", label: "Place an order", blurb: "Tell us the chip, quantity, delivery date and place. We confirm price and delivery by email." },
   { id: "ask", label: "Ask a question", blurb: "Not ready for a call? Send us a question and we will reply." },
 ];

@@ -49,97 +49,74 @@ describe("read-only content", () => {
 });
 
 describe("book a demo", () => {
-  it("offers weekday slots in India time, after the notice period, and marks taken ones", async () => {
-    const { data } = await t.call("GET", "/api/demos/slots");
-    assert.equal(data.timezone, "Asia/Kolkata");
-    assert.ok(data.slots.length > 100);
-    const first = new Date(data.slots[0].start);
-    assert.ok(first.getTime() > Date.now() + 11 * 3600_000, "12 hours' notice");
-    for (const { start } of data.slots) {
-      const ist = new Date(new Date(start).getTime() + 330 * 60_000);
-      assert.ok(ist.getUTCDay() >= 1 && ist.getUTCDay() <= 5, "weekdays only");
-      const minutes = ist.getUTCHours() * 60 + ist.getUTCMinutes();
-      assert.ok(minutes >= 600 && minutes <= 17 * 60 + 30 && minutes % 30 === 0, "10:00–18:00 on the half hour");
-    }
-    const slot = data.slots[0].start;
-    await t.call("POST", "/api/demos", { body: demoBody(slot) });
-    const again = (await t.call("GET", "/api/demos/slots")).data.slots.find((s) => s.start === slot);
-    assert.equal(again.available, false);
-    assert.equal(JSON.stringify(again).includes("Asha"), false, "nothing about the booking leaks");
-  });
-
-  it("books a slot: stores the demo, creates the Meet event for the customer and the team, and notifies the team", async () => {
-    const slot = await t.freeSlot();
-    const r = await t.call("POST", "/api/demos", { body: demoBody(slot) });
+  it("stores the request, asks for nothing about a calendar, and e-mails the team and the customer", async () => {
+    const r = await t.call("POST", "/api/demos", { body: demoBody() });
     assert.equal(r.status, 201);
-    assert.equal(r.data.scheduled, true);
-    assert.equal(r.data.meetLink, "https://meet.google.com/abc-defg-hij");
-    const row = (await t.db.query("SELECT * FROM demos")).rows[0];
-    assert.equal(row.status, "scheduled");
+    assert.match(r.data.id, /^ZT-[0-9A-F]{8}$/);
+    assert.deepEqual(Object.keys(r.data).sort(), ["id", "ok"], "no slot, no meeting link");
+    const row = (await t.db.query("SELECT *, preferred_date::text AS preferred_date FROM demos")).rows[0];
+    assert.equal(row.status, "requested");
     assert.equal(row.email, "asha@example.com");
     assert.equal(row.chip, "both");
     assert.equal(row.analog_format, "hard");
-    assert.equal(row.meet_link, "https://meet.google.com/abc-defg-hij");
-    assert.equal(new Date(row.slot_end) - new Date(row.slot_start), 30 * 60_000);
-    const meeting = t.google.calls.meetings[0];
-    assert.deepEqual(meeting.attendees.sort(), ["asha@example.com", "zenitheumsolutions@gmail.com"]);
-    assert.equal(meeting.startIso, new Date(slot).toISOString());
-    assert.match(meeting.description, /ZT-AFE1 delivery: Hard IP/);
-    assert.match(meeting.description, /ZT-SEC1: soft IP licence/);
-    assert.equal(t.mails.length, 1);
-    assert.match(t.mails[0].text, /meet\.google\.com/);
+    assert.equal(row.preferred_date, demoBody().preferredDate);
+    assert.equal(row.preferred_time, "afternoon");
+    assert.equal(t.mails.length, 2);
     assert.equal(t.mails[0].to, "zenitheumsolutions@gmail.com");
+    assert.match(t.mails[0].text, /ZT-AFE1 delivery: Hard IP/);
+    assert.match(t.mails[0].text, /ZT-SEC1: soft IP licence/);
+    assert.match(t.mails[0].text, /Afternoon/);
+    assert.equal(t.mails[1].to, "asha@example.com");
+    assert.match(t.mails[1].subject, /^We received your demo request ZT-/);
   });
 
-  it("never lets two customers book the same slot", async () => {
-    const slot = await t.freeSlot();
-    const results = await Promise.all([t.call("POST", "/api/demos", { body: demoBody(slot, { email: "a@example.com" }) }), t.call("POST", "/api/demos", { body: demoBody(slot, { email: "b@example.com" }) })]);
-    assert.deepEqual(results.map((r) => r.status).sort(), [201, 409]);
-    assert.equal(results.find((r) => r.status === 409).data.error, "slot_taken");
-    assert.equal(await count("demos"), 1);
+  it("has no booking calendar any more", async () => {
+    assert.equal((await t.call("GET", "/api/demos/slots")).status, 404);
+    const cols = (await t.db.query("SELECT column_name FROM information_schema.columns WHERE table_name = 'demos'")).rows.map((c) => c.column_name);
+    for (const gone of ["slot_start", "slot_end", "meet_link", "calendar_event_id", "visitor_timezone"]) assert.ok(!cols.includes(gone), gone);
   });
 
-  it("requires a real slot, and a delivery format only when ZT-AFE1 is involved (ZT-SEC1 is soft IP only)", async () => {
-    const slot = await t.freeSlot();
-    const bad = await t.call("POST", "/api/demos", { body: demoBody("2020-01-01T10:00:00Z", { analogFormat: "" }) });
+  it("lets two customers ask for the same day: it is only a preference", async () => {
+    const results = await Promise.all([t.call("POST", "/api/demos", { body: demoBody({ email: "a@example.com" }) }), t.call("POST", "/api/demos", { body: demoBody({ email: "b@example.com" }) })]);
+    assert.deepEqual(results.map((r) => r.status), [201, 201]);
+    assert.equal(await count("demos"), 2);
+  });
+
+  it("makes the preferred day and time optional, but checks them when given", async () => {
+    assert.equal((await t.call("POST", "/api/demos", { body: demoBody({ preferredDate: "", preferredTime: "" }) })).status, 201);
+    const row = (await t.db.query("SELECT preferred_date, preferred_time FROM demos")).rows[0];
+    assert.deepEqual(row, { preferred_date: null, preferred_time: null });
+    const past = await t.call("POST", "/api/demos", { body: demoBody({ preferredDate: "2020-01-01" }) });
+    assert.ok(past.data.errors.preferredDate, "a day in the past is refused");
+    assert.ok((await t.call("POST", "/api/demos", { body: demoBody({ preferredDate: "2027-02-30" }) })).data.errors.preferredDate, "a date that does not exist");
+    assert.ok((await t.call("POST", "/api/demos", { body: demoBody({ preferredTime: "midnight" }) })).data.errors.preferredTime);
+  });
+
+  it("requires a delivery format only when ZT-AFE1 is involved (ZT-SEC1 is soft IP only)", async () => {
+    const bad = await t.call("POST", "/api/demos", { body: demoBody({ analogFormat: "" }) });
     assert.equal(bad.status, 400);
-    assert.ok(bad.data.errors.slot && bad.data.errors.analogFormat);
-    const offGrid = await t.call("POST", "/api/demos", { body: demoBody(new Date(new Date(slot).getTime() + 7 * 60_000).toISOString()) });
-    assert.ok(offGrid.data.errors.slot, "a time between slots is refused");
-    const digital = await t.call("POST", "/api/demos", { body: demoBody(slot, { chip: "digital", analogFormat: "hard" }) });
+    assert.ok(bad.data.errors.analogFormat);
+    const digital = await t.call("POST", "/api/demos", { body: demoBody({ chip: "digital", analogFormat: "hard" }) });
     assert.equal(digital.status, 201);
     assert.equal((await t.db.query("SELECT analog_format FROM demos")).rows[0].analog_format, null, "digital is soft IP only: no format is stored");
   });
 
   it("requires the details a sales call needs", async () => {
-    const r = await t.call("POST", "/api/demos", { body: { slot: await t.freeSlot(), chip: "analog", analogFormat: "soft" } });
+    const r = await t.call("POST", "/api/demos", { body: { chip: "analog", analogFormat: "soft" } });
     assert.deepEqual(Object.keys(r.data.errors).sort(), ["consent", "email", "name", "organisation", "phone"]);
   });
 
-  it("keeps the booking when Google fails, and says it still needs confirming", async () => {
-    const broken = await startServer({ db: t.db, google: fakeGoogle({ failMeeting: true }) });
-    try {
-      const r = await broken.call("POST", "/api/demos", { body: demoBody(await broken.freeSlot()) });
-      assert.equal(r.status, 201);
-      assert.equal(r.data.scheduled, false);
-      assert.equal((await t.db.query("SELECT status FROM demos")).rows[0].status, "requested");
-      assert.match(broken.mails[0].text, /NOT CREATED/);
-    } finally {
-      await broken.close();
-    }
-  });
-
-  it("works without Google configured (the team confirms by hand)", async () => {
+  it("works whether or not Google is connected", async () => {
     const plain = await startServer({ db: t.db, google: fakeGoogle({ enabled: false }) });
     try {
-      assert.equal((await plain.call("POST", "/api/demos", { body: demoBody(await plain.freeSlot()) })).data.scheduled, false);
+      assert.equal((await plain.call("POST", "/api/demos", { body: demoBody() })).status, 201);
     } finally {
       await plain.close();
     }
   });
 
   it("drops honeypot submissions", async () => {
-    const r = await t.call("POST", "/api/demos", { body: demoBody(await t.freeSlot(), { website: "spam" }) });
+    const r = await t.call("POST", "/api/demos", { body: demoBody({ website: "spam" }) });
     assert.equal(r.status, 201);
     assert.equal(await count("demos"), 0);
   });

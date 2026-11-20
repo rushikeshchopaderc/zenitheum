@@ -15,7 +15,7 @@ describe("data tier", () => {
   it("applies each migration once and is safe to run again", async () => {
     assert.deepEqual(await migrate(db), []);
     const { rows } = await db.query("SELECT version FROM schema_migrations ORDER BY version");
-    assert.deepEqual(rows.map((r) => r.version), ["001_init.sql", "002_simplify.sql", "003_customisation.sql"]);
+    assert.deepEqual(rows.map((r) => r.version), ["001_init.sql", "002_simplify.sql", "003_customisation.sql", "004_demo_requests.sql"]);
   });
 
   it("keeps only the business tables: no visit tracking, no staff accounts, no resumes", async () => {
@@ -25,7 +25,8 @@ describe("data tier", () => {
 
   it("has the columns the forms capture", async () => {
     const cols = async (table) => (await db.query("SELECT column_name FROM information_schema.columns WHERE table_name = $1", [table])).rows.map((r) => r.column_name);
-    for (const c of ["slot_start", "slot_end", "meet_link", "calendar_event_id", "chip", "analog_format", "phone", "organisation", "status"]) assert.ok((await cols("demos")).includes(c), `demos.${c}`);
+    for (const c of ["preferred_date", "preferred_time", "chip", "analog_format", "phone", "organisation", "status"]) assert.ok((await cols("demos")).includes(c), `demos.${c}`);
+    for (const c of ["slot_start", "slot_end", "meet_link", "calendar_event_id", "visitor_timezone"]) assert.ok(!(await cols("demos")).includes(c), `demos.${c} is gone`);
     for (const c of ["quantity", "delivery_date", "delivery_location", "contact_name", "customisation", "analog_format", "chip"]) assert.ok((await cols("orders")).includes(c), `orders.${c}`);
     for (const c of ["resume_name", "resume_url", "resume_file_id"]) assert.ok((await cols("applications")).includes(c), `applications.${c}`);
     for (const c of ["chip", "analog_format", "email"]) assert.ok((await cols("subscribers")).includes(c), `subscribers.${c}`);
@@ -46,16 +47,15 @@ describe("data tier", () => {
     assert.equal(await title("X-02"), "kept", "edited rows are never deleted");
   });
 
-  it("enforces the vocabularies and the one-booking-per-slot rule in the database itself", async () => {
-    const demo = (ref, status, chip = "analog") => db.query(
-      `INSERT INTO demos (ref, name, email, phone, organisation, chip, slot_start, slot_end, status) VALUES ($1, 'n', 'e@x.com', '1234567', 'o', $3, '2027-03-01T10:00:00Z', '2027-03-01T10:30:00Z', $2)`,
-      [ref, status, chip]);
-    await demo("ZT-D1", "scheduled");
-    await assert.rejects(demo("ZT-D2", "requested"), /unique|duplicate/i);
-    await db.query("UPDATE demos SET status = 'cancelled'");
-    await demo("ZT-D3", "scheduled");
+  it("enforces the vocabularies in the database itself", async () => {
+    const demo = (ref, status, chip = "analog", time = null) => db.query(
+      `INSERT INTO demos (ref, name, email, phone, organisation, chip, status, preferred_time) VALUES ($1, 'n', 'e@x.com', '1234567', 'o', $3, $2, $4)`,
+      [ref, status, chip, time]);
+    await demo("ZT-D1", "requested");
+    await demo("ZT-D2", "requested");
     await assert.rejects(demo("ZT-D4", "bogus"), /check/i);
     await assert.rejects(demo("ZT-D5", "requested", "quantum"), /check/i);
+    await assert.rejects(demo("ZT-D6", "requested", "analog", "midnight"), /check/i);
     await assert.rejects(db.query("INSERT INTO orders (ref, contact_name, email, phone, organisation, chip, quantity, delivery_date, delivery_location) VALUES ('ZT-O1','n','e@x.com','1','o','analog',0,'2027-01-01','x')"), /check/i);
     await assert.rejects(db.query("UPDATE milestones SET status = 'done' WHERE id = 'M-01'"), /check/i);
     await db.exec("TRUNCATE demos");

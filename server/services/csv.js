@@ -39,7 +39,8 @@ export const COLUMNS = {
   ],
   demos: [
     { key: "ref", header: "Reference" },
-    { key: "slotStart", header: "Demo time" },
+    { key: "preferredDate", header: "Preferred date" },
+    { key: "preferredTime", header: "Preferred time (IST)" },
     { key: "status", header: "Status" },
     { key: "name", header: "Name" },
     { key: "email", header: "Email" },
@@ -50,10 +51,8 @@ export const COLUMNS = {
     { key: "chip", header: "Chip" },
     { key: "analogFormat", header: "ZT-AFE1 delivery" },
     { key: "message", header: "Message" },
-    { key: "meetLink", header: "Google Meet" },
-    { key: "visitorTimezone", header: "Visitor time zone" },
     { key: "notes", header: "Notes" },
-    { key: "createdAt", header: "Booked on" },
+    { key: "createdAt", header: "Requested on" },
   ],
   orders: [
     { key: "ref", header: "Reference" },

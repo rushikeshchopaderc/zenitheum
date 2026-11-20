@@ -39,10 +39,6 @@ export function whereBuilder() {
       params.push(value);
       clauses.push(sql.replaceAll("?", `$${params.length}`));
     },
-    /** A fixed clause with no value, e.g. addRaw("slot_start >= now()"). */
-    addRaw(sql) {
-      clauses.push(sql);
-    },
     get sql() {
       return clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
     },

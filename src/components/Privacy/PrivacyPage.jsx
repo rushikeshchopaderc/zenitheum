@@ -12,7 +12,7 @@ const sections = [
   {
     title: "What we collect",
     list: [
-      "Book a demo: your name, email, phone, company, role (optional), the chip you are interested in (and, for the analog chip, whether you want soft or hard IP), the time you choose and a note.",
+      "Book a demo: your name, email, phone, company, role (optional), the chip you are interested in (and, for the analog chip, whether you want soft or hard IP), the day and time of day you prefer, and a note.",
       "Book an order: your contact person's name, email, phone, company, the chip, the delivery format, quantity, delivery date and location, any customisation you describe, and a note.",
       "Ask a question or request a customisation: your name, email, phone and role (optional), company, the chip and delivery format you are asking about, and your message.",
       "Chip release news: your email, your name and the chip you want news about (optional), and the delivery format you care about.",
@@ -24,7 +24,7 @@ const sections = [
     title: "Why we use it",
     list: [
       "To reply to your question or customisation request, run the demo you booked and prepare the order you placed.",
-      "To email you the calendar invitation and Google Meet link for your demo, and a confirmation of what you submitted.",
+      "To email you a confirmation of what you submitted, and to arrange the demo call with you.",
       "To send chip release news, if you joined the list. Every message says how to stop.",
       "To assess your application and contact you about the role.",
     ],
@@ -33,7 +33,7 @@ const sections = [
   {
     title: "Who can see it",
     body: [
-      "Our founders and the people who answer enquiries, deliver orders or hire for the role you applied for, through a password-protected staff console. We rely on a small set of providers that process data on our behalf and only for that purpose: Neon (database), Render and Cloudflare (hosting), and Google (the company Calendar and Google Meet for demos, Google Drive for uploaded resumes, and Gmail for notifications).",
+      "Our founders and the people who answer enquiries, deliver orders or hire for the role you applied for, through a password-protected staff console. We rely on a small set of providers that process data on our behalf and only for that purpose: Neon (database), Render and Cloudflare (hosting), and Google (Google Drive for uploaded resumes and Gmail for notifications).",
     ],
   },
   {
@@ -54,7 +54,7 @@ const sections = [
   {
     title: "Cookies and third parties",
     body: [
-      "This site does not set cookies for visitors and does not use advertising or third-party analytics. It serves its own fonts and scripts. Staff signing in to the console receive a sign-in cookie that is used for nothing else. If you book a demo, the Google Meet call is subject to Google's own policies. Links to other sites, such as LinkedIn, lead to services with their own policies.",
+      "This site does not set cookies for visitors and does not use advertising or third-party analytics. It serves its own fonts and scripts. Staff signing in to the console receive a sign-in cookie that is used for nothing else. Links to other sites, such as LinkedIn, lead to services with their own policies.",
     ],
   },
   {

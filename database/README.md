@@ -10,7 +10,7 @@ Six tables hold everything the website collects. There are no login, session, pa
 
 | Table          | Holds                                          | Notes                                                                                                                                                              |
 | -------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `demos`        | Booked product demos                           | customer details, `chip` (`analog`/`digital`/`both`), `analog_format` (`soft`/`hard`/`both`), `slot_start`/`slot_end`, `meet_link`, `calendar_event_id`, `status`, `notes` |
+| `demos`        | Demo requests                                  | customer details, `chip` (`analog`/`digital`/`both`), `analog_format` (`soft`/`hard`/`both`), `preferred_date`, `preferred_time` (`morning`/`afternoon`/`evening`), `status`, `notes` |
 | `orders`       | Chip orders                                    | `contact_name`, `chip`, `analog_format`, `quantity`, `delivery_date`, `delivery_location`, `customisation`, `status`, `internal_notes`                             |
 | `contacts`     | Questions and customisation requests           | name, email, phone, company, message, `topic` (`question`/`customisation`), `chip`, `analog_format`, `status`, `notes`                                              |
 | `applications` | Job applications                               | `job_slug`, `track`, `status`, `notes`; the resume is **not** in the database: `resume_name`, `resume_url` (a Google Drive link) and `resume_file_id` point to it    |
@@ -21,7 +21,6 @@ Rules enforced by the database itself:
 
 - **The delivery rule.** The analog chip (ZT-AFE1) can be delivered as soft IP, hard IP or both; the digital chip (ZT-SEC1) is licensed as soft IP only.
   `analog_format` is therefore filled for analog (and "both") requests and empty for digital ones. An order is for one chip, so `orders.chip` is `analog` or `digital`.
-- **No double booking.** `demos_slot_unique` allows one live (`requested` or `scheduled`) demo per `slot_start`; cancelling a demo frees its slot.
 - Status vocabularies are `CHECK` constraints that mirror `shared/crm.js`. Every timestamp is `timestamptz` (UTC); ids that leave the system are UUIDs
   or short references like `ZT-1A2B3C4D`; no IP address is stored.
 
@@ -32,6 +31,7 @@ Rules enforced by the database itself:
 | `001_init.sql`       | The original schema (contacts, applications, subscribers, milestones, plus analytics and console-login tables that were later removed).       |
 | `002_simplify.sql`   | Drops the analytics, login and resume-storage tables, adds the `demos` and `orders` tables and the chip/format columns. It refuses to drop `application_files` if it still holds resumes. |
 | `003_customisation.sql` | Adds `contacts.topic` and `contacts.analog_format` for customisation requests. |
+| `004_demo_requests.sql` | A demo is a request, not a calendar booking: adds `demos.preferred_date` / `preferred_time` (a booked slot becomes its India date) and drops the slot, Meet-link, calendar-event and time-zone columns. |
 
 Adding one: create `migrations/004_short_name.sql` (the next number), never edit a migration that has been applied anywhere, keep it
 idempotent where cheap (`CREATE INDEX IF NOT EXISTS …`) and restart the API or run `npm run db:migrate`. `npm test` runs every migration on a fresh database.
@@ -39,16 +39,15 @@ idempotent where cheap (`CREATE INDEX IF NOT EXISTS …`) and restart the API or
 ## Looking at the data
 
 - **Admin console** (`/admin`): demos, orders, questions, applications, subscribers, milestones, with CSV export.
-- **Neon console** → your project → *Tables* (a spreadsheet view) or *SQL Editor* (type `select * from demos order by slot_start desc;`).
+- **Neon console** → your project → *Tables* (a spreadsheet view) or *SQL Editor* (type `select * from demos order by created_at desc;`).
 - **Terminal:** `psql "$DATABASE_URL"`.
 
 ## Handy queries
 
 ```sql
--- Upcoming demos (India time)
-SELECT ref, name, organisation, chip, analog_format,
-       slot_start AT TIME ZONE 'Asia/Kolkata' AS slot_ist, meet_link, status
-FROM demos WHERE slot_start >= now() AND status IN ('requested', 'scheduled') ORDER BY slot_start;
+-- Demo requests waiting for a reply
+SELECT ref, name, organisation, chip, analog_format, preferred_date, preferred_time, created_at
+FROM demos WHERE status = 'requested' ORDER BY created_at;
 
 -- Open orders by delivery date
 SELECT ref, organisation, contact_name, chip, analog_format, quantity, delivery_date, delivery_location, status

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { after, before, beforeEach, describe, it } from "node:test";
 
 import { signSession } from "../services/auth.js";
-import { ADMIN, PDF, applicationForm, demoBody, fakeGoogle, orderBody, startServer } from "./helpers.js";
+import { ADMIN, PDF, applicationForm, demoBody, orderBody, startServer } from "./helpers.js";
 
 let t;
 before(async () => {
@@ -102,54 +102,26 @@ describe("sign-in (one account from the environment, a signed cookie, nothing st
 });
 
 describe("demos", () => {
-  it("lists upcoming demos with the Meet link, filters, updates status and notes", async () => {
+  it("lists demo requests with their preferred day, filters, updates status and notes", async () => {
     const cookie = await t.login();
-    await t.call("POST", "/api/demos", { body: demoBody(await t.freeSlot(0)) });
-    await t.call("POST", "/api/demos", { body: demoBody(await t.freeSlot(0), { email: "b@example.com", organisation: "Beta", chip: "digital" }) });
-    const all = (await get("/demos?upcoming=1", cookie)).data;
+    await t.call("POST", "/api/demos", { body: demoBody() });
+    await t.call("POST", "/api/demos", { body: demoBody({ email: "b@example.com", organisation: "Beta", chip: "digital", preferredDate: "", preferredTime: "" }) });
+    const all = (await get("/demos", cookie)).data;
     assert.equal(all.total, 2);
-    assert.ok(all.rows[0].slotStart < all.rows[1].slotStart, "soonest first");
-    assert.equal(all.rows[0].meetLink, "https://meet.google.com/abc-defg-hij");
+    assert.equal(all.rows[0].organisation, "Beta", "newest first");
+    assert.equal(all.rows[1].preferredDate, demoBody().preferredDate);
+    assert.equal(all.rows[1].preferredTime, "afternoon");
+    assert.equal(all.rows[1].meetLink, undefined, "there is no meeting link");
     assert.equal((await get("/demos?chip=digital", cookie)).data.total, 1);
+    assert.equal((await get("/demos?status=requested", cookie)).data.total, 2);
     assert.equal((await get("/demos?q=beta", cookie)).data.rows[0].organisation, "Beta");
     const id = all.rows[0].id;
-    const done = await send("PATCH", `/demos/${id}`, cookie, { status: "completed", notes: "Went well" });
-    assert.equal(done.data.demo.status, "completed");
+    const done = await send("PATCH", `/demos/${id}`, cookie, { status: "scheduled", notes: "Call on Thursday 11:00, link sent" });
+    assert.equal(done.data.demo.status, "scheduled");
+    assert.equal(done.data.demo.notes, "Call on Thursday 11:00, link sent");
     assert.equal((await send("PATCH", `/demos/${id}`, cookie, { status: "nope" })).status, 400);
-  });
-
-  it("cancelling a booked demo cancels the calendar event and frees the slot", async () => {
-    const cookie = await t.login();
-    const slot = await t.freeSlot();
-    await t.call("POST", "/api/demos", { body: demoBody(slot) });
-    const id = (await get("/demos", cookie)).data.rows[0].id;
-    await send("PATCH", `/demos/${id}`, cookie, { status: "cancelled" });
-    assert.deepEqual(t.google.calls.cancelled, ["evt-1"]);
-    assert.equal((await t.call("GET", "/api/demos/slots")).data.slots.find((s) => s.start === slot).available, true);
-    assert.equal((await t.call("POST", "/api/demos", { body: demoBody(slot, { email: "next@example.com" }) })).status, 201);
-  });
-
-  it("creates the Meet link afterwards when the automatic step failed", async () => {
-    const flaky = fakeGoogle({ failMeeting: true });
-    const s = await startServer({ db: t.db, google: flaky });
-    try {
-      const cookie = await s.login();
-      await s.call("POST", "/api/demos", { body: demoBody(await s.freeSlot()) });
-      const id = (await s.call("GET", "/api/admin/demos", { cookie })).data.rows[0].id;
-      assert.equal((await s.call("POST", `/api/admin/demos/${id}/meeting`, { cookie, admin: true })).status, 502);
-    } finally {
-      await s.close();
-    }
-    const ok = await startServer({ db: t.db });
-    try {
-      const cookie = await ok.login();
-      const id = (await ok.call("GET", "/api/admin/demos", { cookie })).data.rows[0].id;
-      const r = await ok.call("POST", `/api/admin/demos/${id}/meeting`, { cookie, admin: true });
-      assert.equal(r.data.demo.status, "scheduled");
-      assert.match(r.data.demo.meetLink, /meet\.google\.com/);
-    } finally {
-      await ok.close();
-    }
+    assert.equal((await t.call("POST", `/api/admin/demos/${id}/meeting`, { cookie, admin: true })).status, 404, "no meeting endpoint");
+    assert.equal((await send("DELETE", `/demos/${id}`, cookie)).status, 200);
   });
 });
 
@@ -219,16 +191,16 @@ describe("orders, questions, applications and subscribers", () => {
 
   it("summarises everything for the home screen", async () => {
     const cookie = await t.login();
-    await t.call("POST", "/api/demos", { body: demoBody(await t.freeSlot()) });
+    await t.call("POST", "/api/demos", { body: demoBody() });
     await t.call("POST", "/api/orders", { body: orderBody() });
     await t.call("POST", "/api/contact", { body: question() });
     await t.call("POST", "/api/subscribe", { body: { email: "s@example.com" } });
     const o = (await get("/overview", cookie)).data;
-    assert.equal(o.counts.demos.scheduled, 1);
+    assert.equal(o.counts.demos.requested, 1);
     assert.equal(o.counts.orders.new, 1);
     assert.equal(o.counts.contacts.new, 1);
     assert.equal(o.counts.subscribers.active, 1);
-    assert.equal(o.upcomingDemos.length, 1);
+    assert.equal(o.newDemos.length, 1);
     assert.equal(o.newOrders.length, 1);
   });
 });
@@ -251,7 +223,7 @@ describe("milestones", () => {
 describe("CSV export", () => {
   it("exports every business table with a BOM, readable headers and neutralised spreadsheet formulas", async () => {
     const cookie = await t.login();
-    await t.call("POST", "/api/demos", { body: demoBody(await t.freeSlot()) });
+    await t.call("POST", "/api/demos", { body: demoBody() });
     await t.call("POST", "/api/orders", { body: orderBody({ organisation: "=HYPERLINK(\"http://evil.example\",\"x\")" }) });
     await t.call("POST", "/api/contact", { body: question() });
     await t.call("POST", "/api/applications", { form: applicationForm() });
@@ -265,7 +237,7 @@ describe("CSV export", () => {
     const orders = (await get("/export/orders", cookie)).raw.toString("utf8");
     assert.match(orders, /Delivery location/);
     assert.ok(orders.includes("\"'=HYPERLINK("), "a leading = is defused");
-    assert.match((await get("/export/demos", cookie)).raw.toString("utf8"), /meet\.google\.com/);
+    assert.match((await get("/export/demos", cookie)).raw.toString("utf8"), /Preferred date/);
     assert.equal((await get("/export/admin_users", cookie)).status, 404);
   });
 });

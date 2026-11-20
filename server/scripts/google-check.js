@@ -1,9 +1,8 @@
 /**
- * Checks the Google connection without changing anything: can the stored token reach the calendar, the Drive folder and Gmail?
+ * Checks the Google connection without changing anything: can the stored token reach the Drive folder and Gmail?
  *
  *   npm run google:check                  read-only checks
  *   npm run google:check -- --email       also send a test e-mail to TEAM_EMAIL
- *   npm run google:check -- --meet        also create a test event with a Meet link for TEAM_EMAIL, then delete it
  *
  * Reads GOOGLE_* from .env / .env.local (or the environment).
  */
@@ -25,7 +24,6 @@ const line = (label, ok, text) => {
 };
 
 const result = await google.check();
-line("Calendar", result.calendar.ok, result.calendar.detail ?? result.calendar.error);
 line("Drive", result.drive.ok, result.drive.detail ?? result.drive.error);
 line("Gmail", result.gmail.ok, result.gmail.detail ?? result.gmail.error);
 
@@ -35,23 +33,6 @@ if (flag("email")) {
     line("Test mail", true, `sent to ${config.google.teamEmail}`);
   } catch (error) {
     line("Test mail", false, error.message);
-  }
-}
-
-if (flag("meet")) {
-  try {
-    const start = new Date(Date.now() + 24 * 3600_000);
-    const meeting = await google.createMeeting({
-      title: "Zenitheum website: Meet link test (safe to ignore)",
-      description: "Created by npm run google:check and deleted straight away.",
-      startIso: start.toISOString(),
-      endIso: new Date(start.getTime() + 30 * 60_000).toISOString(),
-      attendees: [config.google.teamEmail],
-    });
-    line("Meet link", Boolean(meeting.meetLink), meeting.meetLink ?? "the event was created but Google returned no Meet link");
-    await google.cancelMeeting(meeting.eventId);
-  } catch (error) {
-    line("Meet link", false, error.message);
   }
 }
 

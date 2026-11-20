@@ -4,38 +4,14 @@ import { describe, it } from "node:test";
 import { loadConfig } from "../config.js";
 import { checkCredentials, createThrottle, signSession, verifySession } from "../services/auth.js";
 import { createGoogle, googleScopes } from "../services/google.js";
-import { listSlots, matchSlot, todayIn } from "../services/slots.js";
+import { todayInIndia } from "../lib/dates.js";
 
 const cfg = (extra = {}) => loadConfig({ NODE_ENV: "test" }, { admin: { email: "a@example.com", password: "a long enough password", ...extra.admin }, google: { clientId: "id", clientSecret: "secret", refreshToken: "refresh", ...extra.google } });
 
-describe("demo slots", () => {
-  const { demo } = cfg();
-  // Thursday 2026-11-19 09:00 IST
-  const now = new Date("2026-11-19T03:30:00Z");
-
-  it("are weekday half-hours between 10:00 and 18:00 IST, at least 12 hours ahead, for 21 days", () => {
-    const slots = listSlots(demo, now);
-    assert.ok(slots[0] > new Date(now.getTime() + 12 * 3600_000 - 1));
-    // now = Thu 09:00 IST; +12 h = Thu 21:00 IST (after hours), so the first slot is Fri 10:00 IST = 04:30 UTC
-    assert.equal(slots[0].toISOString(), "2026-11-20T04:30:00.000Z");
-  });
-
-  it("skip weekends, and the last slot of a day starts at 17:30", () => {
-    const slots = listSlots(demo, now);
-    const ist = slots.map((s) => new Date(s.getTime() + 330 * 60_000));
-    assert.ok(ist.every((d) => d.getUTCDay() >= 1 && d.getUTCDay() <= 5));
-    assert.ok(ist.some((d) => d.getUTCHours() === 17 && d.getUTCMinutes() === 30));
-    assert.ok(!ist.some((d) => d.getUTCHours() >= 18 || d.getUTCHours() < 10));
-    assert.ok(slots.at(-1) < new Date(now.getTime() + 22 * 86_400_000));
-  });
-
-  it("match only exact slots", () => {
-    const first = listSlots(demo, now)[0];
-    assert.equal(matchSlot(demo, first.toISOString(), now).end - matchSlot(demo, first.toISOString(), now).start, 30 * 60_000);
-    assert.equal(matchSlot(demo, new Date(first.getTime() + 60_000).toISOString(), now), null);
-    assert.equal(matchSlot(demo, "garbage", now), null);
-    assert.equal(matchSlot(demo, undefined, now), null);
-    assert.equal(todayIn(demo, new Date("2026-11-19T20:00:00Z")), "2026-11-20", "India is already on the next day");
+describe("dates", () => {
+  it("knows today's date in India, which is already tomorrow late in the UTC evening", () => {
+    assert.equal(todayInIndia(new Date("2026-11-19T10:00:00Z")), "2026-11-19");
+    assert.equal(todayInIndia(new Date("2026-11-19T20:00:00Z")), "2026-11-20");
   });
 });
 
@@ -91,30 +67,6 @@ describe("Google client", () => {
     assert.equal(createGoogle(cfg()).enabled, true);
   });
 
-  it("creates a Meet event, invites everyone and sets reminders", async () => {
-    const { doFetch, seen } = scripted([token, ["/calendar/v3/calendars/primary/events", { method: "POST", body: { id: "evt1", hangoutLink: "https://meet.google.com/aaa-bbbb-ccc", htmlLink: "h" } }]]);
-    const g = createGoogle(cfg(), { fetch: doFetch });
-    const r = await g.createMeeting({ title: "Demo", description: "d", startIso: "2026-12-01T04:30:00.000Z", endIso: "2026-12-01T05:00:00.000Z", attendees: ["c@x.com", "zenitheumsolutions@gmail.com"] });
-    assert.equal(r.meetLink, "https://meet.google.com/aaa-bbbb-ccc");
-    const call = seen.find((s) => s.url.includes("/events"));
-    assert.match(call.url, /conferenceDataVersion=1/);
-    assert.match(call.url, /sendUpdates=all/);
-    assert.equal(call.init.headers.Authorization, "Bearer AT");
-    const body = JSON.parse(call.init.body);
-    assert.deepEqual(body.attendees, [{ email: "c@x.com" }, { email: "zenitheumsolutions@gmail.com" }]);
-    assert.equal(body.conferenceData.createRequest.conferenceSolutionKey.type, "hangoutsMeet");
-    assert.ok(body.reminders.overrides.some((o) => o.method === "email"), "an e-mail reminder goes out before the call");
-    assert.equal(seen.filter((s) => s.url.includes("oauth2")).length, 1);
-  });
-
-  it("reads the event back when the Meet link is created asynchronously", async () => {
-    let reads = 0;
-    const { doFetch } = scripted([token, ["/events/evt2", { method: "GET", body: () => (reads += 1, { id: "evt2", hangoutLink: "https://meet.google.com/late" }) }], ["/events", { method: "POST", body: { id: "evt2" } }]]);
-    const r = await createGoogle(cfg(), { fetch: doFetch }).createMeeting({ title: "t", description: "d", startIso: "a", endIso: "b", attendees: ["x@y.z"] });
-    assert.equal(r.meetLink, "https://meet.google.com/late");
-    assert.equal(reads, 1);
-  });
-
   it("stores a resume in a Drive folder it creates once", async () => {
     const { doFetch, seen } = scripted([
       token,
@@ -140,19 +92,19 @@ describe("Google client", () => {
     assert.equal(seen.filter((s) => s.url.startsWith("https://www.googleapis.com/drive/v3/files")).length, 0, "no folder is searched for or created");
     assert.ok(seen.find((s) => s.url.includes("/upload/")).init.body.toString().includes('"parents":["folderABC"]'));
     assert.ok(googleScopes({ driveFolderId: "x" }).includes("https://www.googleapis.com/auth/drive"));
+    assert.ok(!googleScopes({ driveFolderId: "x" }).some((scope) => /calendar/.test(scope)), "no calendar permission is requested");
     assert.ok(googleScopes({}).includes("https://www.googleapis.com/auth/drive.file"));
     assert.ok(!googleScopes({}).includes("https://www.googleapis.com/auth/drive"));
   });
 
-  it("checks calendar, Drive folder and Gmail separately", async () => {
+  it("checks the Drive folder and Gmail separately", async () => {
     const { doFetch } = scripted([
       token,
-      ["/calendar/v3/calendars/primary", { body: { summary: "Company", timeZone: "Asia/Kolkata" } }],
       ["/drive/v3/files/folderABC", { body: { name: "Resumes", mimeType: "application/vnd.google-apps.folder", capabilities: { canAddChildren: true }, owners: [{ emailAddress: "team@example.com" }] } }],
       ["/gmail/v1/users/me/profile", { status: 403, body: { error: { message: "Gmail API has not been used in project" } } }],
     ]);
     const r = await createGoogle(cfg({ google: { driveFolderId: "folderABC" } }), { fetch: doFetch }).check();
-    assert.deepEqual(r.calendar, { ok: true, detail: "Company (Asia/Kolkata)" });
+    assert.equal(r.calendar, undefined, "there is no calendar any more");
     assert.match(r.drive.detail, /folder "Resumes", owned by team@example\.com/);
     assert.equal(r.gmail.ok, false);
     assert.match(r.gmail.error, /Gmail API has not been used/);
@@ -169,8 +121,8 @@ describe("Google client", () => {
 
   it("explains a refused sign-in and surfaces API errors", async () => {
     const bad = scripted([["oauth2.googleapis.com/token", { status: 400, body: { error: "invalid_grant", error_description: "Token has been expired or revoked." } }]]);
-    await assert.rejects(createGoogle(cfg(), { fetch: bad.doFetch }).createMeeting({ title: "t", description: "d", startIso: "a", endIso: "b", attendees: [] }), /invalid_grant/);
-    const denied = scripted([token, ["/events", { status: 403, body: { error: { message: "Calendar API has not been used in project" } } }]]);
-    await assert.rejects(createGoogle(cfg(), { fetch: denied.doFetch }).createMeeting({ title: "t", description: "d", startIso: "a", endIso: "b", attendees: [] }), /Calendar API has not been used/);
+    await assert.rejects(createGoogle(cfg(), { fetch: bad.doFetch }).sendMail({ to: "a@b.c", subject: "s", text: "t" }), /invalid_grant/);
+    const denied = scripted([token, ["/gmail/v1/users/me/messages/send", { status: 403, body: { error: { message: "Gmail API has not been used in project" } } }]]);
+    await assert.rejects(createGoogle(cfg(), { fetch: denied.doFetch }).sendMail({ to: "a@b.c", subject: "s", text: "t" }), /Gmail API has not been used/);
   });
 });

@@ -3,12 +3,10 @@ import crypto from "node:crypto";
 import MailComposer from "nodemailer/lib/mail-composer/index.js";
 
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
-const CALENDAR = "https://www.googleapis.com/calendar/v3";
 const DRIVE = "https://www.googleapis.com/drive/v3";
 const DRIVE_UPLOAD = "https://www.googleapis.com/upload/drive/v3";
 const GMAIL = "https://gmail.googleapis.com/gmail/v1";
 
-const SCOPE_CALENDAR = "https://www.googleapis.com/auth/calendar.events";
 const SCOPE_GMAIL = "https://www.googleapis.com/auth/gmail.send";
 const SCOPE_DRIVE_FILE = "https://www.googleapis.com/auth/drive.file";
 const SCOPE_DRIVE_FULL = "https://www.googleapis.com/auth/drive";
@@ -18,11 +16,10 @@ const SCOPE_DRIVE_FULL = "https://www.googleapis.com/auth/drive";
  * full Drive access: the narrow drive.file scope only sees files this app created itself, so such a folder would be "not found".
  * Without a folder id the app creates its own folder and the narrow scope is enough.
  */
-export const googleScopes = ({ driveFolderId } = {}) => [SCOPE_CALENDAR, SCOPE_GMAIL, driveFolderId ? SCOPE_DRIVE_FULL : SCOPE_DRIVE_FILE];
+export const googleScopes = ({ driveFolderId } = {}) => [SCOPE_GMAIL, driveFolderId ? SCOPE_DRIVE_FULL : SCOPE_DRIVE_FILE];
 
 /**
- * One OAuth refresh token (for the company Google account) powers three things, all over HTTPS:
- *   - createMeeting: a Calendar event with a Google Meet link, invitations e-mailed to everyone,
+ * One OAuth refresh token (for the company Google account) powers two things, all over HTTPS:
  *   - uploadResume:  a file in a Drive folder (a given folder id, or a folder the app creates itself),
  *   - sendMail:      e-mail through the Gmail API (free hosts such as Render block SMTP ports).
  * Nothing here is used unless GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET / GOOGLE_REFRESH_TOKEN are set.
@@ -61,32 +58,6 @@ export function createGoogle(config, { fetch: doFetch = globalThis.fetch, log = 
   return {
     enabled,
 
-    /** Create a Calendar event with a Meet link and e-mail the invitation (with reminders) to every attendee. */
-    async createMeeting({ title, description, startIso, endIso, attendees }) {
-      const params = new URLSearchParams({ conferenceDataVersion: "1", sendUpdates: "all" });
-      const body = {
-        summary: title,
-        description,
-        start: { dateTime: startIso },
-        end: { dateTime: endIso },
-        attendees: attendees.map((email) => ({ email })),
-        conferenceData: { createRequest: { requestId: crypto.randomUUID(), conferenceSolutionKey: { type: "hangoutsMeet" } } },
-        reminders: { useDefault: false, overrides: [{ method: "email", minutes: 60 }, { method: "popup", minutes: 10 }] },
-      };
-      const url = `${CALENDAR}/calendars/${encodeURIComponent(g.calendarId)}/events`;
-      let event = await call(`${url}?${params}`, { method: "POST", json: body });
-      // Meet links are created asynchronously; read the event back once if the link is not there yet.
-      if (!event.hangoutLink) {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        event = await call(`${url}/${event.id}?conferenceDataVersion=1`);
-      }
-      return { meetLink: event.hangoutLink ?? null, eventId: event.id, htmlLink: event.htmlLink };
-    },
-
-    async cancelMeeting(eventId) {
-      await call(`${CALENDAR}/calendars/${encodeURIComponent(g.calendarId)}/events/${eventId}?sendUpdates=all`, { method: "DELETE" });
-    },
-
     /** Store a resume in the Drive folder (created on first use). Returns the file id and a link the team can open. */
     async uploadResume({ name, mimeType, buffer }) {
       folder ??= (async () => {
@@ -118,7 +89,7 @@ export function createGoogle(config, { fetch: doFetch = globalThis.fetch, log = 
     },
 
     /**
-     * Read-only health check used by `npm run google:check`: can the stored token reach the calendar, the Drive folder and Gmail?
+     * Read-only health check used by `npm run google:check`: can the stored token reach the Drive folder and Gmail?
      * Each part reports { ok, detail } or { ok: false, error } so one failure does not hide the others.
      */
     async check() {
@@ -130,10 +101,6 @@ export function createGoogle(config, { fetch: doFetch = globalThis.fetch, log = 
         }
       };
       return {
-        calendar: await part(async () => {
-          const c = await call(`${CALENDAR}/calendars/${encodeURIComponent(g.calendarId)}`);
-          return `${c.summary} (${c.timeZone})`;
-        }),
         drive: await part(async () => {
           if (!g.driveFolderId) return `no GOOGLE_DRIVE_FOLDER_ID set: the app will create a folder called "${g.driveFolderName}"`;
           const f = await call(`${DRIVE}/files/${g.driveFolderId}?supportsAllDrives=true&fields=${encodeURIComponent("id,name,mimeType,capabilities(canAddChildren),owners(emailAddress)")}`);

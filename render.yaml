@@ -21,7 +21,7 @@ services:
         sync: false
       - key: ADMIN_PASSWORD     # 12+ characters
         sync: false
-      # Google (demo calendar + Meet link, resumes in Drive, notification e-mail). See README, "Google setup".
+      # Google (resumes in Drive, notification e-mail). See README, "Connect Google".
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET

@@ -64,24 +64,11 @@ export function loadConfig(env = process.env, overrides = {}) {
       secureCookie: ["true", "false"].includes(env.ADMIN_COOKIE_SECURE) ? env.ADMIN_COOKIE_SECURE : "auto",
     },
 
-    // ---- Demo booking: Mon–Fri, 30-minute slots, in India time (no daylight saving, so a fixed offset) ----
-    demo: {
-      timezone: "Asia/Kolkata",
-      utcOffsetMinutes: 330,
-      weekdays: [1, 2, 3, 4, 5],
-      startHour: toInt(env.DEMO_START_HOUR, 10),
-      endHour: toInt(env.DEMO_END_HOUR, 18),
-      slotMinutes: toInt(env.DEMO_SLOT_MINUTES, 30),
-      noticeHours: toInt(env.DEMO_NOTICE_HOURS, 12),
-      horizonDays: toInt(env.DEMO_HORIZON_DAYS, 21),
-    },
-
-    // ---- Google (Calendar + Meet, Drive for resumes, Gmail for notifications). All optional. ----------
+    // ---- Google (Drive for resumes, Gmail for notifications). All optional. ----------
     google: {
       clientId: env.GOOGLE_CLIENT_ID || "",
       clientSecret: env.GOOGLE_CLIENT_SECRET || "",
       refreshToken: env.GOOGLE_REFRESH_TOKEN || "",
-      calendarId: env.GOOGLE_CALENDAR_ID || "primary",
       driveFolderId: (env.GOOGLE_DRIVE_FOLDER_ID || "").trim(), // an existing folder to store resumes in (preferred)
       driveFolderName: env.GOOGLE_DRIVE_FOLDER || "Zenitheum applications", // used only when no folder id is given
       teamEmail: env.TEAM_EMAIL || SITE.emails.team,
@@ -101,7 +88,7 @@ export function loadConfig(env = process.env, overrides = {}) {
   };
 
   const merged = { ...base, ...overrides };
-  for (const key of ["rateLimit", "upload", "admin", "demo", "google", "smtp", "mail"]) {
+  for (const key of ["rateLimit", "upload", "admin", "google", "smtp", "mail"]) {
     merged[key] = { ...base[key], ...overrides[key] };
   }
   return merged;

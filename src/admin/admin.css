@@ -1812,7 +1812,3 @@ a.adm-tile:hover {
   font-size: 13px;
   font-weight: 600;
 }
-.adm-when__visitor {
-  font-size: 13px;
-  color: var(--adm-body);
-}

@@ -2,11 +2,11 @@ import express, { Router } from "express";
 import rateLimit from "express-rate-limit";
 
 import { jobs, findJob } from "../../shared/jobs.js";
-import { ANALOG_FORMATS, CHIPS, SEGMENTS, ids, includesAnalog, labelOf } from "../../shared/market.js";
+import { ANALOG_FORMATS, CHIPS, DEMO_TIMES, SEGMENTS, ids, includesAnalog, labelOf } from "../../shared/market.js";
 import { HttpError } from "../lib/errors.js";
 import { INVALID_FILE_MESSAGE, createUpload, sniffExtension } from "../lib/upload.js";
 import { consent, email, integer, isoDate, oneOf, optionalOneOf, phone, safeFileName, text, url, validate } from "../lib/validate.js";
-import { listSlots, matchSlot, todayIn } from "../services/slots.js";
+import { todayInIndia } from "../lib/dates.js";
 
 /** A filled honeypot field means a bot: answer "success" and quietly drop it. */
 const isHoneypot = (body) => typeof body?.website === "string" && body.website.trim() !== "";
@@ -86,18 +86,6 @@ export function createPublicRouter({ config, db, repos, mailer, google, log }) {
 
   // ---- Book a demo -----------------------------------------------------------------------------
 
-  /** Free slots for the booking calendar. Only start times and availability are exposed. */
-  router.get("/demos/slots", async (_req, res) => {
-    res.set("Cache-Control", "no-store");
-    const all = listSlots(config.demo);
-    const taken = new Set(all.length ? await repos.demos.takenSlots(all[0].toISOString(), new Date(all.at(-1).getTime() + 1).toISOString()) : []);
-    res.json({
-      timezone: config.demo.timezone,
-      slotMinutes: config.demo.slotMinutes,
-      slots: all.map((slot) => ({ start: slot.toISOString(), available: !taken.has(slot.toISOString()) })),
-    });
-  });
-
   const demoSchema = {
     name: text({ label: "Name", required: true, min: 2, max: 100 }),
     email: email(),
@@ -106,8 +94,9 @@ export function createPublicRouter({ config, db, repos, mailer, google, log }) {
     jobTitle: text({ label: "Role", max: 100 }),
     segment: optionalOneOf(ids(SEGMENTS), { label: "Segment" }),
     chip: oneOf(ids(CHIPS), { label: "Chip" }),
+    preferredDate: isoDate({ label: "Preferred date", required: false }),
+    preferredTime: optionalOneOf(ids(DEMO_TIMES), { label: "Preferred time" }),
     message: text({ label: "Message", max: 2000, multiline: true }),
-    visitorTimezone: text({ label: "Time zone", max: 60 }),
     consent: consent(),
   };
 
@@ -115,55 +104,29 @@ export function createPublicRouter({ config, db, repos, mailer, google, log }) {
     if (isHoneypot(req.body)) return res.status(201).json({ ok: true, id: fakeRef() });
     const { value, errors } = validate(req.body, demoSchema);
     value.analogFormat = analogFormat(value.chip, req.body?.analogFormat, errors);
-    const slot = matchSlot(config.demo, req.body?.slot);
-    if (!slot) errors.slot = "Please pick one of the available times.";
+    if (!errors.preferredDate && value.preferredDate && value.preferredDate <= todayInIndia()) errors.preferredDate = "Choose a date after today.";
     if (Object.keys(errors).length) return fail(res, errors);
 
-    let demo = await repos.demos.create({ ...value, slotStart: slot.start.toISOString(), slotEnd: slot.end.toISOString() }); // 409 if just taken
-
-    let meeting = null;
-    if (google.enabled) {
-      try {
-        meeting = await google.createMeeting({
-          title: `Zenitheum demo — ${value.organisation}`,
-          description: `${lines([
-            ["Contact", `${value.name}${value.jobTitle ? `, ${value.jobTitle}` : ""}`],
-            ["Company", value.organisation],
-            ["Email", value.email],
-            ["Phone", value.phone],
-            ["Interest", chipLine(value.chip, value.analogFormat)],
-            ["Customer segment", value.segment && labelOf(SEGMENTS, value.segment)],
-          ])}\n\n${value.message || ""}`.trim(),
-          startIso: new Date(demo.slotStart).toISOString(),
-          endIso: new Date(demo.slotEnd).toISOString(),
-          attendees: [...new Set([value.email, config.google.teamEmail])],
-        });
-        demo = await repos.demos.setMeeting(demo.id, { meetLink: meeting.meetLink, eventId: meeting.eventId });
-      } catch (error) {
-        log.error?.(`[demo] could not create the calendar event for ${demo.ref}: ${error.message}`);
-      }
-    }
-
+    const demo = await repos.demos.create(value);
+    const when = [value.preferredDate, value.preferredTime && labelOf(DEMO_TIMES, value.preferredTime)].filter(Boolean).join(", ");
+    const summary = lines([
+      ["Reference", demo.ref],
+      ["Interest", chipLine(value.chip, value.analogFormat)],
+      ["Preferred day and time (India time)", when],
+      ["Segment", value.segment && labelOf(SEGMENTS, value.segment)],
+    ]);
     mailer.send({
       to: team,
       replyTo: value.email,
-      subject: `[Demo] ${value.organisation} — ${value.name} · ${new Date(slot.start).toLocaleString("en-IN", { timeZone: config.demo.timezone, dateStyle: "medium", timeStyle: "short" })} IST`,
-      text: `${lines([
-        ["Reference", demo.ref],
-        ["When", `${slot.start.toISOString()} (${config.demo.timezone})`],
-        ["Google Meet", meeting?.meetLink || "NOT CREATED: open the admin console and use “Create Meet link”"],
-        ["Name", value.name],
-        ["Role", value.jobTitle],
-        ["Company", value.organisation],
-        ["Email", value.email],
-        ["Phone", value.phone],
-        ["Interest", chipLine(value.chip, value.analogFormat)],
-        ["Segment", value.segment && labelOf(SEGMENTS, value.segment)],
-        ["Visitor time zone", value.visitorTimezone],
-      ])}\n\n${value.message || "(no message)"}\n`,
+      subject: `[Demo] ${value.organisation} — ${value.name}${when ? ` · ${when}` : ""}`,
+      text: `${summary}\n\n${lines([["Name", value.name], ["Role", value.jobTitle], ["Company", value.organisation], ["Email", value.email], ["Phone", value.phone]])}\n\n${value.message || "(no message)"}\n`,
     });
-
-    return res.status(201).json({ ok: true, id: demo.ref, scheduled: Boolean(meeting?.meetLink), meetLink: meeting?.meetLink ?? null, slot: slot.start.toISOString() });
+    mailer.send({
+      to: value.email,
+      subject: `We received your demo request ${demo.ref}`,
+      text: `Hello ${value.name},\n\nThank you. We have received your demo request and will email you a time that works shortly.\n\n${summary}\n\nZenitheum\n${team}\n`,
+    });
+    return res.status(201).json({ ok: true, id: demo.ref });
   });
 
   // ---- Place an order ----------------------------------------------------------------------------
@@ -187,7 +150,7 @@ export function createPublicRouter({ config, db, repos, mailer, google, log }) {
     if (isHoneypot(req.body)) return res.status(201).json({ ok: true, id: fakeRef() });
     const { value, errors } = validate(req.body, orderSchema);
     value.analogFormat = analogFormat(value.chip, req.body?.analogFormat, errors);
-    if (!errors.deliveryDate && value.deliveryDate <= todayIn(config.demo)) errors.deliveryDate = "Choose a delivery date after today.";
+    if (!errors.deliveryDate && value.deliveryDate <= todayInIndia()) errors.deliveryDate = "Choose a delivery date after today.";
     if (Object.keys(errors).length) return fail(res, errors);
 
     const order = await repos.orders.create(value);

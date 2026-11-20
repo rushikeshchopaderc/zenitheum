@@ -21,19 +21,11 @@ export async function openTestDb() {
 const TRUNCATE = "TRUNCATE contacts, applications, subscribers, demos, orders RESTART IDENTITY CASCADE";
 
 /** A stand-in for the Google integration that records what the API asked of it. */
-export function fakeGoogle({ enabled = true, failMeeting = false, failUpload = false } = {}) {
-  const calls = { meetings: [], uploads: [], cancelled: [] };
+export function fakeGoogle({ enabled = true, failUpload = false } = {}) {
+  const calls = { uploads: [] };
   return {
     enabled,
     calls,
-    async createMeeting(input) {
-      if (failMeeting) throw new Error("calendar down");
-      calls.meetings.push(input);
-      return { meetLink: "https://meet.google.com/abc-defg-hij", eventId: `evt-${calls.meetings.length}`, htmlLink: "https://calendar.google.com/x" };
-    },
-    async cancelMeeting(id) {
-      calls.cancelled.push(id);
-    },
     async uploadResume(input) {
       if (failUpload) throw new Error("drive down");
       calls.uploads.push(input);
@@ -83,19 +75,11 @@ export async function startServer({ db, overrides = {}, google = fakeGoogle() } 
     return response.headers.get("set-cookie").split(";")[0];
   }
 
-  /** The first free demo slot (an ISO string). */
-  async function freeSlot(skip = 0) {
-    const { data } = await call("GET", "/api/demos/slots");
-    return data.slots.filter((s) => s.available)[skip].start;
-  }
-
   return {
-    base, db, repos, config, mails, google, call, login, freeSlot,
+    base, db, repos, config, mails, google, call, login,
     reset: async () => {
       mails.length = 0;
-      google.calls.meetings.length = 0;
       google.calls.uploads.length = 0;
-      google.calls.cancelled.length = 0;
       await db.exec(TRUNCATE);
     },
     close: async () => {
@@ -116,7 +100,10 @@ export function applicationForm(fields = {}, file = { name: "resume.pdf", type: 
   return form;
 }
 
-export const demoBody = (slot, extra = {}) => ({
+/** A date a week or so ahead, as YYYY-MM-DD (the API only accepts days after today). */
+export const nextWeekday = (days) => new Date(Date.now() + days * 86_400_000).toISOString().slice(0, 10);
+
+export const demoBody = (extra = {}) => ({
   name: "Asha Rao",
   email: "Asha@Example.com",
   phone: "+91 98765 43210",
@@ -126,8 +113,8 @@ export const demoBody = (slot, extra = {}) => ({
   chip: "both",
   analogFormat: "hard",
   message: "We ship 50,000 meters a year and want a custom variant.",
-  visitorTimezone: "Asia/Kolkata",
-  slot,
+  preferredDate: nextWeekday(7),
+  preferredTime: "afternoon",
   consent: true,
   ...extra,
 });

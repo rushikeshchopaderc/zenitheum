@@ -1,5 +1,5 @@
 /**
- * One-time helper: connect the company Google account so the API can create Meet links, store resumes in Drive and send
+ * One-time helper: connect the company Google account so the API can store resumes in Drive and send
  * notification e-mails. It prints the refresh token to paste into GOOGLE_REFRESH_TOKEN (Render dashboard / .env.local).
  *
  *   GOOGLE_CLIENT_ID=... GOOGLE_CLIENT_SECRET=... npm run google:authorize
@@ -28,7 +28,7 @@ const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchPar
 })}`;
 
 console.log("\n1. Open this address in your browser and sign in with the company Google account:\n\n" + authUrl + "\n");
-console.log(`2. Approve the three permissions (calendar events, ${google.driveFolderId ? "Google Drive, to store resumes in your folder" : "files this app creates"}, send mail). Waiting for Google to call back...\n`);
+console.log(`2. Approve the two permissions (${google.driveFolderId ? "Google Drive, to store resumes in your folder" : "files this app creates"}, send mail). Waiting for Google to call back...\n`);
 
 const code = await new Promise((resolve, reject) => {
   const server = http

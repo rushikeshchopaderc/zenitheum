@@ -4,11 +4,12 @@ What this gives the website, using the **one** company Google account:
 
 | Feature | Google service | Where it shows up |
 | --- | --- | --- |
-| A demo booking becomes a calendar event with a **Google Meet link**; the customer and the team are invited and reminded | Google Calendar | Calendar of zenitheumsolutions@gmail.com, the invitation e-mails |
 | Résumés and other applicant files are stored as files | Google Drive | the folder you shared (`GOOGLE_DRIVE_FOLDER_ID`) |
-| Notifications to the team and confirmations to customers | Gmail | the Sent folder of zenitheumsolutions@gmail.com |
+| Notifications to the team and confirmations to customers (demo requests, orders, questions, applications) | Gmail | the Sent folder of zenitheumsolutions@gmail.com |
 
-Nothing here costs money. You only need to do it once, and it takes about 15 minutes. Do every step **signed in as zenitheumsolutions@gmail.com**
+There is **no calendar** integration: a demo request is saved in the database and the team answers it by e-mail.
+
+Nothing here costs money. You only need to do it once, and it takes about 10 minutes. Do every step **signed in as zenitheumsolutions@gmail.com**
 (not your personal account): the website will act as that account.
 
 ## 1. Create a Google Cloud project
@@ -16,11 +17,10 @@ Nothing here costs money. You only need to do it once, and it takes about 15 min
 1. Open <https://console.cloud.google.com> and sign in as **zenitheumsolutions@gmail.com**. Accept the terms if asked.
 2. Click the project picker at the top (next to the Google Cloud logo) → **New project** → name it `Zenitheum website` → **Create**. Make sure it is the selected project.
 
-## 2. Switch on the three APIs
+## 2. Switch on the two APIs
 
 Open each link below (with the new project selected) and press **Enable**:
 
-- Google Calendar API: <https://console.cloud.google.com/apis/library/calendar-json.googleapis.com>
 - Google Drive API: <https://console.cloud.google.com/apis/library/drive.googleapis.com>
 - Gmail API: <https://console.cloud.google.com/apis/library/gmail.googleapis.com>
 
@@ -31,14 +31,13 @@ This is the screen Google shows once, when you let the website use the account.
 1. Menu (☰) → **APIs & Services** → **OAuth consent screen** (it opens *Google Auth Platform*) → **Get started**.
 2. App name: `Zenitheum website`. User support email: zenitheumsolutions@gmail.com. → Next.
 3. Audience: **External** → Next. Contact email: zenitheumsolutions@gmail.com → Next → tick the agreement → **Create**.
-4. Left menu → **Data Access** → **Add or remove scopes**, and add these three (search for them, or paste into "Manually add scopes"), then **Update** and **Save**:
-   - `https://www.googleapis.com/auth/calendar.events`
+4. Left menu → **Data Access** → **Add or remove scopes**, and add these two (search for them, or paste into "Manually add scopes"), then **Update** and **Save**:
    - `https://www.googleapis.com/auth/gmail.send`
    - `https://www.googleapis.com/auth/drive`
 5. Left menu → **Audience** → **Publish app** → **Confirm**. The status must read **In production**.
-   > **Why this matters:** while the app is in *Testing*, Google deletes its access after **7 days**, and demos would silently stop getting Meet links.
+   > **Why this matters:** while the app is in *Testing*, Google deletes its access after **7 days**, and the website would silently stop sending e-mail and storing résumés.
    > Publishing does not make anything public; only people you give the connection to can use it. Because the app is not verified by Google you will
-   > see a "Google hasn't verified this app" warning once in step 5. That is expected for your own account.
+   > see a "Google hasn't verified this app" warning once in step 6. That is expected for your own account.
 
 ## 4. Create the client ID and secret
 
@@ -67,7 +66,7 @@ GOOGLE_CLIENT_ID="paste-client-id" GOOGLE_CLIENT_SECRET="paste-secret" GOOGLE_DR
 1. It prints an address. Open it in your browser.
 2. Choose **zenitheumsolutions@gmail.com**.
 3. You see *"Google hasn't verified this app"*. Click **Advanced** → **Go to Zenitheum website (unsafe)**. (It is your own app.)
-4. Tick **every** permission (calendar events, Google Drive, send e-mail) → **Continue**.
+4. Tick **every** permission (Google Drive, send e-mail) → **Continue**.
 5. The browser says "Done". The terminal prints a line `GOOGLE_REFRESH_TOKEN=…`. Copy it. Treat it like a password.
 
 ## 7. Check it works (on your computer)
@@ -84,10 +83,10 @@ GOOGLE_DRIVE_FOLDER_ID=1u-mlmtivQMCM6WVFl9yZZtvyI8abzwQi
 Then run:
 
 ```bash
-npm run google:check -- --email --meet
+npm run google:check -- --email
 ```
 
-You should see `OK` for Calendar, Drive (it names your folder) and Gmail, a test e-mail in zenitheumsolutions@gmail.com, and a Meet link. The test calendar event is deleted straight away.
+You should see `OK` for Drive (it names your folder) and Gmail, and a test e-mail should arrive in zenitheumsolutions@gmail.com.
 
 ## 8. Give the live website the same values
 
@@ -95,8 +94,8 @@ Render dashboard → your service `zenitheum-api` → **Environment** → add th
 
 `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, `GOOGLE_DRIVE_FOLDER_ID`
 
-Test it for real: on the live site, book a demo with your personal e-mail address. Within a minute you should get a Google Calendar invitation with a Meet link, and the demo
-should show as *Scheduled* in `/admin`. Submit a test application with a résumé and check that a file appears in the Drive folder.
+Test it for real: on the live site, request a demo with your personal e-mail address. Within a minute you should get a confirmation e-mail, and the request should
+show in `/admin` under Demos. Submit a test application with a résumé and check that a file appears in the Drive folder.
 
 ## If something goes wrong
 
@@ -105,14 +104,13 @@ should show as *Scheduled* in `/admin`. Submit a test application with a résum�
 | `invalid_grant` ("Token has been expired or revoked") | The app was left in *Testing*, or access was removed. Publish the app (step 3.5), then repeat step 6 and update `GOOGLE_REFRESH_TOKEN`. |
 | "Access blocked … has not completed the Google verification process" / `access_denied` | The app is in *Testing* and your account is not a test user. Publish it (step 3.5). |
 | `redirect_uri_mismatch` | The client was created as "Web application". Create a **Desktop app** client (step 4). |
-| `Google API 403 … API has not been used in project` | One of the three APIs is not enabled (step 2). Wait a minute after enabling. |
+| `Google API 403 … API has not been used in project` | One of the two APIs is not enabled (step 2). Wait a minute after enabling. |
 | `File not found: <folder id>` (Drive) | The token only has the narrow Drive permission, or the account cannot open the folder. Run step 6 again **with `GOOGLE_DRIVE_FOLDER_ID` set**, and check the folder is shared with / owned by zenitheumsolutions@gmail.com. |
 | "Google did not return a refresh token" | Google only gives one on the first approval. Open <https://myaccount.google.com/permissions>, remove *Zenitheum website*, and repeat step 6. |
-| The demo is saved but has no Meet link | Google was not reachable or not set up. Open the demo in `/admin` and press **Create Meet link**; the Render logs show what Google answered. |
+| No e-mail arrives for a new request | Google was not reachable or not set up. Demos, orders and questions are still saved and visible in `/admin`; the Render logs show what Google answered. |
 
 ## What the permissions allow (so you can decide)
 
-- **Calendar events**: create and delete events on the calendar. It cannot read your other calendars' settings.
 - **Send e-mail**: send messages only. It cannot read your inbox.
 - **Google Drive (full)**: needed to write into a folder you created by hand. It means the token could in principle read every file in that Drive, so keep the
   refresh token secret, and keep anything unrelated out of the company Drive. If you prefer the narrower permission, leave `GOOGLE_DRIVE_FOLDER_ID` empty:

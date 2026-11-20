@@ -28,9 +28,9 @@ try {
   } else {
     const show = (kind) => what === "all" || what === kind;
     if (show("demos")) {
-      const { rows, total } = await demos.list({ upcoming: true, limit });
-      console.log(`\nUPCOMING DEMOS (${rows.length} of ${total})`);
-      for (const r of rows) console.log(`  ${when(r.slotStart)} IST  ${r.ref}  ${r.status.padEnd(9)} ${r.name} · ${r.organisation} · ${r.chip}${r.meetLink ? ` · ${r.meetLink}` : " · (no Meet link yet)"}`);
+      const { rows, total } = await demos.list({ limit });
+      console.log(`\nDEMO REQUESTS (${rows.length} of ${total})`);
+      for (const r of rows) console.log(`  ${when(r.createdAt)}  ${r.ref}  ${r.status.padEnd(9)} ${r.name} · ${r.organisation} · ${r.chip}${r.analogFormat ? `/${r.analogFormat}` : ""}${r.preferredDate ? ` · wants ${r.preferredDate}${r.preferredTime ? ` ${r.preferredTime}` : ""}` : ""}`);
     }
     if (show("orders")) {
       const { rows, total } = await orders.list({ limit });

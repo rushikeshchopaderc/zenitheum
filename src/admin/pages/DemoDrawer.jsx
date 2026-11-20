@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 
-import { api, errorText } from "../api";
 import { StatusBadge } from "../components/Badge";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { NotesEditor, StatusSelect } from "../components/Controls";
@@ -9,49 +8,27 @@ import Delivery from "../components/Delivery";
 import { DetailList, Section } from "../components/Detail";
 import Drawer from "../components/Drawer";
 import { Notice } from "../components/Feedback";
-import Icon from "../components/icons";
-import MeetActions from "../components/MeetActions";
 import PersonActions from "../components/PersonActions";
 import { Time } from "../components/Time";
-import { useToast } from "../context/contexts";
-import { BUSINESS_TZ_LABEL, describeSlot, firstName, mailtoHref, telHref } from "../format";
+import { describePreference, firstName, mailtoHref, telHref } from "../format";
 import useCloseGuard from "../hooks/useCloseGuard";
 import useRecordActions from "../hooks/useRecordActions";
-import { DEMO_STATUSES, segmentLabel } from "../labels";
+import { DEMO_STATUSES, demoTimeLabel, segmentLabel } from "../labels";
 
 const LIVE = ["requested", "scheduled"];
 
-/** One demo booking in full: when (India time first), the Meet link, the person and what they asked for. */
+/** One demo request in full: what day and time suit the customer, who they are and what they asked for. */
 export default function DemoDrawer({ row, onClose, onUpdated, onRemoved, returnFocus }) {
-  const toast = useToast();
   const { requestClose, setDirty, warned } = useCloseGuard(onClose);
   const actions = useRecordActions({ collection: "demos", responseKey: "demo", noun: "Demo", row, onUpdated, onRemoved });
-  const [creating, setCreating] = useState(false);
-  const [meetError, setMeetError] = useState("");
   const [confirmCancel, setConfirmCancel] = useState(false);
 
-  const slot = useMemo(() => describeSlot(row), [row]);
+  const wish = useMemo(() => describePreference(row, demoTimeLabel), [row]);
   const live = LIVE.includes(row.status);
   const mailHref = useMemo(
-    () => mailtoHref(row.email, { subject: `Your Zenitheum demo, ${slot.day} (${row.ref})`, body: `Hi ${firstName(row.name)},\n\nThank you for booking a demo with Zenitheum.\n\n` }),
-    [row.email, row.ref, row.name, slot.day],
+    () => mailtoHref(row.email, { subject: `Your Zenitheum demo (${row.ref})`, body: `Hi ${firstName(row.name)},\n\nThank you for asking for a demo of Zenitheum.\n\n` }),
+    [row.email, row.ref, row.name],
   );
-
-  const createMeet = async () => {
-    setCreating(true);
-    setMeetError("");
-    try {
-      const response = await api.post(`/demos/${encodeURIComponent(row.id)}/meeting`);
-      onUpdated(response.demo);
-      toast.success("Meet link created");
-    } catch (error) {
-      const message = errorText(error);
-      setMeetError(message);
-      toast.error(message);
-    } finally {
-      setCreating(false);
-    }
-  };
 
   const cancelDemo = async () => {
     const result = await actions.saveStatus("cancelled");
@@ -63,8 +40,8 @@ export default function DemoDrawer({ row, onClose, onUpdated, onRemoved, returnF
     {
       id: "delete",
       label: "Delete demo",
-      title: "Delete this demo?",
-      text: `This permanently deletes the booking from ${row.name} (${row.ref}). It does not cancel a calendar event: cancel the demo first if one exists. It can’t be undone.`,
+      title: "Delete this demo request?",
+      text: `This permanently deletes the demo request from ${row.name} (${row.ref}). It can’t be undone.`,
       confirmLabel: "Delete demo",
       onConfirm: actions.remove,
     },
@@ -77,10 +54,8 @@ export default function DemoDrawer({ row, onClose, onUpdated, onRemoved, returnF
         subtitle={
           <span style={{ display: "inline-flex", flexWrap: "wrap", alignItems: "center", gap: "2px 10px" }}>
             <StatusBadge kind="demo" value={row.status} />
-            <span>
-              {slot.day}, {slot.time} {BUSINESS_TZ_LABEL}
-            </span>
-            <span className="adm-muted">{slot.relative}</span>
+            <span className="adm-muted">{row.ref}</span>
+            <Time value={row.createdAt} className="adm-muted" />
           </span>
         }
         onClose={requestClose}
@@ -104,49 +79,14 @@ export default function DemoDrawer({ row, onClose, onUpdated, onRemoved, returnF
           <PersonActions email={row.email} phone={row.phone} mailHref={mailHref} mailLabel="Email attendee" />
         </div>
 
-        <Section title="When" id="demo-when">
+        <Section title="Preferred day and time" id="demo-when">
           <div className="adm-when">
             <div className="adm-when__main">
-              <time dateTime={String(row.slotStart)} title={String(row.slotStart)}>
-                <strong>{slot.day}</strong>, {slot.time} to {slot.endTime}
-              </time>{" "}
-              <span className="adm-when__zone">{BUSINESS_TZ_LABEL}</span>
+              <strong>{wish.text}</strong> {wish.text !== "No preference" ? <span className="adm-when__zone">India time</span> : null}
             </div>
-            <div className="adm-when__rel">
-              {slot.relative.charAt(0).toUpperCase() + slot.relative.slice(1)} · {slot.minutes} minutes
-            </div>
-            {slot.visitor ? (
-              <div className="adm-when__visitor">
-                For the visitor: {slot.visitor.day}, {slot.visitor.time} <span className="adm-muted">({slot.visitor.zone})</span>
-              </div>
-            ) : null}
-            {slot.unknownZone ? <div className="adm-hint adm-break">The visitor’s time zone ({slot.unknownZone}) is not one this browser recognises.</div> : null}
+            {wish.relative ? <div className="adm-when__rel">{wish.relative.charAt(0).toUpperCase() + wish.relative.slice(1)}</div> : null}
           </div>
-        </Section>
-
-        <Section title="Google Meet" id="demo-meet">
-          {row.meetLink ? (
-            <MeetActions meetLink={row.meetLink} size="md" />
-          ) : live ? (
-            <div className="adm-stack" style={{ gap: 10 }}>
-              <Notice tone="warn" icon="video">
-                There is no Google Meet link for this demo yet, so the attendee has nothing to join. Create it now: it also puts the demo on the team calendar.
-              </Notice>
-              <div>
-                <button type="button" className="adm-btn adm-btn--primary" onClick={createMeet} disabled={creating}>
-                  {creating ? <Icon name="spinner" size={16} className="adm-spin" /> : <Icon name="video" size={16} />}
-                  Create Meet link
-                </button>
-              </div>
-              {meetError ? (
-                <p className="adm-fielderror" role="alert">
-                  {meetError}
-                </p>
-              ) : null}
-            </div>
-          ) : (
-            <p className="adm-hint">No Meet link was created for this demo.</p>
-          )}
+          <p className="adm-hint">This is what the customer asked for. Email them a time, then set the status to Scheduled and note the time and meeting link in the internal notes.</p>
         </Section>
 
         <Section title="Contact" id="demo-contact">
@@ -166,7 +106,7 @@ export default function DemoDrawer({ row, onClose, onUpdated, onRemoved, returnF
             items={[
               { label: "Customer segment", value: segmentLabel(row.segment) },
               { label: "Chip and delivery", value: <Delivery chip={row.chip} analogFormat={row.analogFormat} /> },
-              { label: "Booked", value: <Time value={row.createdAt} /> },
+              { label: "Requested", value: <Time value={row.createdAt} /> },
               { label: "Reference", value: row.ref, mono: true },
             ]}
           />
@@ -197,8 +137,7 @@ export default function DemoDrawer({ row, onClose, onUpdated, onRemoved, returnF
           onCancel={() => setConfirmCancel(false)}
         >
           <p>
-            The demo with <strong style={{ color: "var(--adm-text)" }}>{row.organisation}</strong> is marked cancelled and its time slot is freed for someone else.
-            {row.calendarEventId ? " Its Google Calendar event is cancelled too, and everyone invited is notified." : ""}
+            The demo request from <strong style={{ color: "var(--adm-text)" }}>{row.organisation}</strong> is marked cancelled. Remember to tell the customer.
           </p>
         </ConfirmDialog>
       ) : null}

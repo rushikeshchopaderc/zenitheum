@@ -67,64 +67,13 @@ export function fmtRelativeDay(ymd, now = new Date()) {
   return relative.format(days, "day");
 }
 
-// ---- Demo times ----------------------------------------------------------------------------------
-
-/** A time zone the browser knows (a visitor's zone is free text from their browser), else null. */
-function knownTimeZone(zone) {
-  if (typeof zone !== "string" || !zone) return null;
-  try {
-    new Intl.DateTimeFormat("en", { timeZone: zone });
-    return zone;
-  } catch {
-    return null;
-  }
-}
-
-const zoned = new Map();
-const inZone = (zone, options) => {
-  const key = `${zone}|${Object.keys(options).join()}`;
-  if (!zoned.has(key)) zoned.set(key, new Intl.DateTimeFormat(undefined, { timeZone: zone, ...options }));
-  return zoned.get(key);
-};
-const dayIn = (date, zone) => inZone(zone, { weekday: "short", day: "numeric", month: "short" }).format(date);
-const yearIn = (date, zone) => inZone(zone, { year: "numeric" }).format(date);
-const timeIn = (date, zone) => inZone(zone, { hour: "numeric", minute: "2-digit" }).format(date);
-
-/** "in 3 hours", "tomorrow", "in 2 days", "yesterday": minutes and hours inside a day, India calendar days beyond. */
-function fmtRelative(when, now = new Date()) {
-  const date = toDate(when);
-  if (!date) return "";
-  const seconds = (date.getTime() - now.getTime()) / 1000;
-  const abs = Math.abs(seconds);
-  if (abs < 60) return "now";
-  if (abs < 3600) return relative.format(Math.round(seconds / 60), "minute");
-  if (abs < 86400) return relative.format(Math.round(seconds / 3600), "hour");
-  return fmtRelativeDay(todayYmd(date), now);
-}
-
-/**
- * Everything the console shows about a demo's time. Always India time first; the visitor's own zone is added
- * only when it shows a different local time (free-text zones the browser does not know are ignored).
- * @returns {{day:string, time:string, endTime:string, minutes:number, relative:string, visitor:null|{zone:string, day:string, time:string}, unknownZone:string|null}}
- */
-export function describeSlot({ slotStart, slotEnd, visitorTimezone }, now = new Date()) {
-  const start = new Date(slotStart);
-  const end = new Date(slotEnd);
-  const sameYear = yearIn(start, BUSINESS_TZ) === yearIn(now, BUSINESS_TZ);
-  const day = sameYear ? dayIn(start, BUSINESS_TZ) : `${dayIn(start, BUSINESS_TZ)} ${yearIn(start, BUSINESS_TZ)}`;
-  const time = timeIn(start, BUSINESS_TZ);
-  const zone = knownTimeZone(visitorTimezone);
-  const there = zone ? { zone, day: dayIn(start, zone), time: timeIn(start, zone) } : null;
-  const differs = there && (there.day !== dayIn(start, BUSINESS_TZ) || there.time !== time);
-  return {
-    day,
-    time,
-    endTime: timeIn(end, BUSINESS_TZ),
-    minutes: Math.round((end - start) / 60000),
-    relative: fmtRelative(start, now),
-    visitor: differs ? { ...there, zone: there.zone.replace(/_/g, " ") } : null,
-    unknownZone: visitorTimezone && !zone ? String(visitorTimezone) : null,
-  };
+/** What a demo request asks for, in words: "Thu, 4 Mar 2027 · in 5 days · Afternoon"; "No preference" when it asks for nothing. */
+export function describePreference({ preferredDate, preferredTime }, timeLabel, now = new Date()) {
+  const parts = [];
+  if (preferredDate) parts.push(fmtYmd(preferredDate));
+  const rel = preferredDate ? fmtRelativeDay(preferredDate, now) : "";
+  const time = preferredTime ? timeLabel(preferredTime) : "";
+  return { date: preferredDate ? fmtYmd(preferredDate) : "", relative: rel, time, text: [...parts, time].filter(Boolean).join(" · ") || "No preference" };
 }
 
 // ---- Text ----------------------------------------------------------------------------------------

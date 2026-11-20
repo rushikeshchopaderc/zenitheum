@@ -5,17 +5,14 @@ import { Card } from "../components/Cards";
 import Delivery from "../components/Delivery";
 import { CardSkeleton, EmptyState, ErrorBanner, Skel } from "../components/Feedback";
 import Icon from "../components/icons";
-import MeetActions from "../components/MeetActions";
 import PageHeader from "../components/PageHeader";
-import { BUSINESS_TZ_LABEL, describeSlot, fmtInt, fmtRelativeDay, fmtYmd } from "../format";
+import { describePreference, fmtInt, fmtRelativeDay, fmtYmd } from "../format";
 import useLoad from "../hooks/useLoad";
 import { useDocumentTitle } from "../hooks/useMisc";
+import { demoTimeLabel } from "../labels";
 
-/** The counts and lists from /overview, plus every upcoming demo (to count the ones that still need a Meet link). */
-const load = async (signal) => {
-  const [overview, upcoming] = await Promise.all([api.get("/overview", undefined, signal), api.get("/demos", { upcoming: "1", limit: 200 }, signal)]);
-  return { overview, upcoming };
-};
+/** The counts and short lists from /overview. */
+const load = (signal) => api.get("/overview", undefined, signal);
 
 /** A number that links to the screen it counts. `tone` highlights the ones that need a person. */
 function Tile({ to, icon, value, label, hint, tone }) {
@@ -33,17 +30,17 @@ function Tile({ to, icon, value, label, hint, tone }) {
   );
 }
 
-function Tiles({ counts, upcoming }) {
-  const noMeet = upcoming.rows.filter((demo) => !demo.meetLink).length;
-  const next = upcoming.rows[0];
+function Tiles({ counts }) {
   const count = (group, status) => counts?.[group]?.[status] ?? 0;
+  const newDemos = count("demos", "requested");
+  const scheduled = count("demos", "scheduled");
   const newOrders = count("orders", "new");
   const newQuestions = count("contacts", "new");
   const newApplications = count("applications", "new");
   return (
     <div className="adm-tiles">
-      <Tile to="/admin/demos" icon="demos" value={upcoming.total} label="Upcoming demos" hint={next ? `Next ${describeSlot(next).relative}` : "None booked"} tone={upcoming.total ? "on" : null} />
-      <Tile to="/admin/demos" icon="video" value={noMeet} label="Demos without a Meet link" hint={noMeet ? "Attendees cannot join yet" : "Every demo has a link"} tone={noMeet ? "warn" : null} />
+      <Tile to="/admin/demos?status=requested" icon="demos" value={newDemos} label="New demo requests" hint={newDemos ? "Waiting for a time" : "All answered"} tone={newDemos ? "on" : null} />
+      <Tile to="/admin/demos?status=scheduled" icon="video" value={scheduled} label="Scheduled demos" hint="Arranged with the customer" />
       <Tile to="/admin/orders?status=new" icon="orders" value={newOrders} label="New orders" hint={newOrders ? "Waiting to be confirmed" : "Nothing waiting"} tone={newOrders ? "on" : null} />
       <Tile to="/admin/questions?status=new" icon="questions" value={newQuestions} label="New questions" hint={newQuestions ? "Awaiting a reply" : "All answered"} tone={newQuestions ? "on" : null} />
       <Tile to="/admin/applications?status=new" icon="applications" value={newApplications} label="New applications" hint={newApplications ? "Waiting to be reviewed" : "Nothing waiting"} tone={newApplications ? "on" : null} />
@@ -52,21 +49,21 @@ function Tiles({ counts, upcoming }) {
   );
 }
 
-function UpcomingDemos({ demos }) {
+function NewDemos({ demos }) {
   return (
     <Card
-      title="Upcoming demos"
-      subtitle={`Soonest first, in India time (${BUSINESS_TZ_LABEL}).`}
+      title="New demo requests"
+      subtitle="Newest first. Email each customer a time that works."
       actions={
-        <Link className="adm-btn adm-btn--ghost adm-btn--sm" to="/admin/demos">
-          All demos <Icon name="arrowRight" size={14} />
+        <Link className="adm-btn adm-btn--ghost adm-btn--sm" to="/admin/demos?status=requested">
+          All requests <Icon name="arrowRight" size={14} />
         </Link>
       }
     >
       {demos.length ? (
         <ul className="adm-feed">
           {demos.map((demo) => {
-            const slot = describeSlot(demo);
+            const wish = describePreference(demo, demoTimeLabel);
             return (
               <li key={demo.id} className="adm-feed__item">
                 <div className="adm-feed__main">
@@ -74,28 +71,18 @@ function UpcomingDemos({ demos }) {
                     <Link to={`/admin/demos?open=${encodeURIComponent(demo.id)}`}>{demo.organisation}</Link> <span className="adm-muted">{demo.name}</span>
                   </div>
                   <div>
-                    <strong style={{ color: "var(--adm-text)" }}>
-                      {slot.day}, {slot.time} {BUSINESS_TZ_LABEL}
-                    </strong>{" "}
-                    <span className="adm-muted">· {slot.relative}</span>
+                    <strong style={{ color: "var(--adm-text)" }}>{wish.text}</strong>
+                    {wish.relative ? <span className="adm-muted"> · {wish.relative}</span> : null}
                   </div>
-                  {slot.visitor ? (
-                    <div className="adm-muted">
-                      For the visitor: {slot.visitor.day}, {slot.visitor.time} ({slot.visitor.zone})
-                    </div>
-                  ) : null}
                   <Delivery chip={demo.chip} analogFormat={demo.analogFormat} />
-                </div>
-                <div className="adm-feed__actions">
-                  <MeetActions meetLink={demo.meetLink} />
                 </div>
               </li>
             );
           })}
         </ul>
       ) : (
-        <EmptyState compact icon="demos" title="No upcoming demos">
-          Demos that visitors book on the public site will appear here with a link to join.
+        <EmptyState compact icon="demos" title="No new demo requests">
+          Demos that visitors request on the public site will appear here.
         </EmptyState>
       )}
     </Card>
@@ -161,14 +148,14 @@ function OverviewSkeleton() {
   );
 }
 
-/** What needs a person today: demos coming up, orders and questions waiting, applications to review. */
+/** What needs a person today: demo requests, orders and questions waiting, applications to review. */
 export default function OverviewPage() {
   useDocumentTitle("Overview");
   const { data, error, loading, reload } = useLoad(load, "overview");
 
   return (
     <div className="adm-page">
-      <PageHeader eyebrow="Dashboard" title="Overview" lede="What needs attention today: demos coming up, and orders, questions and applications waiting for a reply.">
+      <PageHeader eyebrow="Dashboard" title="Overview" lede="What needs attention today: demo requests, orders, questions and applications waiting for a reply.">
         <button type="button" className="adm-btn" onClick={reload} disabled={loading} aria-label="Refresh the overview">
           <Icon name="refresh" size={16} className={loading ? "adm-spin" : ""} /> Refresh
         </button>
@@ -179,10 +166,10 @@ export default function OverviewPage() {
 
       {data ? (
         <div className={`adm-stack${loading ? " adm-dim" : ""}`} style={{ gap: 18 }} aria-busy={loading}>
-          <Tiles counts={data.overview.counts} upcoming={data.upcoming} />
+          <Tiles counts={data.counts} />
           <div className="adm-grid adm-grid--7-5">
-            <UpcomingDemos demos={data.overview.upcomingDemos} />
-            <NewOrders orders={data.overview.newOrders} />
+            <NewDemos demos={data.newDemos} />
+            <NewOrders orders={data.newOrders} />
           </div>
         </div>
       ) : null}

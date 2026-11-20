@@ -17,12 +17,12 @@ import { createPublicRouter } from "./routes/public.js";
 import { createGoogle } from "./services/google.js";
 
 /** The application tier: every repository is built once, from the one database handle. */
-export function createRepositories(db, config) {
+export function createRepositories(db) {
   return {
     leads: createLeadRepository(db),
     demos: createDemoRepository(db),
     orders: createOrderRepository(db),
-    milestones: createMilestoneRepository(db, { timezone: config.demo.timezone }),
+    milestones: createMilestoneRepository(db, { timezone: "Asia/Kolkata" }),
     overview: createOverviewRepository(db),
   };
 }
@@ -34,7 +34,7 @@ export function createRepositories(db, config) {
 export function createApp({ config = loadConfig(), db, log = console, google = createGoogle(config, { log }), mailer = createMailer(config, log, google) } = {}) {
   if (!db) throw new Error("createApp needs a database handle: pass `db` from createDb().");
 
-  const repos = createRepositories(db, config);
+  const repos = createRepositories(db);
   const app = express();
   app.disable("x-powered-by");
   if (config.trustProxy) app.set("trust proxy", config.trustProxy);

@@ -28,7 +28,7 @@ const notFound = () => new HttpError(404, "not_found", "Not found.");
  * Staff console API. One account (ADMIN_EMAIL / ADMIN_PASSWORD) and a signed, expiring cookie: nothing about staff
  * sign-ins is stored in the database.
  */
-export function createAdminRouter({ config, repos, google, log }) {
+export function createAdminRouter({ config, repos }) {
   const router = Router();
   const { leads, demos, orders, milestones, overview } = repos;
   const throttle = createThrottle();
@@ -125,8 +125,8 @@ export function createAdminRouter({ config, repos, google, log }) {
   // ---- Home ------------------------------------------------------------------------------------------
 
   router.get("/overview", async (_req, res) => {
-    const [counts, upcoming, newOrders] = await Promise.all([overview.counts(), demos.list({ upcoming: true, limit: 8 }), orders.list({ status: "new", limit: 5 })]);
-    res.json({ counts, upcomingDemos: upcoming.rows, newOrders: newOrders.rows });
+    const [counts, newDemos, newOrders] = await Promise.all([overview.counts(), demos.list({ status: "requested", limit: 8 }), orders.list({ status: "new", limit: 5 })]);
+    res.json({ counts, newDemos: newDemos.rows, newOrders: newOrders.rows });
   });
 
   /** status / notes patches: "not sent" leaves a field alone, "" clears it. */
@@ -163,39 +163,12 @@ export function createAdminRouter({ config, repos, google, log }) {
 
   // ---- Demos ---------------------------------------------------------------------------------------
 
-  const demoFilters = (q) => ({ status: oneOfIds(DEMO_STATUSES, q.status), chip: str(q.chip, 20), upcoming: q.upcoming === "1" || q.upcoming === "true", q: str(q.q, 80) });
+  const demoFilters = (q) => ({ status: oneOfIds(DEMO_STATUSES, q.status), chip: str(q.chip, 20), q: str(q.q, 80) });
   router.get("/demos", async (req, res) => res.json(await demos.list({ ...demoFilters(req.query), ...paging(req.query) })));
   router.patch("/demos/:id", async (req, res) => {
-    const id = idParam(req);
-    const patch = patchOf(req.body, { statuses: DEMO_STATUSES });
-    const before = await demos.get(id);
-    if (!before) throw notFound();
-    const row = await demos.update(id, patch);
-    // Cancelling a booked demo also cancels the calendar event (everyone is told).
-    if (patch.status === "cancelled" && before.calendarEventId && google.enabled) {
-      google.cancelMeeting(before.calendarEventId).catch((error) => log.error?.(`[demo] could not cancel the calendar event: ${error.message}`));
-    }
+    const row = await demos.update(idParam(req), patchOf(req.body, { statuses: DEMO_STATUSES }));
+    if (!row) throw notFound();
     res.json({ ok: true, demo: row });
-  });
-  /** Create the Meet link for a demo whose automatic scheduling failed (or was not configured). */
-  router.post("/demos/:id/meeting", async (req, res) => {
-    const demo = await demos.get(idParam(req));
-    if (!demo) throw notFound();
-    if (!google.enabled) throw new HttpError(503, "google_not_configured", "Google is not connected on the server yet (see the README).");
-    if (demo.meetLink) return res.json({ ok: true, demo });
-    try {
-      const meeting = await google.createMeeting({
-        title: `Zenitheum demo — ${demo.organisation}`,
-        description: `${demo.name} · ${demo.email} · ${demo.phone}\n\n${demo.message || ""}`.trim(),
-        startIso: new Date(demo.slotStart).toISOString(),
-        endIso: new Date(demo.slotEnd).toISOString(),
-        attendees: [...new Set([demo.email, config.google.teamEmail])],
-      });
-      return res.json({ ok: true, demo: await demos.setMeeting(demo.id, { meetLink: meeting.meetLink, eventId: meeting.eventId }) });
-    } catch (error) {
-      log.error?.(`[demo] manual meeting creation failed: ${error.message}`);
-      throw new HttpError(502, "google_failed", "Google did not create the meeting. Check the server log.");
-    }
   });
   router.delete("/demos/:id", async (req, res) => {
     if (!(await demos.delete(idParam(req)))) throw notFound();
@@ -300,7 +273,7 @@ export function createAdminRouter({ config, repos, google, log }) {
       rows.push(...chunk);
       if (chunk.length < CHUNK) break;
     }
-    const tz = config.demo.timezone;
+    const tz = "Asia/Kolkata"; // exports and file names use India time
     const day = new Intl.DateTimeFormat("en-CA", { timeZone: tz }).format(new Date());
     res.set({ "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="zenitheum-${kind}-${day}.csv"` });
     res.send(toCsv(rows, COLUMNS[kind], { timeZone: tz }));

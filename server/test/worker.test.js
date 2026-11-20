@@ -61,12 +61,12 @@ describe("Cloudflare worker", () => {
 describe("Cloudflare Pages Function", () => {
   it("forwards /api/* exactly like the Worker (sites hosted as a Pages project)", async () => {
     let seen;
-    globalThis.fetch = async (req) => { seen = req; return Response.json({ ok: true, slots: [] }, { status: 200 }); };
-    const request = new Request("https://zenitheum.pages.dev/api/demos/slots", { headers: { "cf-connecting-ip": "198.51.100.7" } });
+    globalThis.fetch = async (req) => { seen = req; return Response.json({ ok: true, jobs: [] }, { status: 200 }); };
+    const request = new Request("https://zenitheum.pages.dev/api/jobs", { headers: { "cf-connecting-ip": "198.51.100.7" } });
     const res = await pagesFunction({ request, env: {} });
     assert.equal(res.status, 200);
-    assert.equal(seen.url, `${DEFAULT_API_ORIGIN}/api/demos/slots`);
+    assert.equal(seen.url, `${DEFAULT_API_ORIGIN}/api/jobs`);
     assert.equal(seen.headers.get("x-forwarded-for"), "198.51.100.7");
-    assert.deepEqual(await res.json(), { ok: true, slots: [] });
+    assert.deepEqual(await res.json(), { ok: true, jobs: [] });
   });
 });

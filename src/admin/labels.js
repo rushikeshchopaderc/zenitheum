@@ -5,10 +5,10 @@
  */
 import { APPLICATION_STATUSES, CONTACT_STATUSES, DEMO_STATUSES, ORDER_STATUSES, SUBSCRIBER_STATUSES } from "@shared/crm.js";
 import { jobs } from "@shared/jobs.js";
-import { ANALOG_FORMATS, CHIPS, SEGMENTS, includesAnalog } from "@shared/market.js";
+import { ANALOG_FORMATS, CHIPS, DEMO_TIMES, SEGMENTS, includesAnalog } from "@shared/market.js";
 import { STATUS_LABELS as MILESTONE_STATUS_LABELS, TRACK_LABELS } from "@shared/milestones.js";
 
-export { ANALOG_FORMATS, APPLICATION_STATUSES, CHIPS, CONTACT_STATUSES, DEMO_STATUSES, ORDER_STATUSES, SEGMENTS, SUBSCRIBER_STATUSES };
+export { ANALOG_FORMATS, APPLICATION_STATUSES, CHIPS, CONTACT_STATUSES, DEMO_STATUSES, DEMO_TIMES, ORDER_STATUSES, SEGMENTS, SUBSCRIBER_STATUSES };
 
 /** Label for an id in a [{id,label}] list; the raw id when unknown, "" when empty. */
 export const labelFor = (list, id) => {
@@ -35,6 +35,7 @@ export const MILESTONE_TRACKS = Object.entries(TRACK_LABELS).map(([id, label]) =
 
 export const chipLabel = (id) => labelFor(CHIPS, id);
 export const segmentLabel = (id) => labelFor(SEGMENTS, id);
+export const demoTimeLabel = (id) => labelFor(DEMO_TIMES, id);
 export const trackLabel = (id) => labelFor(TRACK_LIST, id);
 export const milestoneStatusLabel = (id) => MILESTONE_STATUS_LABELS[id] ?? String(id ?? "");
 export const milestoneTrackLabel = (id) => TRACK_LABELS[id] ?? String(id ?? "");

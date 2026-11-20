@@ -17,6 +17,13 @@ export const ANALOG_FORMATS = [
   { id: "both", label: "Both soft and hard IP" },
 ];
 
+/** When a customer would like the demo call (India time); the team confirms the exact time by e-mail. */
+export const DEMO_TIMES = [
+  { id: "morning", label: "Morning" },
+  { id: "afternoon", label: "Afternoon" },
+  { id: "evening", label: "Evening" },
+];
+
 /** Ideal customers, in the order the website lists them (see src/data/customers.js). */
 export const SEGMENTS = [
   { id: "energy-metering", label: "Smart electricity-meter makers & utilities" },
