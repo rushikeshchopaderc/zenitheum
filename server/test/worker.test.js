@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { afterEach, describe, it } from "node:test";
 
+import { onRequest as pagesFunction } from "../../functions/api/[[path]].js";
 import worker from "../../worker/index.js";
+import { DEFAULT_API_ORIGIN } from "../../worker/proxy.js";
 
 const realFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = realFetch; });
@@ -41,9 +43,30 @@ describe("Cloudflare worker", () => {
     assert.equal((await worker.fetch(new Request("https://site.test/api/contact", { method: "POST", body: "x" }), env())).status, 400);
   });
 
-  it("answers 503 JSON when the API is down or unconfigured", async () => {
+  it("answers 503 JSON when the API is down", async () => {
     globalThis.fetch = async () => { throw new Error("down"); };
-    assert.equal((await worker.fetch(new Request("https://site.test/api/health"), env({ RETRY_PAUSE_MS: 1 }))).status, 503);
-    assert.equal((await worker.fetch(new Request("https://site.test/api/health"), env({ API_ORIGIN: "" }))).status, 503);
+    const res = await worker.fetch(new Request("https://site.test/api/health"), env({ RETRY_PAUSE_MS: 1 }));
+    assert.equal(res.status, 503);
+    assert.equal((await res.json()).error, "api_unreachable");
+  });
+
+  it("falls back to the default API address when API_ORIGIN is not set", async () => {
+    let seen;
+    globalThis.fetch = async (req) => { seen = req; return Response.json({ ok: true }); };
+    await worker.fetch(new Request("https://site.test/api/health"), env({ API_ORIGIN: undefined }));
+    assert.equal(seen.url, `${DEFAULT_API_ORIGIN}/api/health`);
+  });
+});
+
+describe("Cloudflare Pages Function", () => {
+  it("forwards /api/* exactly like the Worker (sites hosted as a Pages project)", async () => {
+    let seen;
+    globalThis.fetch = async (req) => { seen = req; return Response.json({ ok: true, slots: [] }, { status: 200 }); };
+    const request = new Request("https://zenitheum.pages.dev/api/demos/slots", { headers: { "cf-connecting-ip": "198.51.100.7" } });
+    const res = await pagesFunction({ request, env: {} });
+    assert.equal(res.status, 200);
+    assert.equal(seen.url, `${DEFAULT_API_ORIGIN}/api/demos/slots`);
+    assert.equal(seen.headers.get("x-forwarded-for"), "198.51.100.7");
+    assert.deepEqual(await res.json(), { ok: true, slots: [] });
   });
 });

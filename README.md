@@ -46,7 +46,7 @@ Open `http://localhost:5173/admin`. With no `ADMIN_EMAIL`/`ADMIN_PASSWORD` set, 
 | --- | --- | --- |
 | Data | **Neon** (free Postgres) | Project `zenitheum` (Singapore). Its connection strings are in your local `.env.local` (never committed). Neon console → Projects → zenitheum. |
 | API | **Render** (free web service) | Dashboard → *New* → *Blueprint* → pick this GitHub repo (it reads `render.yaml`). Fill in `DATABASE_URL` (the **pooled** Neon string), `ADMIN_EMAIL`, `ADMIN_PASSWORD` (12+ characters) and the three `GOOGLE_*` values (next section). Deploy, then copy the service address, e.g. `https://zenitheum-api.onrender.com`. |
-| Site | **Cloudflare** | Put that address in `wrangler.jsonc` → `API_ORIGIN`, commit, push. Cloudflare's build command is `npm run build`, the deploy command `npx wrangler deploy`. |
+| Site | **Cloudflare** (Workers or Pages) | Build command `npm run build`. Workers: deploy command `npx wrangler deploy` (uses `worker/index.js`). Pages (an address ending in `.pages.dev`): output directory `dist`; the `functions/` folder forwards `/api/*`. Both forward to `https://zenitheum-api.onrender.com` unless you set `API_ORIGIN` (`wrangler.jsonc` for Workers, project variables for Pages). |
 
 Render's free service sleeps after ~15 minutes without traffic, so the first request afterwards takes up to a minute (the forms retry and show a
 friendly message meanwhile). The tables are created automatically on the API's first start. Free-tier limits change; check each provider's pricing page.
@@ -80,7 +80,7 @@ account from this repository. Book a test demo with your own e-mail address righ
 - **Admin console:** `https://your-site/admin`, sign in with `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Demos, orders, questions, applications, subscribers, milestones, CSV downloads.
 - **Raw tables:** Neon console → your project → *Tables* (spreadsheet-like) or *SQL Editor* (type `select * from demos;`). Ready-made queries are in `database/README.md`.
 - **Resumes:** open the *Zenitheum applications* folder in Google Drive (or use the link in the application's page in the console).
-- **Is the API alive?** open `https://your-site/api/health` in a browser: you should see `"status":"ok"`.
+- **Is the API alive, and is the site connected to it?** open `https://your-site/api/health` in a browser: you should see `"status":"ok"`. If you see a web page instead, the site is not forwarding `/api/*` to Render: forms and the demo calendar will fail.
 - **Logs and errors:** Render dashboard → your service → *Logs*. Cloudflare dashboard → Workers → zenitheum → *Logs*.
 
 ## What the visitor can do
@@ -137,7 +137,7 @@ by the application endpoint. All specification numbers are **design targets** an
 database/migrations/   SQL schema (NNN_name.sql, applied in order, once)       → database/README.md
 docs/                  ROADMAP.md (the detailed plan) · TECHNOLOGY.md (how the chips are made): internal, not on the site
 deploy/                nginx config for the container setup
-worker/                Cloudflare Worker: serves the site and proxies /api to Render
+worker/  functions/    Cloudflare Worker (and the Pages Function that does the same): proxy /api to Render
 shared/                data used by the site AND the API (site info, jobs, milestones, form vocabulary, status lists)
 server/
   app.js  index.js     Express app factory · start-up: connect → migrate → seed milestones → listen

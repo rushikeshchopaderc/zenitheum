@@ -10,7 +10,7 @@
     "run_worker_first": ["/api/*"]
   },
   "vars": {
-    // Replace with the address Render gives your API service (see README, "Deploying for free").
+    // The Render service address. Optional: the code falls back to this same address when the variable is not set.
     "API_ORIGIN": "https://zenitheum-api.onrender.com"
   }
 }
