@@ -8,7 +8,7 @@
  */
 import http from "node:http";
 import { loadConfig } from "../config.js";
-import { GOOGLE_SCOPES } from "../services/google.js";
+import { googleScopes } from "../services/google.js";
 
 const { google } = loadConfig();
 if (!google.clientId || !google.clientSecret) {
@@ -22,13 +22,13 @@ const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchPar
   client_id: google.clientId,
   redirect_uri: redirect,
   response_type: "code",
-  scope: GOOGLE_SCOPES.join(" "),
+  scope: googleScopes(google).join(" "),
   access_type: "offline",
   prompt: "consent",
 })}`;
 
 console.log("\n1. Open this address in your browser and sign in with the company Google account:\n\n" + authUrl + "\n");
-console.log("2. Approve the three permissions (calendar events, files this app creates, send mail). Waiting for Google to call back...\n");
+console.log(`2. Approve the three permissions (calendar events, ${google.driveFolderId ? "Google Drive, to store resumes in your folder" : "files this app creates"}, send mail). Waiting for Google to call back...\n`);
 
 const code = await new Promise((resolve, reject) => {
   const server = http
@@ -51,6 +51,12 @@ const response = await fetch("https://oauth2.googleapis.com/token", {
 const data = await response.json();
 if (!data.refresh_token) {
   console.error("Google did not return a refresh token:", data.error_description || data.error || JSON.stringify(data));
+  process.exit(1);
+}
+const granted = String(data.scope || "").split(" ");
+const missing = googleScopes(google).filter((scope) => !granted.includes(scope));
+if (missing.length) {
+  console.error("Google did not grant all the permissions. Missing:\n  " + missing.join("\n  ") + "\nRun this again and tick every box on the permission screen.");
   process.exit(1);
 }
 console.log("Success. Add this to your server's environment variables (keep it secret):\n");

@@ -15,7 +15,7 @@ describe("data tier", () => {
   it("applies each migration once and is safe to run again", async () => {
     assert.deepEqual(await migrate(db), []);
     const { rows } = await db.query("SELECT version FROM schema_migrations ORDER BY version");
-    assert.deepEqual(rows.map((r) => r.version), ["001_init.sql", "002_simplify.sql"]);
+    assert.deepEqual(rows.map((r) => r.version), ["001_init.sql", "002_simplify.sql", "003_customisation.sql"]);
   });
 
   it("keeps only the business tables: no visit tracking, no staff accounts, no resumes", async () => {

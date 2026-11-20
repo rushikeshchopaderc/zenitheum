@@ -176,6 +176,9 @@ describe("orders, questions, applications and subscribers", () => {
     for (let i = 0; i < 5; i += 1) await t.call("POST", "/api/contact", { body: question({ name: `Person ${i}`, email: `p${i}@example.com`, segment: i < 2 ? "weighing" : "iot" }) });
     assert.equal((await get("/contacts", cookie)).data.total, 5);
     assert.equal((await get("/contacts?segment=weighing", cookie)).data.rows.length, 2);
+    assert.equal((await get("/contacts?topic=customisation", cookie)).data.total, 0);
+    assert.equal((await get("/contacts?topic=question", cookie)).data.total, 5);
+    assert.equal((await get("/contacts?topic=nonsense", cookie)).data.total, 5, "an unknown type is ignored");
     assert.equal((await get("/contacts?q=person%204", cookie)).data.rows[0].email, "p4@example.com");
     assert.equal((await get("/contacts?limit=2&offset=2", cookie)).data.rows.length, 2);
     assert.equal((await get("/contacts?q=%25", cookie)).data.total, 0, "LIKE wildcards are literal");
@@ -193,8 +196,8 @@ describe("orders, questions, applications and subscribers", () => {
     await t.call("POST", "/api/applications", { form: applicationForm() });
     await t.call("POST", "/api/applications", { form: applicationForm({ job: "devops-engineer", track: undefined, email: "dev@example.com", profile: "github.com/dev" }, null) });
     const rows = (await get("/applications", cookie)).data.rows;
-    assert.equal(rows.find((r) => r.jobSlug === "vlsi-engineer").hasResume, true);
-    assert.match(rows.find((r) => r.jobSlug === "vlsi-engineer").resumeUrl, /drive\.google\.com/);
+    assert.equal(rows.find((r) => r.jobSlug === "applications-integration-engineer").hasResume, true);
+    assert.match(rows.find((r) => r.jobSlug === "applications-integration-engineer").resumeUrl, /drive\.google\.com/);
     assert.equal(rows.find((r) => r.jobSlug === "devops-engineer").hasResume, false);
     const id = rows[0].id;
     assert.equal((await send("PATCH", `/applications/${id}`, cookie, { status: "interview" })).data.application.status, "interview");

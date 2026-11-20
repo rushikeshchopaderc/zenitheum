@@ -18,15 +18,16 @@ export function createLeadRepository(db) {
     createContact: (input) =>
       withUniqueRef(async (ref) => {
         const { rows } = await db.query(
-          `${insertSql("contacts", ["ref", "name", "email", "phone", "organisation", "job_title", "segment", "chip", "message"])} RETURNING id, ref, created_at`,
-          [ref, input.name, input.email, input.phone || null, input.organisation || null, input.jobTitle || null, input.segment || null, input.chip || null, input.message]
+          `${insertSql("contacts", ["ref", "name", "email", "phone", "organisation", "job_title", "segment", "chip", "analog_format", "topic", "message"])} RETURNING id, ref, created_at`,
+          [ref, input.name, input.email, input.phone || null, input.organisation || null, input.jobTitle || null, input.segment || null, input.chip || null, input.analogFormat || null, input.topic || "question", input.message]
         );
         return camel(rows[0]);
       }),
 
-    async listContacts({ status, segment, chip, q, from, to, ...paging } = {}) {
+    async listContacts({ status, topic, segment, chip, q, from, to, ...paging } = {}) {
       const w = whereBuilder();
       if (status) w.add("status = ?", status);
+      if (topic) w.add("topic = ?", topic);
       if (segment) w.add("segment = ?", segment);
       if (chip) w.add("chip = ?", chip);
       dateRange(w, "created_at", { from, to });

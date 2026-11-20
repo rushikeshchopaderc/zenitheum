@@ -5,6 +5,7 @@ import Navbar from "./components/layout/Navbar";
 import ScrollToTop from "./components/layout/ScrollToTop";
 import RouteFallback from "./components/layout/RouteFallback";
 import CursorGlow from "./components/fx/CursorGlow";
+import CustomiseWidget from "./components/Customise/CustomiseWidget";
 
 // The site is one page (Home); careers, the privacy notice and the staff console are separate chunks.
 const HomePage = lazy(() => import("./components/Home/HomePage"));
@@ -49,6 +50,7 @@ function App() {
       <ScrollToTop />
       <CursorGlow />
       <Navbar />
+      <CustomiseWidget />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -59,6 +61,8 @@ function App() {
           {Object.entries(SECTION_REDIRECTS).map(([from, to]) => (
             <Route key={from} path={from} element={<Navigate to={to} replace />} />
           ))}
+          <Route path="/careers/vlsi-engineer" element={<Navigate to="/careers" replace />} />
+          <Route path="/careers/vlsi-prototyping-intern" element={<Navigate to="/careers" replace />} />
           <Route path="/careers/joblistings-backend" element={<Navigate to="/careers" replace />} />
           <Route path="/careers/joblistings-datascientist" element={<Navigate to="/careers" replace />} />
           <Route path="/careers/joblistings-aibusinessanalyst" element={<Navigate to="/careers" replace />} />

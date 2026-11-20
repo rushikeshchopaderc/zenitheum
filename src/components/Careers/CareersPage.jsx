@@ -19,7 +19,7 @@ const process = [
 function CareersPage() {
   usePageMeta({
     title: "Careers",
-    description: `${totalOpenings} openings at Zenitheum: a CTO for analog chip design, a DevOps Engineer, three VLSI Engineers (freshers and juniors) and two VLSI prototyping interns starting 1 February 2027 (₹10,000 per month for two months, extendable into a full-time role).`,
+    description: `${totalOpenings} openings at Zenitheum across analog design, secure digital design, verification, applications and infrastructure, plus two internships starting 1 February 2027 (₹10,000 per month for two months, extendable into a full-time role).`,
     path: "/careers",
   });
 
@@ -40,7 +40,7 @@ function CareersPage() {
       <Section id="roles">
         <SectionHeading
           eyebrow="Open roles"
-          title="Four roles. Seven seats."
+          title={`${jobs.length} roles. ${totalOpenings} seats.`}
           description="Hands-on from week one: you will own something real."
         />
         <ul className="mt-14 space-y-4">

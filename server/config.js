@@ -82,7 +82,8 @@ export function loadConfig(env = process.env, overrides = {}) {
       clientSecret: env.GOOGLE_CLIENT_SECRET || "",
       refreshToken: env.GOOGLE_REFRESH_TOKEN || "",
       calendarId: env.GOOGLE_CALENDAR_ID || "primary",
-      driveFolderName: env.GOOGLE_DRIVE_FOLDER || "Zenitheum applications",
+      driveFolderId: (env.GOOGLE_DRIVE_FOLDER_ID || "").trim(), // an existing folder to store resumes in (preferred)
+      driveFolderName: env.GOOGLE_DRIVE_FOLDER || "Zenitheum applications", // used only when no folder id is given
       teamEmail: env.TEAM_EMAIL || SITE.emails.team,
     },
 

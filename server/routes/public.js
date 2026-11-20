@@ -222,6 +222,7 @@ export function createPublicRouter({ config, db, repos, mailer, google, log }) {
     phone: phone(),
     organisation: text({ label: "Company", max: 150 }),
     jobTitle: text({ label: "Role", max: 100 }),
+    topic: optionalOneOf(["question", "customisation"], { label: "Type" }),
     segment: optionalOneOf(ids(SEGMENTS), { label: "Segment" }),
     chip: optionalOneOf(ids(CHIPS), { label: "Chip" }),
     message: text({ label: "Message", required: true, min: 10, max: 4000, multiline: true }),
@@ -231,13 +232,29 @@ export function createPublicRouter({ config, db, repos, mailer, google, log }) {
   router.post("/contact", limiter, jsonParser, async (req, res) => {
     if (isHoneypot(req.body)) return res.status(201).json({ ok: true, id: fakeRef() });
     const { value, errors } = validate(req.body, contactSchema);
+    value.topic = value.topic || "question";
+    // A customisation request says which chip to tailor, and for ZT-AFE1 how it should be delivered.
+    if (value.topic === "customisation") {
+      if (!value.chip) errors.chip = "Choose the chip you want customised.";
+      else value.analogFormat = analogFormat(value.chip, req.body?.analogFormat, errors);
+    }
     if (Object.keys(errors).length) return fail(res, errors);
     const record = await repos.leads.createContact(value);
+    const custom = value.topic === "customisation";
     mailer.send({
       to: team,
       replyTo: value.email,
-      subject: `[Question] ${value.name}${value.organisation ? ` (${value.organisation})` : ""}`,
-      text: `${lines([["Reference", record.ref], ["Name", value.name], ["Email", value.email], ["Phone", value.phone], ["Company", value.organisation], ["Role", value.jobTitle], ["Segment", value.segment && labelOf(SEGMENTS, value.segment)], ["Chip", value.chip && labelOf(CHIPS, value.chip)]])}\n\n${value.message}\n`,
+      subject: `[${custom ? "Customisation request" : "Question"}] ${value.name}${value.organisation ? ` (${value.organisation})` : ""}`,
+      text: `${lines([
+        ["Reference", record.ref],
+        ["Name", value.name],
+        ["Email", value.email],
+        ["Phone", value.phone],
+        ["Company", value.organisation],
+        ["Role", value.jobTitle],
+        ["Segment", value.segment && labelOf(SEGMENTS, value.segment)],
+        [custom ? "Interest" : "Chip", value.chip && (custom ? chipLine(value.chip, value.analogFormat) : labelOf(CHIPS, value.chip))],
+      ])}\n\n${value.message}\n`,
     });
     return res.status(201).json({ ok: true, id: record.ref });
   });

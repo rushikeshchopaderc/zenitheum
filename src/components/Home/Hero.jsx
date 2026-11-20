@@ -7,7 +7,7 @@ import ChipStack from "../fx/ChipStack";
 const offers = [
   { code: "ZT-AFE1", text: "Sensor front-end", format: "Soft IP or hard IP" },
   { code: "ZT-SEC1", text: "Secure authentication", format: "Soft IP licence" },
-  { code: "Custom", text: "Tailored to your product", format: "On request" },
+  { code: "Custom", text: "Tailored to your product", format: "Tell us what you need", to: { pathname: "/", hash: "#customise" } },
 ];
 
 function Hero() {
@@ -107,7 +107,15 @@ function Hero() {
               <div key={offer.code} className="border-white/10 px-1 py-5 sm:border-l sm:px-6 sm:first:border-l-0 sm:first:pl-0">
                 <dt className="font-mono text-[11px] uppercase tracking-[0.18em] text-accent-300">{offer.code}</dt>
                 <dd className="mt-1.5 font-display text-lg font-semibold text-white">{offer.text}</dd>
-                <dd className="text-sm text-zinc-400">{offer.format}</dd>
+                <dd className="text-sm text-zinc-400">
+                  {offer.to ? (
+                    <Link to={offer.to} className="inline-flex min-h-[44px] items-center text-accent-300 underline underline-offset-4 transition hover:text-accent-200">
+                      {offer.format} →
+                    </Link>
+                  ) : (
+                    offer.format
+                  )}
+                </dd>
               </div>
             ))}
           </dl>

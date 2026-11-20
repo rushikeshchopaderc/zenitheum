@@ -11,7 +11,12 @@ import { useDocumentTitle } from "../hooks/useMisc";
 import { CHIPS, CONTACT_STATUSES, SEGMENTS, asOptions, chipLabel, segmentLabel } from "../labels";
 import QuestionDrawer from "./QuestionDrawer";
 
-const FILTER_KEYS = ["status", "segment", "chip", "from", "to"];
+const FILTER_KEYS = ["status", "topic", "segment", "chip", "from", "to"];
+const TOPICS = [
+  { value: "question", label: "Question" },
+  { value: "customisation", label: "Customisation request" },
+];
+const topicLabel = (topic) => (topic === "customisation" ? "Customisation" : "Question");
 
 const who = (row) => [row.organisation, row.jobTitle].filter(Boolean).join(" · ") || row.email;
 
@@ -45,6 +50,7 @@ export default function QuestionsPage() {
         </span>
       ),
     },
+    { key: "topic", header: "Type", nowrap: true, cell: (row) => <span className="adm-tag">{topicLabel(row.topic)}</span> },
     { key: "status", header: "Status", cell: (row) => <StatusBadge kind="contact" value={row.status} /> },
     { key: "received", header: "Received", nowrap: true, cell: (row) => <Time value={row.createdAt} /> },
   ];
@@ -57,14 +63,14 @@ export default function QuestionsPage() {
       </>
     ),
     badge: (row) => <StatusBadge kind="contact" value={row.status} />,
-    meta: (row) => [[segmentLabel(row.segment), chipLabel(row.chip)].filter(Boolean).join(" · "), <Time key="t" value={row.createdAt} />],
+    meta: (row) => [[topicLabel(row.topic), segmentLabel(row.segment), chipLabel(row.chip)].filter(Boolean).join(" · "), <Time key="t" value={row.createdAt} />],
   };
 
   const dateError = filters.from && filters.to && filters.from > filters.to ? "The end date is before the start date." : undefined;
 
   return (
     <div className="adm-page">
-      <PageHeader eyebrow="Customers" title="Questions" lede="Questions sent through the “ask a question” form on the public site." />
+      <PageHeader eyebrow="Customers" title="Questions" lede="Questions and customisation requests sent through the public site, including the floating “Customise a chip” button." />
 
       <FilterBar
         search={<SearchBox label="Search questions" value={filters.q} onCommit={(value) => setFilter("q", value)} placeholder="Search name, email, company, message or reference" />}
@@ -79,6 +85,7 @@ export default function QuestionsPage() {
         }
       >
         <SelectField label="Status" value={filters.status} onChange={(value) => setFilter("status", value)} options={asOptions(CONTACT_STATUSES)} allLabel="Any status" />
+        <SelectField label="Type" value={filters.topic} onChange={(value) => setFilter("topic", value)} options={TOPICS} allLabel="Any type" />
         <SelectField label="Customer segment" value={filters.segment} onChange={(value) => setFilter("segment", value)} options={asOptions(SEGMENTS)} allLabel="Any segment" />
         <SelectField label="Chip" value={filters.chip} onChange={(value) => setFilter("chip", value)} options={asOptions(CHIPS)} allLabel="Any chip" />
         <InputField label="Received from" type="date" value={filters.from} onChange={(value) => setFilter("from", value)} />

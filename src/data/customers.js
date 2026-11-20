@@ -62,9 +62,3 @@ export const CUSTOM_BENEFITS = [
     text: "Customers who join early influence the standard chip itself and are first to receive it.",
   },
 ];
-
-export const CUSTOM_STEPS = [
-  { title: "Tell us your product", text: "A short call about what you build and what you need." },
-  { title: "We tailor the chip", text: "We agree the changes and the delivery format with you." },
-  { title: "You integrate it", text: "Soft or hard IP, with integration support." },
-];

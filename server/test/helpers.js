@@ -110,7 +110,7 @@ export const DOCX = Buffer.concat([Buffer.from([0x50, 0x4b, 0x03, 0x04]), Buffer
 
 export function applicationForm(fields = {}, file = { name: "resume.pdf", type: "application/pdf", bytes: PDF }) {
   const form = new FormData();
-  const values = { job: "vlsi-engineer", name: "Priya Patil", email: "Priya@Example.com", phone: "+91 98765 43210", track: "digital", consent: "true", ...fields };
+  const values = { job: "applications-integration-engineer", name: "Priya Patil", email: "Priya@Example.com", phone: "+91 98765 43210", track: "sensing", consent: "true", ...fields };
   for (const [key, value] of Object.entries(values)) if (value !== undefined && value !== null) form.set(key, value);
   if (file) form.set("resume", new Blob([file.bytes], { type: file.type }), file.name);
   return form;

@@ -12,7 +12,7 @@ Six tables hold everything the website collects. There are no login, session, pa
 | -------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `demos`        | Booked product demos                           | customer details, `chip` (`analog`/`digital`/`both`), `analog_format` (`soft`/`hard`/`both`), `slot_start`/`slot_end`, `meet_link`, `calendar_event_id`, `status`, `notes` |
 | `orders`       | Chip orders                                    | `contact_name`, `chip`, `analog_format`, `quantity`, `delivery_date`, `delivery_location`, `customisation`, `status`, `internal_notes`                             |
-| `contacts`     | Questions from prospective customers           | name, email, phone, company, message, `status`, `notes`                                                                                                            |
+| `contacts`     | Questions and customisation requests           | name, email, phone, company, message, `topic` (`question`/`customisation`), `chip`, `analog_format`, `status`, `notes`                                              |
 | `applications` | Job applications                               | `job_slug`, `track`, `status`, `notes`; the resume is **not** in the database: `resume_name`, `resume_url` (a Google Drive link) and `resume_file_id` point to it    |
 | `subscribers`  | People waiting for chip release news           | unique lower-case `email`, `name`, `chip`, `analog_format`, `active` / `unsubscribed`                                                                              |
 | `milestones`   | The broad milestones shown on the website      | `track`, `status`, `target_date`; `edited` stops the seed file from overwriting what you changed in the console                                                    |
@@ -31,8 +31,9 @@ Rules enforced by the database itself:
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `001_init.sql`       | The original schema (contacts, applications, subscribers, milestones, plus analytics and console-login tables that were later removed).       |
 | `002_simplify.sql`   | Drops the analytics, login and resume-storage tables, adds the `demos` and `orders` tables and the chip/format columns. It refuses to drop `application_files` if it still holds resumes. |
+| `003_customisation.sql` | Adds `contacts.topic` and `contacts.analog_format` for customisation requests. |
 
-Adding one: create `migrations/003_short_name.sql` (the next number), never edit a migration that has been applied anywhere, keep it
+Adding one: create `migrations/004_short_name.sql` (the next number), never edit a migration that has been applied anywhere, keep it
 idempotent where cheap (`CREATE INDEX IF NOT EXISTS …`) and restart the API or run `npm run db:migrate`. `npm test` runs every migration on a fresh database.
 
 ## Looking at the data

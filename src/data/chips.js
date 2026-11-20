@@ -30,8 +30,8 @@ export const CHIPS = {
       ],
     },
     delivery: [
-      { label: "Soft IP", text: "A portable design package you integrate into your own chip.", available: "from Mar 2027" },
-      { label: "Hard IP", text: "A finished, silicon-proven layout block, ready to place in your chip.", available: "from Dec 2027" },
+      { label: "Soft IP", text: "A portable design package you integrate into your own chip.", available: "from May 2027" },
+      { label: "Hard IP", text: "A finished, silicon-proven layout block, ready to place in your chip.", available: "from Feb 2028" },
     ],
   },
 
@@ -58,7 +58,7 @@ export const CHIPS = {
         "Provision keys once, then authenticate in firmware with our reference driver.",
       ],
     },
-    delivery: [{ label: "Soft IP licence", text: "Licensed as soft IP only: a design you integrate into your own chip or FPGA.", available: "from Mar 2027" }],
+    delivery: [{ label: "Soft IP licence", text: "Licensed as soft IP only: a design you integrate into your own chip or FPGA.", available: "from May 2027" }],
   },
 };
 

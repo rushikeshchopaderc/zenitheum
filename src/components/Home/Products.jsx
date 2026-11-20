@@ -88,6 +88,12 @@ function ChipCard({ chip, delay }) {
             Order {chip.code}
           </Link>
         </div>
+        <p className="mt-5 text-sm text-zinc-400">
+          Need it different?{" "}
+          <Link to={to(chip.id, "#customise")} className="inline-flex min-h-[44px] items-center font-semibold text-accent-300 underline underline-offset-4">
+            Customise {chip.code}
+          </Link>
+        </p>
       </article>
     </Reveal>
   );

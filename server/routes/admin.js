@@ -149,7 +149,7 @@ export function createAdminRouter({ config, repos, google, log }) {
 
   // ---- Contacts ------------------------------------------------------------------------------------
 
-  const contactFilters = (q) => ({ status: oneOfIds(CONTACT_STATUSES, q.status), segment: str(q.segment, 40), chip: str(q.chip, 20), q: str(q.q, 80), ...windowOf(q) });
+  const contactFilters = (q) => ({ status: oneOfIds(CONTACT_STATUSES, q.status), topic: ["question", "customisation"].includes(q.topic) ? q.topic : undefined, segment: str(q.segment, 40), chip: str(q.chip, 20), q: str(q.q, 80), ...windowOf(q) });
   router.get("/contacts", async (req, res) => res.json(await leads.listContacts({ ...contactFilters(req.query), ...paging(req.query) })));
   router.patch("/contacts/:id", async (req, res) => {
     const row = await leads.updateContact(idParam(req), patchOf(req.body, { statuses: CONTACT_STATUSES }));

@@ -28,5 +28,7 @@ services:
         sync: false
       - key: GOOGLE_REFRESH_TOKEN
         sync: false
+      - key: GOOGLE_DRIVE_FOLDER_ID   # the Drive folder for résumés (the id after /folders/ in its address)
+        sync: false
       - key: TEAM_EMAIL
         value: zenitheumsolutions@gmail.com

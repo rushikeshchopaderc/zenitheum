@@ -39,12 +39,20 @@ export const milestones = [
     status: "in_progress",
   },
   {
+    id: "M-08",
+    track: "company",
+    title: "Design programme starts",
+    detail: "Interns and the first engineers begin work on both chips.",
+    targetDate: "2027-02-01",
+    status: "upcoming",
+  },
+  {
     id: "M-03",
     track: "company",
     kind: "gate",
     title: "Specifications frozen with design partners",
     detail: "Customers who join before this date shape what the chips do.",
-    targetDate: "2027-01-29",
+    targetDate: "2027-03-31",
     status: "upcoming",
   },
   {
@@ -52,7 +60,7 @@ export const milestones = [
     track: "digital",
     title: "ZT-SEC1 soft IP v1.0 ready to license",
     detail: "Verified and documented, ready to license.",
-    targetDate: "2027-03-31",
+    targetDate: "2027-05-31",
     status: "upcoming",
   },
   {
@@ -60,7 +68,7 @@ export const milestones = [
     track: "analog",
     title: "ZT-AFE1 soft IP ready",
     detail: "Design complete and verified, ready to integrate.",
-    targetDate: "2027-03-31",
+    targetDate: "2027-05-31",
     status: "upcoming",
   },
   {
@@ -68,7 +76,7 @@ export const milestones = [
     track: "analog",
     title: "ZT-AFE1 test chip sent for fabrication",
     detail: "First silicon on its way to hard-IP customers. The date may move.",
-    targetDate: "2027-08-31",
+    targetDate: "2027-10-31",
     status: "upcoming",
   },
   {
@@ -77,7 +85,7 @@ export const milestones = [
     kind: "gate",
     title: "ZT-AFE1 proven on silicon: hard IP delivery",
     detail: "Measured results documented; hard IP available to order.",
-    targetDate: "2027-12-31",
+    targetDate: "2028-02-29",
     status: "upcoming",
   },
 ];

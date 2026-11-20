@@ -8,7 +8,6 @@ import { totalOpenings } from "@shared/jobs.js";
 const navItems = [
   { label: "Products", to: "/#products", section: "products" },
   { label: "Customers", to: "/#customers", section: "customers" },
-  { label: "Custom chips", to: "/#custom", section: "custom" },
   { label: "Milestones", to: "/#milestones", section: "milestones" },
   { label: "About", to: "/#about", section: "about" },
   { label: "Careers", to: "/careers", badge: totalOpenings },

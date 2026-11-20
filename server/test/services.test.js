@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 import { loadConfig } from "../config.js";
 import { checkCredentials, createThrottle, signSession, verifySession } from "../services/auth.js";
-import { createGoogle } from "../services/google.js";
+import { createGoogle, googleScopes } from "../services/google.js";
 import { listSlots, matchSlot, todayIn } from "../services/slots.js";
 
 const cfg = (extra = {}) => loadConfig({ NODE_ENV: "test" }, { admin: { email: "a@example.com", password: "a long enough password", ...extra.admin }, google: { clientId: "id", clientSecret: "secret", refreshToken: "refresh", ...extra.google } });
@@ -131,6 +131,31 @@ describe("Google client", () => {
     assert.match(upload.init.headers["Content-Type"], /^multipart\/related; boundary=/);
     assert.ok(upload.init.body.toString().includes('"parents":["folder1"]'));
     assert.ok(upload.init.body.toString().includes("%PDF-1.4 hi"));
+  });
+
+  it("uploads straight into a given Drive folder and asks for full Drive access only then", async () => {
+    const { doFetch, seen } = scripted([token, ["/upload/drive/v3/files", { method: "POST", body: { id: "f9", webViewLink: "link" } }]]);
+    const g = createGoogle(cfg({ google: { driveFolderId: "folderABC" } }), { fetch: doFetch });
+    await g.uploadResume({ name: "cv.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4 x") });
+    assert.equal(seen.filter((s) => s.url.startsWith("https://www.googleapis.com/drive/v3/files")).length, 0, "no folder is searched for or created");
+    assert.ok(seen.find((s) => s.url.includes("/upload/")).init.body.toString().includes('"parents":["folderABC"]'));
+    assert.ok(googleScopes({ driveFolderId: "x" }).includes("https://www.googleapis.com/auth/drive"));
+    assert.ok(googleScopes({}).includes("https://www.googleapis.com/auth/drive.file"));
+    assert.ok(!googleScopes({}).includes("https://www.googleapis.com/auth/drive"));
+  });
+
+  it("checks calendar, Drive folder and Gmail separately", async () => {
+    const { doFetch } = scripted([
+      token,
+      ["/calendar/v3/calendars/primary", { body: { summary: "Company", timeZone: "Asia/Kolkata" } }],
+      ["/drive/v3/files/folderABC", { body: { name: "Resumes", mimeType: "application/vnd.google-apps.folder", capabilities: { canAddChildren: true }, owners: [{ emailAddress: "team@example.com" }] } }],
+      ["/gmail/v1/users/me/profile", { status: 403, body: { error: { message: "Gmail API has not been used in project" } } }],
+    ]);
+    const r = await createGoogle(cfg({ google: { driveFolderId: "folderABC" } }), { fetch: doFetch }).check();
+    assert.deepEqual(r.calendar, { ok: true, detail: "Company (Asia/Kolkata)" });
+    assert.match(r.drive.detail, /folder "Resumes", owned by team@example\.com/);
+    assert.equal(r.gmail.ok, false);
+    assert.match(r.gmail.error, /Gmail API has not been used/);
   });
 
   it("sends mail through the Gmail API as a base64url message", async () => {

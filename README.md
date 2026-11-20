@@ -38,6 +38,7 @@ Open `http://localhost:5173/admin`. With no `ADMIN_EMAIL`/`ADMIN_PASSWORD` set, 
 | `npm run lint` | ESLint |
 | `npm run db:migrate` | Apply migrations + seed milestones without starting the server |
 | `npm run google:authorize` | One-time: connect the company Google account and print the refresh token |
+| `npm run google:check` | Check the Google connection (`-- --email`, `-- --meet` also send a test e-mail / create a test Meet link) |
 | `npm run inbox` | Latest demos, orders, questions, applications and sign-ups in the terminal (`-- summary` for counts) |
 
 ## Deploying for free (Cloudflare + Render + Neon)
@@ -53,26 +54,15 @@ friendly message meanwhile). The tables are created automatically on the API's f
 
 ### Connect Google (calendar + Meet link, resumes, notification e-mail)
 
-The API uses **one** company Google account (the one behind `zenitheumsolutions@gmail.com`) for three things, all over HTTPS: it creates a Calendar event with a
-Google Meet link for every demo and invites the customer and the team (Google sends the invitation and the reminders: an e-mail 60 minutes and a pop-up 10 minutes before);
-it stores uploaded resumes in a private Drive folder named *Zenitheum applications*; and it sends the notification e-mails through Gmail
-(free hosts such as Render block SMTP). One-time set-up, about ten minutes:
+The API uses **one** company Google account (zenitheumsolutions@gmail.com) for three things, all over HTTPS: a Calendar event with a Google Meet link for every demo
+(Google e-mails the invitation and reminders to the customer and the team), a Drive folder for uploaded résumés, and Gmail for notifications (free hosts such as
+Render block SMTP). The full, click-by-click guide, including where the client ID and secret come from, is **[docs/GOOGLE_SETUP.md](docs/GOOGLE_SETUP.md)**.
+In short: create a Google Cloud project, enable the Calendar, Drive and Gmail APIs, publish the consent screen (**In production**, not *Testing*), create a **Desktop app**
+client, run `npm run google:authorize`, check with `npm run google:check -- --email --meet`, then set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
+`GOOGLE_REFRESH_TOKEN` and `GOOGLE_DRIVE_FOLDER_ID` on Render.
 
-1. [Google Cloud console](https://console.cloud.google.com) → create a project (e.g. *Zenitheum website*).
-2. *APIs & Services → Library*: enable **Google Calendar API**, **Google Drive API**, **Gmail API**.
-3. *APIs & Services → OAuth consent screen*: user type **External**, fill in the app name and your e-mail. Then **Publish app** (status *In production*).
-   Do not leave it in *Testing*: refresh tokens of apps in testing expire after about 7 days and demos would silently stop getting Meet links.
-   (An unverified app shows a "Google hasn't verified this app" screen once, when you approve it; that is fine for your own account.)
-4. *Credentials → Create credentials → OAuth client ID* → application type **Desktop app**. Copy the client ID and secret.
-5. On your computer, in this folder:
-   ```bash
-   GOOGLE_CLIENT_ID=xxxx GOOGLE_CLIENT_SECRET=yyyy npm run google:authorize
-   ```
-   Open the address it prints, sign in with the company account, approve the three permissions, and copy the **refresh token** it prints.
-6. In the Render dashboard set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` and `GOOGLE_REFRESH_TOKEN`, then redeploy.
-
-The Google integration is written against Google's documented REST APIs and covered by tests with a fake Google, but it has **not** been run against a real Google
-account from this repository. Book a test demo with your own e-mail address right after set-up. If something is misconfigured the booking is still saved
+The integration is written against Google's documented REST APIs and covered by tests with a fake Google, but it has **not** been run against a real Google account from
+this repository, so run the check above and book a test demo with your own e-mail address right after set-up. If something is misconfigured the booking is still saved
 (status *requested*), the customer still sees their confirmation, and the Render logs say what Google replied.
 
 ### Looking at your data (no coding needed)
@@ -90,6 +80,7 @@ account from this repository. Book a test demo with your own e-mail address righ
 | **Book a demo** (`#demo`) | Picks a 30-minute slot (Monday–Friday, 10:00–18:00 IST, at least 12 hours ahead, three weeks out), fills in their details and which chip and delivery format they care about. The slot is reserved in the database (it cannot be double-booked), a Calendar event with a Meet link is created, and the customer and `zenitheumsolutions@gmail.com` are invited. |
 | **Book an order** (`#order`) | Chip, delivery format, quantity, delivery date and location, customisation, contact person. Stored in `orders`; the team is notified. |
 | **Ask a question** (`#ask`) | Stored in `contacts`; the team is notified. |
+| **Customise a chip** (floating button, every public page; or a link ending `#customise`, e.g. `/?chip=analog#customise`) | A panel with the value pitch and a short form: chip, delivery format (ZT-AFE1) and what to change. Stored in `contacts` with `topic = customisation`; the team is notified. |
 | **Chip release news** | E-mail (plus optional name, chip, delivery format) in `subscribers`. |
 | **Apply** (`/careers`) | Stored in `applications`; the resume goes to Google Drive and only its link is stored. |
 
@@ -109,7 +100,7 @@ get a leading apostrophe so a hostile "name" typed into a public form cannot run
 | Overview | Counts and what needs attention: upcoming demos, new orders, unanswered questions, new applications, subscribers |
 | Demos | Upcoming and past demos with the Meet link (open, copy, or **Create Meet link** if Google was unavailable when it was booked), status (requested → scheduled → completed / cancelled / no show), notes |
 | Orders | Orders with delivery date and location, status (new → confirmed → in progress → delivered / cancelled), internal notes |
-| Questions | Questions from prospective customers |
+| Questions | Questions and customisation requests (filter by type) |
 | Applications | Applicants by role, the resume link, status and notes |
 | Subscribers | The release-news list by chip and delivery format, unsubscribe handling |
 | Roadmap | The status and dates of the broad milestones the website shows |
@@ -118,7 +109,7 @@ get a leading apostrophe so a hostile "name" typed into a public form cannot run
 
 | To change… | Edit |
 | --- | --- |
-| Open roles, requirements, **internship start, length and stipend** | `shared/jobs.js` |
+| Open roles (one posting per skill, tied to a chip), requirements, **internship start, length and stipend** | `shared/jobs.js` |
 | **Milestones** on the website | the admin console (Roadmap); the seed and defaults are `shared/milestones.js` |
 | Phone, e-mail, leadership names | `shared/site.js` |
 | The two chips: one-line pitch, how each works and plugs into the customer's device, delivery formats | `src/data/chips.js` |
@@ -135,7 +126,7 @@ by the application endpoint. All specification numbers are **design targets** an
 
 ```
 database/migrations/   SQL schema (NNN_name.sql, applied in order, once)       → database/README.md
-docs/                  ROADMAP.md (the detailed plan) · TECHNOLOGY.md (how the chips are made): internal, not on the site
+docs/                  ROADMAP.md · TECHNOLOGY.md (internal, not on the site) · GOOGLE_SETUP.md (connect Google)
 deploy/                nginx config for the container setup
 worker/  functions/    Cloudflare Worker (and the Pages Function that does the same): proxy /api to Render
 shared/                data used by the site AND the API (site info, jobs, milestones, form vocabulary, status lists)
@@ -150,7 +141,8 @@ server/
   scripts/             migrate · inbox · google-authorize
   test/                *.test.js — node:test
 src/
-  components/Home/     the one page: Hero · Products · Customers · CustomChip · Milestones · Start (demo / order / question) · About
+  components/Home/     the one page: Hero · Products · Customers · Milestones · Start (demo / order / question) · About
+  components/Customise/ the floating "Customise a chip" button and its panel (on every public page)
   components/forms/    DemoForm · SlotPicker · OrderForm · QuestionForm · SubscribeForm · ApplicationForm
   components/Careers/  /careers and the job pages
   admin/               the staff console (a lazy-loaded chunk, separate from the public site)
@@ -186,6 +178,7 @@ Copy `.env.example` to `.env`; every variable is documented there. The ones that
 | `TRUST_PROXY` | Number of reverse proxies in front of the app (`2` for Cloudflare Worker + Render, `1` behind nginx). Without it, all visitors share one rate-limit bucket |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | The one console login (password 12+ characters) |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN` | Calendar + Meet, Drive, Gmail. See "Connect Google". Without them: no Meet links, no resume upload in production |
+| `GOOGLE_DRIVE_FOLDER_ID` | The Drive folder résumés are stored in (the part of the folder's address after `/folders/`) |
 | `TEAM_EMAIL` | Invited to every demo and notified of every submission (default `zenitheumsolutions@gmail.com`) |
 | `DEMO_*` | Demo hours, slot length, notice and horizon |
 | `SMTP_*`, `MAIL_*` | Optional fallback e-mail if you host somewhere that allows SMTP |

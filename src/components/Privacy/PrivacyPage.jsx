@@ -14,7 +14,7 @@ const sections = [
     list: [
       "Book a demo: your name, email, phone, company, role (optional), the chip you are interested in (and, for the analog chip, whether you want soft or hard IP), the time you choose and a note.",
       "Book an order: your contact person's name, email, phone, company, the chip, the delivery format, quantity, delivery date and location, any customisation you describe, and a note.",
-      "Ask a question: your name, email, phone and role (optional), company and your message.",
+      "Ask a question or request a customisation: your name, email, phone and role (optional), company, the chip and delivery format you are asking about, and your message.",
       "Chip release news: your email, your name and the chip you want news about (optional), and the delivery format you care about.",
       "Job applications: your name, email, phone, current institute or employer, a profile link, the role you apply for, a note, and the resume you choose to upload.",
     ],
@@ -23,7 +23,7 @@ const sections = [
   {
     title: "Why we use it",
     list: [
-      "To reply to your question, run the demo you booked and prepare the order you placed.",
+      "To reply to your question or customisation request, run the demo you booked and prepare the order you placed.",
       "To email you the calendar invitation and Google Meet link for your demo, and a confirmation of what you submitted.",
       "To send chip release news, if you joined the list. Every message says how to stop.",
       "To assess your application and contact you about the role.",

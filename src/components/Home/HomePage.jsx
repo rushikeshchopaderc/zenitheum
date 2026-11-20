@@ -4,7 +4,6 @@ import { SITE } from "@shared/site.js";
 import Hero from "./Hero";
 import Products from "./Products";
 import Customers from "./Customers";
-import CustomChip from "./CustomChip";
 import Milestones from "./Milestones";
 import Start from "./Start";
 import About from "./About";
@@ -17,7 +16,6 @@ function HomePage() {
       <Hero />
       <Products />
       <Customers />
-      <CustomChip />
       <Milestones />
       <Start />
       <About />

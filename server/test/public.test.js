@@ -20,8 +20,8 @@ describe("read-only content", () => {
   });
 
   it("serves the jobs; the internship starts on 1 February, pays ₹10,000 a month and can become full-time", async () => {
-    assert.equal((await t.call("GET", "/api/jobs")).data.jobs.length, 4);
-    const { job } = (await t.call("GET", "/api/jobs/vlsi-prototyping-intern")).data;
+    assert.equal((await t.call("GET", "/api/jobs")).data.jobs.length, 9);
+    const { job } = (await t.call("GET", "/api/jobs/analog-design-intern")).data;
     assert.equal(job.stipend, "₹10,000 per month");
     assert.equal(job.start, "1 February 2027");
     assert.match(job.duration, /1 Feb – 31 Mar 2027/);
@@ -31,8 +31,13 @@ describe("read-only content", () => {
 
   it("serves a short list of broad milestones from the database", async () => {
     const { milestones } = (await t.call("GET", "/api/milestones")).data;
-    assert.equal(milestones.length, 7);
+    assert.equal(milestones.length, 8);
     assert.ok(milestones.some((m) => m.status === "completed"));
+    const programme = milestones.find((m) => m.title === "Design programme starts");
+    assert.equal(programme.targetDate, "2027-02-01", "the plan starts on 1 February");
+    const dates = milestones.map((m) => m.targetDate);
+    assert.deepEqual(dates, [...dates].sort(), "listed in date order");
+    assert.equal(dates.at(-1), "2028-02-29");
     assert.match(milestones[0].targetDate, /^\d{4}-\d{2}-\d{2}$/);
   });
 
@@ -192,6 +197,32 @@ describe("questions", () => {
     assert.equal(t.mails.length, 1);
   });
 
+  it("stores a customisation request with the chip and its delivery format (analog only)", async () => {
+    const body = (extra) => ({ name: "Meera", email: "meera@example.com", message: "We need 8 channels and an SPI interface.", topic: "customisation", consent: true, ...extra });
+    const noChip = await t.call("POST", "/api/contact", { body: body({}) });
+    assert.equal(noChip.status, 400);
+    assert.ok(noChip.data.errors.chip);
+    const noFormat = await t.call("POST", "/api/contact", { body: body({ chip: "analog" }) });
+    assert.equal(noFormat.status, 400);
+    assert.ok(noFormat.data.errors.analogFormat, "analog needs soft / hard / both");
+
+    assert.equal((await t.call("POST", "/api/contact", { body: body({ chip: "analog", analogFormat: "hard" }) })).status, 201);
+    assert.equal((await t.call("POST", "/api/contact", { body: body({ chip: "digital", analogFormat: "hard" }) })).status, 201);
+    const rows = (await t.db.query("SELECT topic, chip, analog_format FROM contacts ORDER BY created_at")).rows;
+    assert.deepEqual(rows, [
+      { topic: "customisation", chip: "analog", analog_format: "hard" },
+      { topic: "customisation", chip: "digital", analog_format: null },
+    ]);
+    assert.match(t.mails.at(-1).subject, /^\[Customisation request\]/);
+    assert.match(t.mails.at(-2).text, /ZT-AFE1 delivery: Hard IP/);
+  });
+
+  it("keeps ordinary questions as questions", async () => {
+    await t.call("POST", "/api/contact", { body: { name: "Rohan", email: "r@example.com", message: "Do you support RTD sensors?", consent: true } });
+    assert.equal((await t.db.query("SELECT topic FROM contacts")).rows[0].topic, "question");
+    assert.equal((await t.call("POST", "/api/contact", { body: { name: "Rohan", email: "r@example.com", message: "Do you support RTD sensors?", topic: "spam", consent: true } })).status, 400);
+  });
+
   it("reports every invalid field at once, and strips header-injection characters", async () => {
     const r = await t.call("POST", "/api/contact", { body: { name: "A", email: "nope", message: "short", segment: "made-up" } });
     assert.deepEqual(Object.keys(r.data.errors).sort(), ["consent", "email", "message", "name", "segment"]);
@@ -241,7 +272,7 @@ describe("job applications", () => {
     const r = await t.call("POST", "/api/applications", { form: applicationForm() });
     assert.equal(r.status, 201);
     const app = (await t.db.query("SELECT * FROM applications")).rows[0];
-    assert.equal(app.job_slug, "vlsi-engineer");
+    assert.equal(app.job_slug, "applications-integration-engineer");
     assert.equal(app.resume_name, "resume.pdf");
     assert.match(app.resume_url, /^https:\/\/drive\.google\.com\//);
     assert.equal(app.resume_file_id, "file-1");
@@ -269,11 +300,12 @@ describe("job applications", () => {
     assert.ok((await t.call("POST", "/api/applications", { form: applicationForm({}, null) })).data.errors.resume);
     assert.equal((await t.call("POST", "/api/applications", { form: applicationForm({ profile: "github.com/priya" }, null) })).status, 201);
     assert.ok((await t.call("POST", "/api/applications", { form: applicationForm({ track: undefined }) })).data.errors.track);
+    assert.ok((await t.call("POST", "/api/applications", { form: applicationForm({ track: "analog" }) })).data.errors.track, "only the tracks the role lists");
     assert.equal((await t.call("POST", "/api/applications", { form: applicationForm({ job: "astronaut" }) })).status, 404);
   });
 
   it("applies to the internship without a track", async () => {
-    assert.equal((await t.call("POST", "/api/applications", { form: applicationForm({ job: "vlsi-prototyping-intern", track: undefined }) })).status, 201);
+    assert.equal((await t.call("POST", "/api/applications", { form: applicationForm({ job: "digital-design-intern", track: undefined }) })).status, 201);
   });
 
   it("enforces the upload size limit", async () => {

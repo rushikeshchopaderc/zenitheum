@@ -116,8 +116,8 @@ function JobDescriptionPage() {
             {job.tracks && (
               <Reveal>
                 <section className="panel hud p-7 sm:p-8">
-                  <h2 className="font-display text-xl font-semibold text-white">Three openings, three tracks</h2>
-                  <ul className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <h2 className="font-display text-xl font-semibold text-white">Choose where you start</h2>
+                  <ul className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
                     {job.tracks.map((track, i) => (
                       <li key={track.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
                         <span className="font-mono text-xs tracking-[0.2em] text-accent-400">{String(i + 1).padStart(2, "0")}</span>

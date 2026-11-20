@@ -1,14 +1,29 @@
-# Roadmap — December 2026 → December 2027
+# Roadmap — February 2027 → February 2028
 
 > Internal planning document (not shown on the website). The website shows only the broad milestones, which you edit in the admin console under **Roadmap**.
 > Every date is a plan. Anything that depends on a foundry shuttle calendar is marked.
 
 Two chips run in parallel:
 
-- **ZT-SEC1** (digital secure chip): a 3–4 month soft-IP phase (Dec 2026 → Mar 2027), then evaluation with design partners and a block on the shared test chip. Licensed as **soft IP only**.
-- **ZT-AFE1** (analog sensor front-end): a 12-month path to silicon proof (tape-out Aug 2027, measured results Dec 2027). Delivered as **soft IP and hard IP**.
+- **ZT-SEC1** (digital secure chip): a 3–4 month soft-IP phase (Feb 2027 → May 2027), then evaluation with design partners and a block on the shared test chip. Licensed as **soft IP only**.
+- **ZT-AFE1** (analog sensor front-end): a 12-month path to silicon proof (tape-out Oct 2027, measured results Feb 2028). Delivered as **soft IP and hard IP**.
 
-**Internship:** two VLSI prototyping interns, **1 February – 31 March 2027** (₹10,000 per month, 2 months), with a path to a full-time role for strong performers.
+**Internship:** two prototyping interns (one digital for ZT-SEC1, one analog for ZT-AFE1), **1 February – 31 March 2027** (₹10,000 per month, 2 months), with a path to a full-time role for strong performers.
+
+## Roles and the chips they serve
+
+The programme starts on **1 February 2027**, the day the interns join. Roles live in `shared/jobs.js`.
+
+| Role | Seats | Chip |
+| --- | --- | --- |
+| Chief Technology Officer | 1 | Both (analog lead) |
+| Analog IC Design Engineer | 2 | ZT-AFE1 |
+| Analog Layout & Characterisation Engineer | 1 | ZT-AFE1 (hard IP) |
+| Secure Digital Design Engineer | 1 | ZT-SEC1 |
+| Design Verification Engineer | 1 | ZT-SEC1 |
+| Applications & Integration Engineer | 1 | Both (demos, customisation, integration) |
+| DevOps Engineer | 1 | Both (regressions, release packaging, web stack) |
+| Digital Design Intern / Analog Design Intern | 1 + 1 | ZT-SEC1 / ZT-AFE1 |
 
 ## Lanes
 
@@ -24,65 +39,65 @@ Two chips run in parallel:
 
 | Lane | Bar | From | To | Kind |
 | --- | --- | --- | --- | --- |
-| ZT-SEC1 · Digital | Spec | 2026-12 | 2026-12 | solid |
-| ZT-SEC1 · Digital | RTL & verification | 2027-01 | 2027-02 | solid |
-| ZT-SEC1 · Digital | v1.0 | 2027-03 | 2027-03 | release |
-| ZT-SEC1 · Digital | FPGA evaluation with partners | 2027-04 | 2027-07 | solid |
-| ZT-SEC1 · Digital | Tape-out | 2027-08 | 2027-08 | release |
-| ZT-SEC1 · Digital | Fabrication window | 2027-09 | 2027-11 | ghost |
-| ZT-SEC1 · Digital | Bring-up | 2027-12 | 2027-12 | release |
-| ZT-AFE1 · Analog | Spec & architecture | 2026-12 | 2027-01 | solid |
-| ZT-AFE1 · Analog | Circuit design | 2027-02 | 2027-03 | solid |
-| ZT-AFE1 · Analog | Layout | 2027-04 | 2027-05 | solid |
-| ZT-AFE1 · Analog | Extract | 2027-06 | 2027-06 | solid |
-| ZT-AFE1 · Analog | Sign-off | 2027-07 | 2027-07 | solid |
-| ZT-AFE1 · Analog | Tape-out | 2027-08 | 2027-08 | release |
-| ZT-AFE1 · Analog | Fabrication window | 2027-09 | 2027-11 | ghost |
-| ZT-AFE1 · Analog | Silicon proof | 2027-12 | 2027-12 | release |
-| Pipeline & Infra | CI setup | 2026-12 | 2026-12 | solid |
-| Pipeline & Infra | Regression farm & dashboards | 2027-01 | 2027-03 | solid |
-| Pipeline & Infra | Physical-verification pipelines | 2027-04 | 2027-07 | solid |
-| Pipeline & Infra | Freeze | 2027-08 | 2027-08 | release |
-| Pipeline & Infra | Characterisation data & delivery portal | 2027-09 | 2027-12 | solid |
+| ZT-SEC1 · Digital | Spec | 2027-02 | 2027-02 | solid |
+| ZT-SEC1 · Digital | RTL & verification | 2027-03 | 2027-04 | solid |
+| ZT-SEC1 · Digital | v1.0 | 2027-05 | 2027-05 | release |
+| ZT-SEC1 · Digital | FPGA evaluation with partners | 2027-06 | 2027-09 | solid |
+| ZT-SEC1 · Digital | Tape-out | 2027-10 | 2027-10 | release |
+| ZT-SEC1 · Digital | Fabrication window | 2027-11 | 2028-01 | ghost |
+| ZT-SEC1 · Digital | Bring-up | 2028-02 | 2028-02 | release |
+| ZT-AFE1 · Analog | Spec & architecture | 2027-02 | 2027-03 | solid |
+| ZT-AFE1 · Analog | Circuit design | 2027-04 | 2027-05 | solid |
+| ZT-AFE1 · Analog | Layout | 2027-06 | 2027-07 | solid |
+| ZT-AFE1 · Analog | Extract | 2027-08 | 2027-08 | solid |
+| ZT-AFE1 · Analog | Sign-off | 2027-09 | 2027-09 | solid |
+| ZT-AFE1 · Analog | Tape-out | 2027-10 | 2027-10 | release |
+| ZT-AFE1 · Analog | Fabrication window | 2027-11 | 2028-01 | ghost |
+| ZT-AFE1 · Analog | Silicon proof | 2028-02 | 2028-02 | release |
+| Pipeline & Infra | CI setup | 2027-02 | 2027-02 | solid |
+| Pipeline & Infra | Regression farm & dashboards | 2027-03 | 2027-05 | solid |
+| Pipeline & Infra | Physical-verification pipelines | 2027-06 | 2027-09 | solid |
+| Pipeline & Infra | Freeze | 2027-10 | 2027-10 | release |
+| Pipeline & Infra | Characterisation data & delivery portal | 2027-11 | 2028-02 | solid |
 | Team & Company | Interns · 1 Feb → 31 Mar | 2027-02 | 2027-03 | solid |
-| Team & Company | Hiring: CTO · DevOps · 3× VLSI | 2026-12 | 2027-02 | solid |
-| Team & Company | Team ramp, mentoring & IP hygiene | 2027-03 | 2027-12 | ghost |
-| Customers & Partners | Customer discovery | 2026-12 | 2027-02 | solid |
-| Customers & Partners | ZT-SEC1 partner evaluations | 2027-04 | 2027-07 | solid |
-| Customers & Partners | ZT-AFE1 evaluation boards & reviews | 2027-09 | 2027-12 | solid |
+| Team & Company | Hiring: CTO · analog ×2 · layout · secure digital · verification · applications · DevOps | 2027-02 | 2027-04 | solid |
+| Team & Company | Team ramp, mentoring & IP hygiene | 2027-05 | 2028-02 | ghost |
+| Customers & Partners | Customer discovery | 2027-02 | 2027-04 | solid |
+| Customers & Partners | ZT-SEC1 partner evaluations | 2027-06 | 2027-09 | solid |
+| Customers & Partners | ZT-AFE1 evaluation boards & reviews | 2027-11 | 2028-02 | solid |
 
 ## Decision gates
 
-### G1 — Specification freeze (2027-01-29)
+### G1 — Specification freeze (2027-03-31)
 
 - **Pass criterion:** ZT-SEC1 and ZT-AFE1 specifications signed off after conversations with 20 prospective customers; architecture reviews passed; freedom-to-operate search started.
 - **If it fails:** Re-scope blocks or targets before any RTL or transistor-level work is committed.
 
-### G2 — ZT-SEC1 soft IP v1.0 frozen (2027-03-31)
+### G2 — ZT-SEC1 soft IP v1.0 frozen (2027-05-31)
 
 - **Pass criterion:** Lint-clean RTL, regression and coverage targets met, proven on an FPGA, packaged with documentation and tagged as an internal release.
 - **If it fails:** Use the buffer month and trim optional modes rather than slip the release.
 
-### G3 — Design freeze & tape-out review (2027-07-30)
+### G3 — Design freeze & tape-out review (2027-09-30)
 
 - **Pass criterion:** Clean DRC, LVS and antenna checks; post-layout simulation meets targets across PVT corners and Monte Carlo; independent review passed.
 - **If it fails:** Fix and re-review; hold for the next shuttle date and budget an extra MPW.
 
-### G4 — Tape-out (2027-08-31)
+### G4 — Tape-out (2027-10-31)
 
 - **Pass criterion:** GDSII for the shared test chip (ZT-AFE1 signal chain and the ZT-SEC1 security block) accepted by the MPW programme; package selected; evaluation boards ordered. Date follows the shuttle calendar.
 - **If it fails:** Move to the next shuttle date, or an overseas shuttle through programme partners.
 
-### G5 — ZT-AFE1 silicon proof (2027-12-31)
+### G5 — ZT-AFE1 silicon proof (2028-02-29)
 
 - **Pass criterion:** Packaged samples brought up on the evaluation board; measured results documented against the specification targets.
 - **If it fails:** Publish partial measured results while remaining characterisation completes; plan a revision.
 
 ## Ten steps
 
-### Step 1 — Kick-off, specification & environment (December 2026)
+### Step 1 — Kick-off, specification & environment (February 2027)
 
-*Day one is 1 December: specifications open and the pipeline skeleton goes live.*
+*Day one is 1 February: the two interns join, specifications open and the pipeline skeleton goes live.*
 
 **ZT-SEC1 · Digital**
 - Scope ZT-SEC1: a secure-authentication chip built on AES, SHA-256 / HMAC and a true-random-number generator with health tests, behind an SPI / I²C interface.
@@ -90,14 +105,15 @@ Two chips run in parallel:
 
 **ZT-AFE1 · Analog**
 - Capture ZT-AFE1 requirements: a 24-bit sigma-delta signal chain with programmable gain, a low-drift reference and sensor excitation for bridges and RTDs, targeting SCL 180 nm.
-- Define the test-chip scope: the core signal chain that has to reach silicon by December 2027.
+- Define the test-chip scope: the core signal chain that has to reach silicon by February 2028.
 
 **Pipeline & Infra**
 - Stand up the monorepo, CI skeleton and versioned EDA environments.
 - Baseline: every result reproducible from a commit.
 
 **Team & Company**
-- Hiring opens: CTO, DevOps Engineer, three VLSI Engineers. IP-assignment and clean-room declarations are signed from day one.
+- Hiring opens for the eight full-time roles (CTO; two analog IC design engineers; analog layout; secure digital design; design verification; applications & integration; DevOps). IP-assignment and clean-room declarations are signed from day one.
+- Two prototyping interns start on 1 February (one digital for ZT-SEC1, one analog for ZT-AFE1): ₹10,000 per month for two months, with a path to a full-time role.
 
 **Customers & Partners**
 - Begin conversations with the first of 20 prospective customers: instrument, meter and secure-device makers.
@@ -106,7 +122,7 @@ Two chips run in parallel:
 - **Exit:** Specifications v0.9 reviewed; pipeline skeleton green; interns productive.
 - **Tools:** Git, CI / CD, Commercial EDA environment
 
-### Step 2 — Architecture & behavioural models (January 2027)
+### Step 2 — Architecture & behavioural models (March 2027)
 
 *Decide what to build — and prove the maths — before drawing a single transistor.*
 
@@ -123,7 +139,8 @@ Two chips run in parallel:
 - CI runs lint and simulation on every commit; artifact registry ready for design releases.
 
 **Team & Company**
-- Technical leadership onboarding (target); mentoring plan for the first engineers and the February intern cohort.
+- Technical leadership onboarding (target); mentoring plan for the first engineers and the two interns.
+- The intern cohort ends on 31 March with a prototype demo day (26 March); strong performers are offered full-time roles.
 
 **Customers & Partners**
 - Feedback from customer conversations folded into both specifications.
@@ -133,7 +150,7 @@ Two chips run in parallel:
 - **Gate:** G1
 - **Tools:** Python / NumPy, Verilog-A, RTL simulator
 
-### Step 3 — Build: RTL and analog schematics (February 2027)
+### Step 3 — Build: RTL and analog schematics (April 2027)
 
 *The first working blocks — digital in simulation, analog on the simulator's bench.*
 
@@ -150,7 +167,6 @@ Two chips run in parallel:
 
 **Team & Company**
 - Early-career engineers take block ownership; weekly design reviews begin.
-- Two prototyping interns start on 1 February: ₹10,000 per month for two months, with a path to a full-time role.
 
 **Customers & Partners**
 - Design-partner discussions move on to the draft specifications.
@@ -158,7 +174,7 @@ Two chips run in parallel:
 - **Exit:** ZT-SEC1 RTL-complete; reference and amplifier meet first-pass targets in simulation.
 - **Tools:** RTL simulator, Logic synthesis, SPICE-class simulator, Schematic capture
 
-### Step 4 — ZT-SEC1 soft IP v1.0 & analog design II (March 2027)
+### Step 4 — ZT-SEC1 soft IP v1.0 & analog design II (May 2027)
 
 *The 4-month digital phase closes: verified, FPGA-proven, packaged, frozen.*
 
@@ -176,7 +192,6 @@ Two chips run in parallel:
 
 **Team & Company**
 - Weekly reviews continue; the first blocks are signed off by the CTO.
-- The intern cohort ends on 31 March with a prototype demo day; strong performers are offered full-time roles.
 
 **Customers & Partners**
 - FPGA evaluation kit and integration notes prepared for design partners.
@@ -185,7 +200,7 @@ Two chips run in parallel:
 - **Gate:** G2
 - **Tools:** Formal verification, Logic synthesis, FPGA board
 
-### Step 5 — Analog layout I & FPGA evaluations (April 2027)
+### Step 5 — Analog layout I & FPGA evaluations (June 2027)
 
 *The digital chip meets its first users while the analog test chip takes physical shape.*
 
@@ -208,7 +223,7 @@ Two chips run in parallel:
 - **Exit:** Reference layout DRC/LVS-clean; first design-partner evaluations running.
 - **Tools:** Layout editor, DRC / LVS, FPGA kit
 
-### Step 6 — Layout completion, extraction & post-layout closure (May – June 2027)
+### Step 6 — Layout completion, extraction & post-layout closure (July – August 2027)
 
 *Where analog designs live or die: parasitics, corners and mismatch.*
 
@@ -234,7 +249,7 @@ Two chips run in parallel:
 - **Exit:** Post-layout results meet targets in all corners.
 - **Tools:** Parasitic extraction, SPICE-class simulator, Python
 
-### Step 7 — Integration, sign-off & design freeze (July 2027)
+### Step 7 — Integration, sign-off & design freeze (September 2027)
 
 *Nothing goes to the foundry that an independent reviewer has not tried to break.*
 
@@ -258,7 +273,7 @@ Two chips run in parallel:
 - **Gate:** G3
 - **Tools:** Sign-off DRC / LVS, Static timing analysis, Sign-off checklist
 
-### Step 8 — Tape-out (August 2027)
+### Step 8 — Tape-out (October 2027)
 
 *GDSII leaves the building — on the shuttle that the foundry calendar allows.*
 
@@ -282,7 +297,7 @@ Two chips run in parallel:
 - **Gate:** G4
 - **Tools:** GDSII, MPW shuttle, OSAT packaging
 
-### Step 9 — Fabrication window: bench, test programme & evaluation boards (September – November 2027)
+### Step 9 — Fabrication window: bench, test programme & evaluation boards (November 2027 – January 2028)
 
 *While wafers are in the fab, everything around the silicon gets built.*
 
@@ -306,7 +321,7 @@ Two chips run in parallel:
 - **Exit:** Test programme and bench ready before samples arrive.
 - **Tools:** Python automation, Bench instruments, Delivery portal
 
-### Step 10 — Silicon bring-up & ZT-AFE1 silicon proof (December 2027)
+### Step 10 — Silicon bring-up & ZT-AFE1 silicon proof (February 2028)
 
 *Measured results replace simulated ones. The analog signal chain is proven on silicon.*
 
@@ -332,7 +347,7 @@ Two chips run in parallel:
 
 - **2** Chips in development (ZT-AFE1 · ZT-SEC1)
 - **1** Silicon test chip taped out (SCL 180 nm target)
-- **7** Open positions (5 full-time · 2 interns)
+- **10** Open positions (8 full-time · 2 interns)
 - **5** Decision gates (G1 – G5)
 
 ## Risks and responses

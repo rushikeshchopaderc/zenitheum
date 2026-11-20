@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 
 /**
@@ -7,8 +7,16 @@ import { useLocation } from "react-router-dom";
  */
 function ScrollToTop() {
   const { pathname, hash, key } = useLocation();
+  const previous = useRef({ pathname, hash });
 
   useEffect(() => {
+    const before = previous.current;
+    previous.current = { pathname, hash };
+    // The floating "customise" panel opens and closes through #customise; that must not move the page.
+    if (hash === "#customise" || (!hash && before.hash === "#customise" && before.pathname === pathname)) {
+      if (hash === "#customise" && before.pathname !== pathname) window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      return undefined;
+    }
     if (!hash) {
       window.scrollTo({ top: 0, left: 0, behavior: "auto" });
       return undefined;

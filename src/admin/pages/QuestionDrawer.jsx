@@ -6,6 +6,7 @@ import DangerZone from "../components/DangerZone";
 import { DetailList, Section } from "../components/Detail";
 import Drawer from "../components/Drawer";
 import { Notice } from "../components/Feedback";
+import Delivery from "../components/Delivery";
 import PersonActions from "../components/PersonActions";
 import { Time } from "../components/Time";
 import { firstName, mailtoHref, telHref } from "../format";
@@ -43,12 +44,13 @@ export default function QuestionDrawer({ row, onClose, onUpdated, onRemoved, ret
         <PersonActions email={row.email} phone={row.phone} mailHref={mailHref} />
       </div>
 
-      <Section title="Question" id="question-text">
+      <Section title={row.topic === "customisation" ? "Customisation request" : "Question"} id="question-text">
         <p className="adm-message">{row.message}</p>
         <DetailList
           items={[
+            { label: "Type", value: row.topic === "customisation" ? "Customisation request" : "Question" },
             { label: "Customer segment", value: segmentLabel(row.segment) },
-            { label: "Chip", value: chipLabel(row.chip) },
+            row.topic === "customisation" ? { label: "Chip and delivery", value: <Delivery chip={row.chip} analogFormat={row.analogFormat} /> } : { label: "Chip", value: chipLabel(row.chip) },
           ]}
         />
       </Section>

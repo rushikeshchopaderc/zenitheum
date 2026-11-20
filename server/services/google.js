@@ -8,16 +8,22 @@ const DRIVE = "https://www.googleapis.com/drive/v3";
 const DRIVE_UPLOAD = "https://www.googleapis.com/upload/drive/v3";
 const GMAIL = "https://gmail.googleapis.com/gmail/v1";
 
-export const GOOGLE_SCOPES = [
-  "https://www.googleapis.com/auth/calendar.events",
-  "https://www.googleapis.com/auth/drive.file",
-  "https://www.googleapis.com/auth/gmail.send",
-];
+const SCOPE_CALENDAR = "https://www.googleapis.com/auth/calendar.events";
+const SCOPE_GMAIL = "https://www.googleapis.com/auth/gmail.send";
+const SCOPE_DRIVE_FILE = "https://www.googleapis.com/auth/drive.file";
+const SCOPE_DRIVE_FULL = "https://www.googleapis.com/auth/drive";
+
+/**
+ * The permissions to ask the company account for. Writing into a Drive folder you made by hand (GOOGLE_DRIVE_FOLDER_ID) needs
+ * full Drive access: the narrow drive.file scope only sees files this app created itself, so such a folder would be "not found".
+ * Without a folder id the app creates its own folder and the narrow scope is enough.
+ */
+export const googleScopes = ({ driveFolderId } = {}) => [SCOPE_CALENDAR, SCOPE_GMAIL, driveFolderId ? SCOPE_DRIVE_FULL : SCOPE_DRIVE_FILE];
 
 /**
  * One OAuth refresh token (for the company Google account) powers three things, all over HTTPS:
  *   - createMeeting: a Calendar event with a Google Meet link, invitations e-mailed to everyone,
- *   - uploadResume:  a file in a Drive folder (the drive.file scope sees only files this app created),
+ *   - uploadResume:  a file in a Drive folder (a given folder id, or a folder the app creates itself),
  *   - sendMail:      e-mail through the Gmail API (free hosts such as Render block SMTP ports).
  * Nothing here is used unless GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET / GOOGLE_REFRESH_TOKEN are set.
  */
@@ -84,6 +90,7 @@ export function createGoogle(config, { fetch: doFetch = globalThis.fetch, log = 
     /** Store a resume in the Drive folder (created on first use). Returns the file id and a link the team can open. */
     async uploadResume({ name, mimeType, buffer }) {
       folder ??= (async () => {
+        if (g.driveFolderId) return g.driveFolderId;
         const q = `name='${g.driveFolderName.replace(/'/g, "\\'")}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
         const found = await call(`${DRIVE}/files?${new URLSearchParams({ q, fields: "files(id)", spaces: "drive" })}`);
         if (found.files?.[0]) return found.files[0].id;
@@ -102,12 +109,40 @@ export function createGoogle(config, { fetch: doFetch = globalThis.fetch, log = 
         buffer,
         Buffer.from(`\r\n--${boundary}--`),
       ]);
-      const file = await call(`${DRIVE_UPLOAD}/files?uploadType=multipart&fields=id,webViewLink`, {
+      const file = await call(`${DRIVE_UPLOAD}/files?uploadType=multipart&supportsAllDrives=true&fields=id,webViewLink`, {
         method: "POST",
         body: payload,
         headers: { "Content-Type": `multipart/related; boundary=${boundary}` },
       });
       return { fileId: file.id, url: file.webViewLink };
+    },
+
+    /**
+     * Read-only health check used by `npm run google:check`: can the stored token reach the calendar, the Drive folder and Gmail?
+     * Each part reports { ok, detail } or { ok: false, error } so one failure does not hide the others.
+     */
+    async check() {
+      const part = async (read) => {
+        try {
+          return { ok: true, detail: await read() };
+        } catch (error) {
+          return { ok: false, error: error.message };
+        }
+      };
+      return {
+        calendar: await part(async () => {
+          const c = await call(`${CALENDAR}/calendars/${encodeURIComponent(g.calendarId)}`);
+          return `${c.summary} (${c.timeZone})`;
+        }),
+        drive: await part(async () => {
+          if (!g.driveFolderId) return `no GOOGLE_DRIVE_FOLDER_ID set: the app will create a folder called "${g.driveFolderName}"`;
+          const f = await call(`${DRIVE}/files/${g.driveFolderId}?supportsAllDrives=true&fields=${encodeURIComponent("id,name,mimeType,capabilities(canAddChildren),owners(emailAddress)")}`);
+          if (f.mimeType !== "application/vnd.google-apps.folder") throw new Error(`"${f.name}" is a file, not a folder`);
+          if (f.capabilities?.canAddChildren === false) throw new Error(`the account cannot add files to "${f.name}" (needs Editor access)`);
+          return `folder "${f.name}"${f.owners?.[0] ? `, owned by ${f.owners[0].emailAddress}` : ""}`;
+        }),
+        gmail: await part(async () => (await call(`${GMAIL}/users/me/profile`)).emailAddress),
+      };
     },
 
     /** Send a plain-text e-mail (optionally with attachments) through the Gmail API. */
