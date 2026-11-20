@@ -2,14 +2,17 @@ import { Link } from "react-router-dom";
 import Reveal from "./Reveal";
 import WaferMap from "../fx/WaferMap";
 
+/** A router link, or a plain anchor for mailto: addresses. */
+const Action = ({ to, ...props }) => (/^mailto:|^https?:/.test(to) ? <a href={to} {...props} /> : <Link to={to} {...props} />);
+
 /**
  * Closing call-to-action at the foot of every page, over a slowly "growing" wafer map.
  */
 function CTABand({
-  title = "Building instruments or meters? Let's talk.",
-  description = "Become a design partner for ZT-AFE1 or ZT-SEC1, follow our milestones, or help us build the chips. Tell us what you are working on and we will come back with a concrete next step.",
-  primaryLabel = "Become a design partner",
-  primaryTo = "/contactus?topic=design-partner",
+  title = "Ready to see it work in your product?",
+  description = "Book a 30-minute demo, or place an order. We will come back with a concrete next step.",
+  primaryLabel = "Book a demo",
+  primaryTo = "/#demo",
   secondaryLabel,
   secondaryTo,
 }) {
@@ -39,13 +42,13 @@ function CTABand({
           </Reveal>
           <Reveal delay={200}>
             <div className="mt-10 flex flex-wrap items-center gap-4">
-              <Link to={primaryTo} className="btn-primary">
+              <Action to={primaryTo} className="btn-primary">
                 {primaryLabel}
-              </Link>
+              </Action>
               {secondaryLabel && secondaryTo && (
-                <Link to={secondaryTo} className="btn-ghost">
+                <Action to={secondaryTo} className="btn-ghost">
                   {secondaryLabel}
-                </Link>
+                </Action>
               )}
             </div>
           </Reveal>

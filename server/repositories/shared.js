@@ -11,13 +11,14 @@ export const newRef = () => `ZT-${crypto.randomBytes(4).toString("hex").toUpperC
 
 export const isUniqueViolation = (error) => error?.code === "23505";
 
-/** Run `attempt(ref)` with a fresh reference, retrying on the (very unlikely) collision. */
+/** Run `attempt(ref)` with a fresh reference, retrying on the (very unlikely) reference collision only. */
 export async function withUniqueRef(attempt) {
   for (let i = 0; ; i += 1) {
     try {
       return await attempt(newRef());
     } catch (error) {
-      if (!isUniqueViolation(error) || i >= 3) throw error;
+      const refCollision = isUniqueViolation(error) && /ref/i.test(error.constraint ?? error.detail ?? error.message ?? "");
+      if (!refCollision || i >= 3) throw error;
     }
   }
 }
@@ -38,6 +39,10 @@ export function whereBuilder() {
       params.push(value);
       clauses.push(sql.replaceAll("?", `$${params.length}`));
     },
+    /** A fixed clause with no value, e.g. addRaw("slot_start >= now()"). */
+    addRaw(sql) {
+      clauses.push(sql);
+    },
     get sql() {
       return clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
     },
@@ -49,26 +54,3 @@ export const page = ({ limit = 25, offset = 0, maxLimit = 500 } = {}) => ({
   limit: Math.min(Math.max(Number(limit) || 25, 1), maxLimit),
   offset: Math.max(Number(offset) || 0, 0),
 });
-
-/** The marketing attribution that travels with every lead (copied from the visitor's session). */
-export const EMPTY_ATTRIBUTION = {
-  visitor_id: null,
-  session_id: null,
-  channel: null,
-  utm_source: null,
-  utm_medium: null,
-  utm_campaign: null,
-  referrer_host: null,
-  landing_path: null,
-};
-
-export async function attributionFor(db, { visitorId, sessionId } = {}) {
-  if (!sessionId) return { ...EMPTY_ATTRIBUTION, visitor_id: visitorId ?? null };
-  const { rows } = await db.query(
-    `SELECT id AS session_id, visitor_id, channel, utm_source, utm_medium, utm_campaign, referrer_host, landing_path
-       FROM sessions WHERE id = $1`,
-    [sessionId]
-  );
-  // The session's own visitor wins over whatever the browser claimed.
-  return rows[0] ?? { ...EMPTY_ATTRIBUTION, visitor_id: visitorId ?? null };
-}

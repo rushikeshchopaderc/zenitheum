@@ -1,23 +1,21 @@
 import { useMemo } from "react";
 
-import { resumeHref } from "../api";
 import { StatusBadge } from "../components/Badge";
-import { CopyButton, NotesEditor, StatusSelect } from "../components/Controls";
+import { NotesEditor, StatusSelect } from "../components/Controls";
 import DangerZone from "../components/DangerZone";
-import { AttributionBlock, DetailList, Section } from "../components/Detail";
+import { DetailList, Section } from "../components/Detail";
 import Drawer from "../components/Drawer";
 import { Notice } from "../components/Feedback";
 import Icon from "../components/icons";
-import SessionJourney from "../components/SessionJourney";
+import PersonActions from "../components/PersonActions";
 import { Time } from "../components/Time";
-import { firstName, fmtBytes, mailtoHref, safeHttpUrl, shortUrl, telHref } from "../format";
+import { firstName, mailtoHref, safeHttpUrl, shortUrl, telHref } from "../format";
 import useCloseGuard from "../hooks/useCloseGuard";
 import useRecordActions from "../hooks/useRecordActions";
 import { APPLICATION_STATUSES, trackLabel } from "../labels";
 
-/** A profile link typed into a public form: a link only when it is a plain http(s) address, otherwise just text. */
-function ProfileLink({ value }) {
-  if (!value) return null;
+/** A link typed into a public form: a link only when it is a plain http(s) address, otherwise just text. */
+function WebLink({ value }) {
   const href = safeHttpUrl(value);
   if (!href) {
     return (
@@ -33,20 +31,17 @@ function ProfileLink({ value }) {
   );
 }
 
-/** One job application in full: the résumé, the applicant's details, a pipeline stage and internal notes. */
+/** One job application in full: the résumé (a Google Drive link), the applicant, a pipeline stage and notes. */
 export default function ApplicationDrawer({ row, onClose, onUpdated, onRemoved, returnFocus }) {
   const { requestClose, setDirty, warned } = useCloseGuard(onClose);
   const actions = useRecordActions({ collection: "applications", responseKey: "application", noun: "Application", row, onUpdated, onRemoved });
+  const tel = telHref(row.phone);
+  const resumeHref = safeHttpUrl(row.resumeUrl);
 
-  const emailHref = useMemo(
-    () =>
-      mailtoHref(row.email, {
-        subject: `Your application: ${row.jobTitle} (${row.ref})`,
-        body: `Hi ${firstName(row.name)},\n\nThank you for applying for the ${row.jobTitle} role at Zenitheum.\n\n`,
-      }),
+  const mailHref = useMemo(
+    () => mailtoHref(row.email, { subject: `Your application: ${row.jobTitle} (${row.ref})`, body: `Hi ${firstName(row.name)},\n\nThank you for applying for the ${row.jobTitle} role at Zenitheum.\n\n` }),
     [row.email, row.jobTitle, row.ref, row.name],
   );
-  const tel = telHref(row.phone);
 
   return (
     <Drawer
@@ -64,34 +59,26 @@ export default function ApplicationDrawer({ row, onClose, onUpdated, onRemoved, 
     >
       <div className="adm-headgrid">
         <StatusSelect label="Pipeline stage" value={row.status} options={APPLICATION_STATUSES} onSave={actions.saveStatus} hint="Saved as soon as you change it." />
-        <div className="adm-actions">
-          <a className="adm-btn adm-btn--primary" href={emailHref}>
-            <Icon name="send" size={16} /> Email applicant
-          </a>
-          {tel ? (
-            <a className="adm-btn" href={tel}>
-              <Icon name="phone" size={16} /> Call
-            </a>
-          ) : null}
-          <CopyButton text={row.email} small>
-            Copy email
-          </CopyButton>
-        </div>
+        <PersonActions email={row.email} phone={row.phone} mailHref={mailHref} mailLabel="Email applicant" />
       </div>
 
       <Section title="Résumé" id="app-resume">
-        {row.hasResume ? (
+        {row.resumeUrl ? (
           <div className="adm-filelink">
             <Icon name="file" size={20} />
             <div className="adm-filelink__name">
               <div className="adm-break" style={{ color: "var(--adm-text)", fontWeight: 600 }}>
                 {row.resumeName || "Résumé"}
               </div>
-              <div className="adm-hint">{fmtBytes(row.resumeSize)}</div>
+              <div className="adm-hint">Stored in Google Drive</div>
             </div>
-            <a className="adm-btn adm-btn--primary adm-btn--sm" href={resumeHref(row.id)} download>
-              <Icon name="download" size={14} /> Download résumé
-            </a>
+            {resumeHref ? (
+              <a className="adm-btn adm-btn--primary adm-btn--sm" href={resumeHref} target="_blank" rel="noopener noreferrer">
+                <Icon name="external" size={14} /> Open résumé in Google Drive
+              </a>
+            ) : (
+              <span className="adm-muted adm-break">{row.resumeUrl} (not a web address, so it is not linked)</span>
+            )}
           </div>
         ) : (
           <p className="adm-hint">No résumé was attached to this application.</p>
@@ -101,10 +88,10 @@ export default function ApplicationDrawer({ row, onClose, onUpdated, onRemoved, 
       <Section title="Applicant" id="app-person">
         <DetailList
           items={[
-            { label: "Email", value: <a href={emailHref}>{row.email}</a> },
+            { label: "Email", value: <a href={mailHref}>{row.email}</a> },
             { label: "Phone", value: tel ? <a href={tel}>{row.phone}</a> : row.phone },
             { label: "Institute or employer", value: row.organisation },
-            { label: "Profile", value: row.profileUrl ? <ProfileLink value={row.profileUrl} /> : null },
+            { label: "Profile", value: row.profileUrl ? <WebLink value={row.profileUrl} /> : null },
           ]}
         />
       </Section>
@@ -120,14 +107,6 @@ export default function ApplicationDrawer({ row, onClose, onUpdated, onRemoved, 
         {row.note ? <p className="adm-message">{row.note}</p> : <p className="adm-hint">The applicant did not add a note.</p>}
       </Section>
 
-      <Section title="Where they came from" id="app-source">
-        <AttributionBlock row={row} />
-      </Section>
-
-      <Section title="Visit journey" id="app-journey">
-        <SessionJourney key={row.sessionId ?? "none"} sessionId={row.sessionId} />
-      </Section>
-
       <Section title="Internal notes" id="app-notes">
         {warned ? (
           <Notice tone="warn" icon="alert">
@@ -140,8 +119,16 @@ export default function ApplicationDrawer({ row, onClose, onUpdated, onRemoved, 
       <Section title="Danger zone" id="app-danger">
         <DangerZone
           busy={actions.busy}
-          erase={{ available: Boolean(row.visitorId), onConfirm: actions.erase }}
-          remove={{ label: "Delete application", noun: `the application from ${row.name} (${row.ref}) together with the attached résumé`, confirmLabel: "Delete application", onConfirm: actions.remove }}
+          actions={[
+            {
+              id: "delete",
+              label: "Delete application",
+              title: "Delete this application?",
+              text: `This permanently deletes the application from ${row.name} (${row.ref}). The résumé file stays in Google Drive until you remove it there. It can’t be undone.`,
+              confirmLabel: "Delete application",
+              onConfirm: actions.remove,
+            },
+          ]}
         />
       </Section>
     </Drawer>

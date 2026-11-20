@@ -7,26 +7,23 @@ import multer from "multer";
 import { loadConfig } from "./config.js";
 import { HttpError } from "./lib/errors.js";
 import { createMailer } from "./lib/mailer.js";
-import { createAdminRepository } from "./repositories/admin.js";
-import { createAnalyticsRepository } from "./repositories/analytics.js";
+import { createDemoRepository } from "./repositories/demos.js";
 import { createLeadRepository } from "./repositories/leads.js";
 import { createMilestoneRepository } from "./repositories/milestones.js";
-import { createReportRepository } from "./repositories/reports.js";
+import { createOrderRepository } from "./repositories/orders.js";
+import { createOverviewRepository } from "./repositories/overview.js";
 import { createAdminRouter } from "./routes/admin.js";
 import { createPublicRouter } from "./routes/public.js";
-
-/** Pages the funnel report counts as "looked at a product". */
-const PRODUCT_PATHS = ["/products", "/products/digital", "/products/analog", "/customers"];
+import { createGoogle } from "./services/google.js";
 
 /** The application tier: every repository is built once, from the one database handle. */
 export function createRepositories(db, config) {
-  const timezone = config.analytics.timezone;
   return {
     leads: createLeadRepository(db),
-    analytics: createAnalyticsRepository(db),
-    milestones: createMilestoneRepository(db, { timezone }),
-    admin: createAdminRepository(db),
-    reports: createReportRepository(db, { timezone, productPaths: PRODUCT_PATHS }),
+    demos: createDemoRepository(db),
+    orders: createOrderRepository(db),
+    milestones: createMilestoneRepository(db, { timezone: config.demo.timezone }),
+    overview: createOverviewRepository(db),
   };
 }
 
@@ -34,7 +31,7 @@ export function createRepositories(db, config) {
  * Build the Express app. Everything environment-specific is injected (config, database, mailer, logger),
  * which is what lets the test-suite run it against an in-memory database with a fake mailer.
  */
-export function createApp({ config = loadConfig(), db, log = console, mailer = createMailer(config, log) } = {}) {
+export function createApp({ config = loadConfig(), db, log = console, google = createGoogle(config, { log }), mailer = createMailer(config, log, google) } = {}) {
   if (!db) throw new Error("createApp needs a database handle: pass `db` from createDb().");
 
   const repos = createRepositories(db, config);
@@ -92,7 +89,7 @@ export function createApp({ config = loadConfig(), db, log = console, mailer = c
     return next();
   });
 
-  const deps = { config, db, repos, mailer, log };
+  const deps = { config, db, repos, mailer, google, log };
   app.use("/api/admin", createAdminRouter(deps));
   app.use("/api", createPublicRouter(deps));
 
@@ -167,5 +164,5 @@ export function createApp({ config = loadConfig(), db, log = console, mailer = c
     });
   });
 
-  return { app, repos, mailer, config };
+  return { app, repos, mailer, google, config };
 }

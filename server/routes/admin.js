@@ -1,20 +1,17 @@
 import express, { Router } from "express";
 import rateLimit from "express-rate-limit";
 
-import { APPLICATION_STATUSES, CONTACT_STATUSES, SUBSCRIBER_STATUSES } from "../../shared/crm.js";
+import { APPLICATION_STATUSES, CONTACT_STATUSES, DEMO_STATUSES, ORDER_STATUSES, SUBSCRIBER_STATUSES } from "../../shared/crm.js";
 import { ids } from "../../shared/market.js";
 import { STATUS_LABELS } from "../../shared/milestones.js";
 import { HttpError } from "../lib/errors.js";
 import { isUuid, isoDate, text } from "../lib/validate.js";
 import {
-  COOKIE, burnTime, clearCookie, newToken, readCookie, sessionCookie, sha256, verifyPassword,
+  COOKIE, adminConfigured, checkCredentials, clearCookie, createThrottle, readCookie, sessionCookie, signSession, verifySession,
 } from "../services/auth.js";
 import { COLUMNS, toCsv } from "../services/csv.js";
-import { previousRange, resolveRange } from "../services/ranges.js";
 
-const MAX_FAILURES = 5;
-const LOCK_MINUTES = 15;
-const EXPORT_CAP = { contacts: 20_000, applications: 20_000, subscribers: 50_000, sessions: 50_000, events: 50_000 };
+const EXPORT_CAP = 50_000;
 const CHUNK = 2_000;
 
 const str = (value, max = 100) => (typeof value === "string" && value.trim() ? value.trim().slice(0, max) : undefined);
@@ -27,10 +24,14 @@ const oneOfIds = (list, value) => (typeof value === "string" && ids(list).includ
 const invalid = (errors) => new HttpError(400, "validation_failed", "Please check the highlighted fields.", { errors });
 const notFound = () => new HttpError(404, "not_found", "Not found.");
 
-export function createAdminRouter({ config, repos, log }) {
+/**
+ * Staff console API. One account (ADMIN_EMAIL / ADMIN_PASSWORD) and a signed, expiring cookie: nothing about staff
+ * sign-ins is stored in the database.
+ */
+export function createAdminRouter({ config, repos, google, log }) {
   const router = Router();
-  const { admin, leads, analytics, milestones, reports } = repos;
-  const tz = config.analytics.timezone;
+  const { leads, demos, orders, milestones, overview } = repos;
+  const throttle = createThrottle();
 
   const secureCookie = (req) => {
     const mode = config.admin.secureCookie;
@@ -46,8 +47,7 @@ export function createAdminRouter({ config, repos, log }) {
     next();
   });
 
-  // CSRF: the session cookie is SameSite=Strict, and every state-changing request must also carry a
-  // custom header. A cross-site page cannot set one without a CORS preflight, which we never grant.
+  // CSRF: the cookie is SameSite=Strict, and every state-changing request must also carry a custom header.
   router.use((req, _res, next) => {
     if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
     if (req.get("x-zenitheum-admin") !== "1") throw new HttpError(403, "csrf", "Missing request header.");
@@ -64,247 +64,189 @@ export function createAdminRouter({ config, repos, log }) {
     skipSuccessfulRequests: true,
     standardHeaders: "draft-8",
     legacyHeaders: false,
-    handler: (_req, res) =>
-      res.status(429).json({ ok: false, error: "rate_limited", message: "Too many sign-in attempts. Try again in a few minutes." }),
+    handler: (_req, res) => res.status(429).json({ ok: false, error: "rate_limited", message: "Too many sign-in attempts. Try again in a few minutes." }),
   });
 
-  router.post("/login", loginLimiter, async (req, res) => {
+  router.post("/login", loginLimiter, (req, res) => {
+    if (!adminConfigured(config)) {
+      throw new HttpError(503, "not_configured", "The staff console is not set up yet: set ADMIN_EMAIL and ADMIN_PASSWORD on the server.");
+    }
     const body = req.body ?? {};
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase().slice(0, 254) : "";
     const password = typeof body.password === "string" ? body.password.slice(0, 200) : "";
-    const refuse = () =>
-      new HttpError(401, "invalid_credentials", "Incorrect email or password, or the account is temporarily locked after repeated failures.");
+    const refuse = () => new HttpError(401, "invalid_credentials", "Incorrect email or password, or too many failed attempts. Try again in 15 minutes.");
 
-    if (!email || !password) throw refuse();
-    const user = await admin.findByEmail(email);
-
-    // Unknown address and locked account cost the same time as a wrong password.
-    if (!user || (user.lockedUntil && new Date(user.lockedUntil) > new Date())) {
-      await burnTime(password);
-      await admin.audit(user?.id, "login_refused", "admin", user?.id ?? null, { known: Boolean(user) });
+    const keys = [`email:${email}`, `ip:${req.ip}`];
+    if (keys.some((key) => throttle.locked(key))) throw refuse();
+    if (!checkCredentials(config, email, password)) {
+      keys.forEach((key) => throttle.fail(key));
       throw refuse();
     }
-    if (!(await verifyPassword(password, user.passwordHash))) {
-      await admin.recordFailure(user.id, { maxFailures: MAX_FAILURES, lockMinutes: LOCK_MINUTES });
-      await admin.audit(user.id, "login_failed", "admin", user.id);
-      throw refuse();
-    }
-
-    await admin.recordSuccess(user.id);
-    const token = newToken();
-    await admin.createSession({ tokenHash: sha256(token), adminId: user.id, hours: config.admin.sessionHours, userAgent: req.get("user-agent") });
-    await admin.audit(user.id, "login", "admin", user.id);
-    res.set("Set-Cookie", sessionCookie(token, { hours: config.admin.sessionHours, secure: secureCookie(req) }));
-    res.json({ ok: true, admin: { email: user.email, name: user.name } });
+    keys.forEach((key) => throttle.clear(key));
+    res.set("Set-Cookie", sessionCookie(signSession(config), { hours: config.admin.sessionHours, secure: secureCookie(req) }));
+    res.json({ ok: true, admin: { email: config.admin.email, name: null } });
   });
 
-  router.post("/logout", async (req, res) => {
-    const token = readCookie(req.headers.cookie, COOKIE);
-    if (token) {
-      const session = await admin.findSession(sha256(token));
-      await admin.deleteSession(sha256(token));
-      if (session) await admin.audit(session.id, "logout", "admin", session.id);
-    }
+  router.post("/logout", (req, res) => {
     res.set("Set-Cookie", clearCookie({ secure: secureCookie(req) }));
     res.json({ ok: true });
   });
 
   // ---- Everything below needs a signed-in administrator -------------------------------------------
 
-  router.use(async (req, _res, next) => {
-    const token = readCookie(req.headers.cookie, COOKIE);
-    const session = token ? await admin.findSession(sha256(token)) : null;
+  router.use((req, _res, next) => {
+    const session = verifySession(config, readCookie(req.headers.cookie, COOKIE));
     if (!session) throw new HttpError(401, "unauthenticated", "Please sign in.");
     req.admin = session;
     next();
   });
-
-  const audit = (req, action, entity, entityId, detail) => admin.audit(req.admin.id, action, entity, entityId, detail);
 
   const idParam = (req) => {
     if (!isUuid(req.params.id)) throw notFound();
     return req.params.id.toLowerCase();
   };
 
-  /** ?from=YYYY-MM-DD&to=YYYY-MM-DD in the business time zone -> exact instants for the repositories. */
-  async function windowOf(query) {
+  /** ?from=YYYY-MM-DD&to=YYYY-MM-DD -> exact instants (India time). */
+  function windowOf(query) {
     const errors = {};
     const from = isoDate({ label: "From", required: false })(query.from);
     const to = isoDate({ label: "To", required: false })(query.to);
     if (from.error) errors.from = from.error;
     if (to.error) errors.to = to.error;
     if (Object.keys(errors).length) throw invalid(errors);
-    if (!from.value && !to.value) return {};
-    const edge = await reports.bounds({ fromDate: from.value ?? "2000-01-01", toDate: to.value ?? "2999-12-31" });
-    return { from: from.value ? edge.from : undefined, to: to.value ? edge.to : undefined };
+    const at = (day, plus = 0) => (day ? new Date(Date.parse(`${day}T00:00:00+05:30`) + plus).toISOString() : undefined);
+    return { from: at(from.value), to: at(to.value, 86_400_000) };
   }
 
   router.get("/me", (req, res) => {
-    res.json({ ok: true, admin: { email: req.admin.email, name: req.admin.name } });
+    res.json({ ok: true, admin: { email: req.admin.email, name: null } });
   });
 
-  // ---- Dashboard ------------------------------------------------------------------------------------
+  // ---- Home ------------------------------------------------------------------------------------------
 
-  router.get("/overview", async (req, res) => {
-    const range = resolveRange(req.query, tz);
-    const [overview, pipeline] = await Promise.all([reports.overview(range, previousRange(range)), reports.pipeline()]);
-    res.json({ ...overview, pipeline });
+  router.get("/overview", async (_req, res) => {
+    const [counts, upcoming, newOrders] = await Promise.all([overview.counts(), demos.list({ upcoming: true, limit: 8 }), orders.list({ status: "new", limit: 5 })]);
+    res.json({ counts, upcomingDemos: upcoming.rows, newOrders: newOrders.rows });
   });
 
-  router.get("/campaigns", async (req, res) => {
-    res.json(await reports.campaigns(resolveRange(req.query, tz)));
-  });
-
-  router.get("/audience", async (req, res) => {
-    res.json(await reports.audience(resolveRange(req.query, tz)));
-  });
-
-  // ---- Leads ----------------------------------------------------------------------------------------
-
-  const contactFilters = async (query) => ({
-    status: oneOfIds(CONTACT_STATUSES, query.status),
-    topic: str(query.topic, 40),
-    segment: str(query.segment, 40),
-    chip: str(query.chip, 20),
-    channel: str(query.channel, 20),
-    q: str(query.q, 80),
-    ...(await windowOf(query)),
-  });
-
-  const applicationFilters = async (query) => ({
-    job: str(query.job, 60),
-    status: oneOfIds(APPLICATION_STATUSES, query.status),
-    track: str(query.track, 40),
-    channel: str(query.channel, 20),
-    q: str(query.q, 80),
-    ...(await windowOf(query)),
-  });
-
-  const subscriberFilters = (query) => ({ status: oneOfIds(SUBSCRIBER_STATUSES, query.status), q: str(query.q, 80) });
-
-  const sessionFilters = async (query) => ({
-    channel: str(query.channel, 20),
-    device: str(query.device, 20),
-    converted: query.converted === "1" || query.converted === "true",
-    ...(await windowOf(query)),
-  });
-
-  const eventFilters = async (query) => ({ name: str(query.name, 40), ...(await windowOf(query)) });
-
-  /** The notes field distinguishes "not sent" (leave alone) from "" (clear it). */
-  function patchOf(body, statuses) {
+  /** status / notes patches: "not sent" leaves a field alone, "" clears it. */
+  function patchOf(body, { statuses, notesField = "notes" }) {
     const errors = {};
     const patch = {};
     if (body?.status !== undefined) {
       if (typeof body.status === "string" && ids(statuses).includes(body.status)) patch.status = body.status;
       else errors.status = "Status is not a valid choice.";
     }
-    if (body?.notes !== undefined) {
-      const notes = text({ label: "Notes", max: 5000, multiline: true })(body.notes);
-      if (notes.error) errors.notes = notes.error;
-      else patch.notes = notes.value;
+    if (body?.[notesField] !== undefined) {
+      const notes = text({ label: "Notes", max: 5000, multiline: true })(body[notesField]);
+      if (notes.error) errors[notesField] = notes.error;
+      else patch[notesField] = notes.value;
     }
     if (Object.keys(errors).length) throw invalid(errors);
     if (!Object.keys(patch).length) throw new HttpError(400, "empty_update", "Nothing to update.");
     return patch;
   }
 
-  router.get("/contacts", async (req, res) => {
-    res.json(await leads.listContacts({ ...(await contactFilters(req.query)), ...paging(req.query) }));
-  });
+  // ---- Contacts ------------------------------------------------------------------------------------
+
+  const contactFilters = (q) => ({ status: oneOfIds(CONTACT_STATUSES, q.status), segment: str(q.segment, 40), chip: str(q.chip, 20), q: str(q.q, 80), ...windowOf(q) });
+  router.get("/contacts", async (req, res) => res.json(await leads.listContacts({ ...contactFilters(req.query), ...paging(req.query) })));
   router.patch("/contacts/:id", async (req, res) => {
-    const id = idParam(req);
-    const patch = patchOf(req.body, CONTACT_STATUSES);
-    const row = await leads.updateContact(id, patch);
+    const row = await leads.updateContact(idParam(req), patchOf(req.body, { statuses: CONTACT_STATUSES }));
     if (!row) throw notFound();
-    await audit(req, "contact_updated", "contact", id, { status: patch.status, notes: patch.notes !== undefined });
     res.json({ ok: true, contact: row });
   });
   router.delete("/contacts/:id", async (req, res) => {
-    const id = idParam(req);
-    if (!(await leads.deleteContact(id))) throw notFound();
-    await audit(req, "contact_deleted", "contact", id);
+    if (!(await leads.deleteContact(idParam(req)))) throw notFound();
     res.json({ ok: true });
   });
 
-  router.get("/applications", async (req, res) => {
-    res.json(await leads.listApplications({ ...(await applicationFilters(req.query)), ...paging(req.query) }));
-  });
-  router.patch("/applications/:id", async (req, res) => {
+  // ---- Demos ---------------------------------------------------------------------------------------
+
+  const demoFilters = (q) => ({ status: oneOfIds(DEMO_STATUSES, q.status), chip: str(q.chip, 20), upcoming: q.upcoming === "1" || q.upcoming === "true", q: str(q.q, 80) });
+  router.get("/demos", async (req, res) => res.json(await demos.list({ ...demoFilters(req.query), ...paging(req.query) })));
+  router.patch("/demos/:id", async (req, res) => {
     const id = idParam(req);
-    const patch = patchOf(req.body, APPLICATION_STATUSES);
-    const row = await leads.updateApplication(id, patch);
+    const patch = patchOf(req.body, { statuses: DEMO_STATUSES });
+    const before = await demos.get(id);
+    if (!before) throw notFound();
+    const row = await demos.update(id, patch);
+    // Cancelling a booked demo also cancels the calendar event (everyone is told).
+    if (patch.status === "cancelled" && before.calendarEventId && google.enabled) {
+      google.cancelMeeting(before.calendarEventId).catch((error) => log.error?.(`[demo] could not cancel the calendar event: ${error.message}`));
+    }
+    res.json({ ok: true, demo: row });
+  });
+  /** Create the Meet link for a demo whose automatic scheduling failed (or was not configured). */
+  router.post("/demos/:id/meeting", async (req, res) => {
+    const demo = await demos.get(idParam(req));
+    if (!demo) throw notFound();
+    if (!google.enabled) throw new HttpError(503, "google_not_configured", "Google is not connected on the server yet (see the README).");
+    if (demo.meetLink) return res.json({ ok: true, demo });
+    try {
+      const meeting = await google.createMeeting({
+        title: `Zenitheum demo — ${demo.organisation}`,
+        description: `${demo.name} · ${demo.email} · ${demo.phone}\n\n${demo.message || ""}`.trim(),
+        startIso: new Date(demo.slotStart).toISOString(),
+        endIso: new Date(demo.slotEnd).toISOString(),
+        attendees: [...new Set([demo.email, config.google.teamEmail])],
+      });
+      return res.json({ ok: true, demo: await demos.setMeeting(demo.id, { meetLink: meeting.meetLink, eventId: meeting.eventId }) });
+    } catch (error) {
+      log.error?.(`[demo] manual meeting creation failed: ${error.message}`);
+      throw new HttpError(502, "google_failed", "Google did not create the meeting. Check the server log.");
+    }
+  });
+  router.delete("/demos/:id", async (req, res) => {
+    if (!(await demos.delete(idParam(req)))) throw notFound();
+    res.json({ ok: true });
+  });
+
+  // ---- Orders --------------------------------------------------------------------------------------
+
+  const orderFilters = (q) => ({ status: oneOfIds(ORDER_STATUSES, q.status), chip: str(q.chip, 20), q: str(q.q, 80) });
+  router.get("/orders", async (req, res) => res.json(await orders.list({ ...orderFilters(req.query), ...paging(req.query) })));
+  router.patch("/orders/:id", async (req, res) => {
+    const row = await orders.update(idParam(req), patchOf(req.body, { statuses: ORDER_STATUSES, notesField: "internalNotes" }));
     if (!row) throw notFound();
-    await audit(req, "application_updated", "application", id, { status: patch.status, notes: patch.notes !== undefined });
+    res.json({ ok: true, order: row });
+  });
+  router.delete("/orders/:id", async (req, res) => {
+    if (!(await orders.delete(idParam(req)))) throw notFound();
+    res.json({ ok: true });
+  });
+
+  // ---- Applications ---------------------------------------------------------------------------------
+
+  const applicationFilters = (q) => ({ job: str(q.job, 60), status: oneOfIds(APPLICATION_STATUSES, q.status), track: str(q.track, 40), q: str(q.q, 80), ...windowOf(q) });
+  router.get("/applications", async (req, res) => res.json(await leads.listApplications({ ...applicationFilters(req.query), ...paging(req.query) })));
+  router.patch("/applications/:id", async (req, res) => {
+    const row = await leads.updateApplication(idParam(req), patchOf(req.body, { statuses: APPLICATION_STATUSES }));
+    if (!row) throw notFound();
     res.json({ ok: true, application: row });
   });
   router.delete("/applications/:id", async (req, res) => {
-    const id = idParam(req);
-    if (!(await leads.deleteApplication(id))) throw notFound();
-    await audit(req, "application_deleted", "application", id);
+    if (!(await leads.deleteApplication(idParam(req)))) throw notFound();
     res.json({ ok: true });
   });
-  router.get("/applications/:id/resume", async (req, res) => {
-    const id = idParam(req);
-    const file = await leads.getResume(id);
-    if (!file) throw notFound();
-    await audit(req, "resume_downloaded", "application", id);
-    // RFC 5987 form keeps non-ASCII names intact; the plain filename is an ASCII fallback.
-    const ascii = file.filename.replace(/[^\x20-\x7E]/g, "_").replace(/["\\]/g, "_");
-    res.set({
-      "Content-Type": file.mimeType,
-      "Content-Length": String(file.content.length),
-      "Content-Disposition": `attachment; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(file.filename)}`,
-    });
-    res.send(file.content);
-  });
 
-  router.get("/subscribers", async (req, res) => {
-    res.json(await leads.listSubscribers({ ...subscriberFilters(req.query), ...paging(req.query) }));
-  });
+  // ---- Subscribers ------------------------------------------------------------------------------------
+
+  const subscriberFilters = (q) => ({ status: oneOfIds(SUBSCRIBER_STATUSES, q.status), chip: str(q.chip, 20), q: str(q.q, 80) });
+  router.get("/subscribers", async (req, res) => res.json(await leads.listSubscribers({ ...subscriberFilters(req.query), ...paging(req.query) })));
   router.patch("/subscribers/:id", async (req, res) => {
-    const id = idParam(req);
     const status = req.body?.status;
     if (typeof status !== "string" || !ids(SUBSCRIBER_STATUSES).includes(status)) throw invalid({ status: "Status is not a valid choice." });
-    const row = await leads.setSubscriberStatus(id, status);
+    const row = await leads.setSubscriberStatus(idParam(req), status);
     if (!row) throw notFound();
-    await audit(req, "subscriber_updated", "subscriber", id, { status });
     res.json({ ok: true, subscriber: row });
   });
   router.delete("/subscribers/:id", async (req, res) => {
-    const id = idParam(req);
-    if (!(await leads.deleteSubscriber(id))) throw notFound();
-    await audit(req, "subscriber_deleted", "subscriber", id);
+    if (!(await leads.deleteSubscriber(idParam(req)))) throw notFound();
     res.json({ ok: true });
   });
 
-  // ---- Website activity -----------------------------------------------------------------------------
-
-  router.get("/sessions", async (req, res) => {
-    res.json(await analytics.listSessions({ ...(await sessionFilters(req.query)), ...paging(req.query) }));
-  });
-  router.get("/sessions/:id", async (req, res) => {
-    const detail = await analytics.getSession(idParam(req));
-    if (!detail) throw notFound();
-    res.json(detail);
-  });
-  router.get("/events", async (req, res) => {
-    const [list, names] = await Promise.all([
-      analytics.listEvents({ ...(await eventFilters(req.query)), ...paging(req.query) }),
-      analytics.eventNames(),
-    ]);
-    res.json({ ...list, names });
-  });
-
-  /** Erase everything stored about one visitor (a right-to-erasure request). Leads keep what the person typed. */
-  router.delete("/visitors/:id", async (req, res) => {
-    const id = idParam(req);
-    const erased = await analytics.eraseVisitor(id);
-    await audit(req, "visitor_erased", "visitor", id, { found: erased });
-    res.json({ ok: true, erased });
-  });
-
-  // ---- Roadmap milestones ---------------------------------------------------------------------------
+  // ---- Milestones (the public timeline) --------------------------------------------------------------
 
   router.get("/milestones", async (_req, res) => {
     res.json({ milestones: await milestones.list(), statuses: Object.entries(STATUS_LABELS).map(([id, label]) => ({ id, label })) });
@@ -316,7 +258,6 @@ export function createAdminRouter({ config, repos, log }) {
     const body = req.body ?? {};
     const errors = {};
     const patch = {};
-
     if (body.status !== undefined) {
       if (Object.hasOwn(STATUS_LABELS, body.status)) patch.status = body.status;
       else errors.status = "Status is not a valid choice.";
@@ -334,64 +275,35 @@ export function createAdminRouter({ config, repos, log }) {
     }
     if (Object.keys(errors).length) throw invalid(errors);
     if (!Object.keys(patch).length) throw new HttpError(400, "empty_update", "Nothing to update.");
-
     const row = await milestones.update(id, patch);
     if (!row) throw notFound();
-    await audit(req, "milestone_updated", "milestone", id, patch);
     res.json({ ok: true, milestone: row });
   });
 
-  // ---- CSV export (the marketing team's hand-off) ---------------------------------------------------
+  // ---- CSV export --------------------------------------------------------------------------------------
 
   const EXPORTS = {
-    contacts: async (query) => {
-      const filters = await contactFilters(query);
-      return (extra) => leads.listContacts({ ...filters, ...extra });
-    },
-    applications: async (query) => {
-      const filters = await applicationFilters(query);
-      return (extra) => leads.listApplications({ ...filters, ...extra });
-    },
-    subscribers: async (query) => {
-      const filters = subscriberFilters(query);
-      return (extra) => leads.listSubscribers({ ...filters, ...extra });
-    },
-    sessions: async (query) => {
-      const filters = await sessionFilters(query);
-      return (extra) => analytics.listSessions({ ...filters, ...extra });
-    },
-    events: async (query) => {
-      const filters = await eventFilters(query);
-      return (extra) => analytics.listEvents({ ...filters, ...extra });
-    },
+    contacts: (q) => { const f = contactFilters(q); return (extra) => leads.listContacts({ ...f, ...extra }); },
+    demos: (q) => { const f = demoFilters(q); return (extra) => demos.list({ ...f, ...extra }); },
+    orders: (q) => { const f = orderFilters(q); return (extra) => orders.list({ ...f, ...extra }); },
+    applications: (q) => { const f = applicationFilters(q); return (extra) => leads.listApplications({ ...f, ...extra }); },
+    subscribers: (q) => { const f = subscriberFilters(q); return (extra) => leads.listSubscribers({ ...f, ...extra }); },
   };
 
   router.get("/export/:kind", async (req, res) => {
     const kind = String(req.params.kind);
     if (!Object.hasOwn(EXPORTS, kind)) throw notFound();
-    const fetchPage = await EXPORTS[kind](req.query);
-
-    const cap = EXPORT_CAP[kind];
+    const fetchPage = EXPORTS[kind](req.query);
     const rows = [];
-    while (rows.length < cap) {
+    while (rows.length < EXPORT_CAP) {
       const chunk = (await fetchPage({ limit: CHUNK, offset: rows.length, maxLimit: CHUNK })).rows;
       rows.push(...chunk);
       if (chunk.length < CHUNK) break;
     }
-    rows.length = Math.min(rows.length, cap);
-
-    await audit(req, "export", kind, null, { rows: rows.length });
-    log.info?.(`[admin] export ${kind}: ${rows.length} rows`);
+    const tz = config.demo.timezone;
     const day = new Intl.DateTimeFormat("en-CA", { timeZone: tz }).format(new Date());
-    res.set({
-      "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="zenitheum-${kind}-${day}.csv"`,
-    });
+    res.set({ "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="zenitheum-${kind}-${day}.csv"` });
     res.send(toCsv(rows, COLUMNS[kind], { timeZone: tz }));
-  });
-
-  router.get("/audit", async (_req, res) => {
-    res.json({ rows: await admin.listAudit(100) });
   });
 
   // Anything else under /api/admin that matched nothing above.

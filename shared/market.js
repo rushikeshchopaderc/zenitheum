@@ -1,7 +1,8 @@
 /**
- * The market vocabulary shared by the website and the API: the two chips we make, the customer
- * segments we build them for, and the ways a visitor can get in touch. The contact form offers these
- * as choices and the API validates against the same lists, so every lead can be filtered by them.
+ * The market vocabulary shared by the website and the API: the two chips, how they are delivered, and the customer
+ * segments. The forms offer these as choices and the API validates against the same lists.
+ *
+ * Delivery: ZT-AFE1 (analog) comes as soft IP, hard IP, or both. ZT-SEC1 (digital) is licensed as soft IP only.
  */
 
 export const CHIPS = [
@@ -10,35 +11,26 @@ export const CHIPS = [
   { id: "both", label: "Both chips" },
 ];
 
-/** Ideal customers for the two chips (see src/data/customers.js for the pitch to each). */
+export const ANALOG_FORMATS = [
+  { id: "soft", label: "Soft IP" },
+  { id: "hard", label: "Hard IP" },
+  { id: "both", label: "Both soft and hard IP" },
+];
+
+/** Ideal customers, in the order the website lists them (see src/data/customers.js). */
 export const SEGMENTS = [
-  { id: "instrumentation", label: "Pressure, temperature & process-instrument makers" },
-  { id: "condition-monitoring", label: "Condition-monitoring & vibration-sensing OEMs" },
-  { id: "water-gas", label: "Water & gas meter makers" },
-  { id: "weighing", label: "Weighing-scale & load-cell system makers" },
   { id: "energy-metering", label: "Smart electricity-meter makers & utilities" },
+  { id: "instrumentation", label: "Pressure, temperature & process-instrument makers" },
+  { id: "weighing", label: "Weighing-scale & load-cell system makers" },
+  { id: "water-gas", label: "Water & gas meter makers" },
+  { id: "condition-monitoring", label: "Condition-monitoring & vibration-sensing OEMs" },
   { id: "government-defence", label: "Government, defence & strategic electronics" },
   { id: "iot", label: "IoT device & accessory makers" },
   { id: "other", label: "Something else" },
 ];
 
-/** Expected annual volume of the customer's product (a sizing hint for the sales conversation). */
-export const VOLUMES = [
-  { id: "prototype", label: "Prototype / evaluation only" },
-  { id: "lt-10k", label: "Under 10,000 a year" },
-  { id: "10k-100k", label: "10,000 – 100,000 a year" },
-  { id: "100k-1m", label: "100,000 – 1 million a year" },
-  { id: "gt-1m", label: "Over 1 million a year" },
-  { id: "unsure", label: "Not sure yet" },
-];
-
-export const CONTACT_TOPICS = [
-  { id: "design-partner", label: "Become a design partner" },
-  { id: "evaluation", label: "Early evaluation access (FPGA kit, evaluation board, samples)" },
-  { id: "partnership", label: "Foundry, packaging, programme or investor enquiry" },
-  { id: "careers", label: "Careers" },
-  { id: "other", label: "Something else" },
-];
-
 export const ids = (list) => list.map((item) => item.id);
 export const labelOf = (list, id) => list.find((item) => item.id === id)?.label ?? id;
+
+/** Does this chip choice include the analog chip? (Only then is a soft / hard choice needed.) */
+export const includesAnalog = (chip) => chip === "analog" || chip === "both";

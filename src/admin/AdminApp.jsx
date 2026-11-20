@@ -10,16 +10,14 @@ import Shell from "./components/Shell";
 import ToastProvider from "./components/ToastProvider";
 import { AuthContext } from "./context/contexts";
 import { useRobotsMeta } from "./hooks/useMisc";
-import ActivityPage from "./pages/ActivityPage";
 import ApplicationsPage from "./pages/ApplicationsPage";
-import AudiencePage from "./pages/AudiencePage";
-import CampaignsPage from "./pages/CampaignsPage";
-import LeadsPage from "./pages/LeadsPage";
+import DemosPage from "./pages/DemosPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import OrdersPage from "./pages/OrdersPage";
 import OverviewPage from "./pages/OverviewPage";
+import QuestionsPage from "./pages/QuestionsPage";
 import RoadmapPage from "./pages/RoadmapPage";
 import SubscribersPage from "./pages/SubscribersPage";
-import VisitorsPage from "./pages/VisitorsPage";
 
 /** Signed in: the frame plus one route per screen (paths are relative to /admin). */
 function Console() {
@@ -27,14 +25,12 @@ function Console() {
     <Shell>
       <Routes>
         <Route index element={<OverviewPage />} />
-        <Route path="leads" element={<LeadsPage />} />
+        <Route path="demos" element={<DemosPage />} />
+        <Route path="orders" element={<OrdersPage />} />
+        <Route path="questions" element={<QuestionsPage />} />
         <Route path="applications" element={<ApplicationsPage />} />
         <Route path="subscribers" element={<SubscribersPage />} />
-        <Route path="visitors" element={<VisitorsPage />} />
-        <Route path="campaigns" element={<CampaignsPage />} />
-        <Route path="audience" element={<AudiencePage />} />
         <Route path="roadmap" element={<RoadmapPage />} />
-        <Route path="activity" element={<ActivityPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Shell>

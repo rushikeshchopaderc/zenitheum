@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { setPageTitle } from "../lib/analytics";
 
 const BASE = "https://www.zenitheum.com";
 const DEFAULT_TITLE = "Zenitheum — Fabless Semiconductor Company";
@@ -8,7 +7,6 @@ const DEFAULT_TITLE = "Zenitheum — Fabless Semiconductor Company";
 export function usePageMeta({ title, description, path }) {
   useEffect(() => {
     document.title = title ? `${title} — Zenitheum` : DEFAULT_TITLE;
-    setPageTitle(document.title);
 
     if (description) {
       document.querySelector('meta[name="description"]')?.setAttribute("content", description);

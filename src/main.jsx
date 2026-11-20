@@ -10,9 +10,6 @@ import '@fontsource-variable/jetbrains-mono/wght.css'
 import './index.css'
 import './components/fx/fx.css'
 import App from './App.jsx'
-import { initAnalytics } from './lib/analytics'
-
-initAnalytics()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

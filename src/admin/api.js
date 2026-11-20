@@ -29,7 +29,7 @@ export function onUnauthorized(handler) {
 }
 
 /** { a: 1, b: "", c: undefined, d: true } -> "?a=1&d=1" (empty values are dropped). */
-export function queryString(params) {
+function queryString(params) {
   const search = new URLSearchParams();
   for (const [key, value] of Object.entries(params ?? {})) {
     if (value === undefined || value === null || value === "" || value === false) continue;
@@ -96,13 +96,13 @@ export const api = {
   login: (email, password) => request("/login", { method: "POST", body: { email, password }, silent401: true }),
   logout: () => request("/logout", { method: "POST", silent401: true }),
   get: (path, params, signal) => request(path, { params, signal }),
+  post: (path, body) => request(path, { method: "POST", body }),
   patch: (path, body) => request(path, { method: "PATCH", body }),
   remove: (path) => request(path, { method: "DELETE" }),
 };
 
-/** Same-origin download links (the cookie authenticates them). */
+/** CSV download link for a list (the cookie authenticates it): kind is demos, orders, contacts, applications or subscribers. */
 export const exportHref = (kind, params) => `${BASE}/export/${kind}${queryString(params)}`;
-export const resumeHref = (applicationId) => `${BASE}/applications/${encodeURIComponent(applicationId)}/resume`;
 
 /** Message to show for a failed action: the first per-field error when there is one, else the server message. */
 export function errorText(error) {

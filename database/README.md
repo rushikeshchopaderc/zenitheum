@@ -1,80 +1,73 @@
 # Database
 
-PostgreSQL 14 or newer. The schema is plain SQL in `migrations/NNN_name.sql`; the API applies any pending file on start
-(inside one transaction, under an advisory lock, so several API instances can start together). `npm run db:migrate` does the
-same without starting the server.
-
-## Adding a migration
-
-1. Create `migrations/002_short_name.sql` (the next number). Never edit a migration that has been applied anywhere.
-2. Keep it idempotent where cheap (`CREATE INDEX IF NOT EXISTS …`) and additive where possible.
-3. Restart the API, or run `npm run db:migrate`. `npm test` runs every migration on a fresh database.
+PostgreSQL 14 or newer (production: Neon). The schema is plain SQL in `migrations/NNN_name.sql`; the API applies any pending
+file when it starts (inside one transaction, under an advisory lock, so several API instances can start together).
+`npm run db:migrate` does the same without starting the server.
 
 ## Tables
 
-| Table                                              | Holds                                                 | Notes                                                                                                                                                                                   |
-| -------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `contacts`                                       | Enquiries from prospective customers                  | `topic`, `segment`, `chip`, `volume`, pipeline `status`, `notes`; marketing attribution copied from the visit (`channel`, `utm_*`, `referrer_host`, `landing_path`) |
-| `applications`                                   | Job applications                                      | `job_slug`, `track`, pipeline `status`, `notes`, same attribution columns                                                                                                       |
-| `application_files`                              | The uploaded resume (`bytea`)                       | One per application; deleted with it; SHA-256 stored                                                                                                                                    |
-| `subscribers`                                    | The early-access list                                 | e-mail unique and lower-case; `active` / `unsubscribed`                                                                                                                             |
-| `visitors`                                       | One row per browser that accepted analytics           | random id, first-touch channel / campaign                                                                                                                                               |
-| `sessions`                                       | One row per visit (30 minutes of inactivity ends one) | channel, UTM, device, browser, OS, screen, language, time zone                                                                                                                          |
-| `page_views`                                     | Pages viewed in a session                             | path, title, time on page, deepest scroll                                                                                                                                               |
-| `events`                                         | Named actions                                         | `cta_click`, `form_start`, `form_submit`, `form_error` … with small JSON `props`                                                                                             |
-| `milestones`                                     | The public milestone chart                            | status and dates edited in the console; `edited` stops re-seeding from overwriting them                                                                                               |
-| `admin_users`, `admin_sessions`, `audit_log` | Console access                                        | password hash (scrypt), only the SHA-256 of each session token, every sensitive action                                                                                                  |
+Six tables hold everything the website collects. There are no login, session, page-view or analytics tables.
 
-Conventions: ids that leave the system are UUIDs; every timestamp is `timestamptz` (UTC); no raw IP address is stored anywhere; a lead
-copies its attribution at insert time so reports survive the analytics retention window; status vocabularies are enforced by `CHECK`
-constraints that mirror `shared/crm.js`.
+| Table          | Holds                                          | Notes                                                                                                                                                              |
+| -------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `demos`        | Booked product demos                           | customer details, `chip` (`analog`/`digital`/`both`), `analog_format` (`soft`/`hard`/`both`), `slot_start`/`slot_end`, `meet_link`, `calendar_event_id`, `status`, `notes` |
+| `orders`       | Chip orders                                    | `contact_name`, `chip`, `analog_format`, `quantity`, `delivery_date`, `delivery_location`, `customisation`, `status`, `internal_notes`                             |
+| `contacts`     | Questions from prospective customers           | name, email, phone, company, message, `status`, `notes`                                                                                                            |
+| `applications` | Job applications                               | `job_slug`, `track`, `status`, `notes`; the resume is **not** in the database: `resume_name`, `resume_url` (a Google Drive link) and `resume_file_id` point to it    |
+| `subscribers`  | People waiting for chip release news           | unique lower-case `email`, `name`, `chip`, `analog_format`, `active` / `unsubscribed`                                                                              |
+| `milestones`   | The broad milestones shown on the website      | `track`, `status`, `target_date`; `edited` stops the seed file from overwriting what you changed in the console                                                    |
 
-## Marketing queries
+Rules enforced by the database itself:
 
-Run them with `psql "$DATABASE_URL"` (or from a BI tool). Time zone: India.
+- **The delivery rule.** The analog chip (ZT-AFE1) can be delivered as soft IP, hard IP or both; the digital chip (ZT-SEC1) is licensed as soft IP only.
+  `analog_format` is therefore filled for analog (and "both") requests and empty for digital ones. An order is for one chip, so `orders.chip` is `analog` or `digital`.
+- **No double booking.** `demos_slot_unique` allows one live (`requested` or `scheduled`) demo per `slot_start`; cancelling a demo frees its slot.
+- Status vocabularies are `CHECK` constraints that mirror `shared/crm.js`. Every timestamp is `timestamptz` (UTC); ids that leave the system are UUIDs
+  or short references like `ZT-1A2B3C4D`; no IP address is stored.
+
+## Migrations
+
+| File                 | What it does                                                                                                                                  |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `001_init.sql`       | The original schema (contacts, applications, subscribers, milestones, plus analytics and console-login tables that were later removed).       |
+| `002_simplify.sql`   | Drops the analytics, login and resume-storage tables, adds the `demos` and `orders` tables and the chip/format columns. It refuses to drop `application_files` if it still holds resumes. |
+
+Adding one: create `migrations/003_short_name.sql` (the next number), never edit a migration that has been applied anywhere, keep it
+idempotent where cheap (`CREATE INDEX IF NOT EXISTS …`) and restart the API or run `npm run db:migrate`. `npm test` runs every migration on a fresh database.
+
+## Looking at the data
+
+- **Admin console** (`/admin`): demos, orders, questions, applications, subscribers, milestones, with CSV export.
+- **Neon console** → your project → *Tables* (a spreadsheet view) or *SQL Editor* (type `select * from demos order by slot_start desc;`).
+- **Terminal:** `psql "$DATABASE_URL"`.
+
+## Handy queries
 
 ```sql
--- Which campaigns produce leads? (last 90 days)
-SELECT utm_campaign, utm_source, count(*) AS leads
-FROM contacts
-WHERE created_at > now() - interval '90 days' AND status <> 'spam' AND utm_campaign IS NOT NULL
-GROUP BY 1, 2 ORDER BY leads DESC;
+-- Upcoming demos (India time)
+SELECT ref, name, organisation, chip, analog_format,
+       slot_start AT TIME ZONE 'Asia/Kolkata' AS slot_ist, meet_link, status
+FROM demos WHERE slot_start >= now() AND status IN ('requested', 'scheduled') ORDER BY slot_start;
 
--- Leads by customer segment and chip, with how many reached "qualified" or better
-SELECT segment, chip, count(*) AS leads,
-       count(*) FILTER (WHERE status IN ('qualified', 'won')) AS qualified
-FROM contacts WHERE status <> 'spam'
-GROUP BY 1, 2 ORDER BY leads DESC;
+-- Open orders by delivery date
+SELECT ref, organisation, contact_name, chip, analog_format, quantity, delivery_date, delivery_location, status
+FROM orders WHERE status IN ('new', 'confirmed', 'in_progress') ORDER BY delivery_date;
 
--- Which channel brings the visitors who convert? (sessions vs leads, last 30 days)
-SELECT s.channel,
-       count(*) AS sessions,
-       count(*) FILTER (WHERE EXISTS (SELECT 1 FROM contacts c WHERE c.session_id = s.id)) AS leads,
-       round(100.0 * count(*) FILTER (WHERE EXISTS (SELECT 1 FROM contacts c WHERE c.session_id = s.id)) / count(*), 1) AS pct
-FROM sessions s WHERE s.started_at > now() - interval '30 days'
-GROUP BY 1 ORDER BY sessions DESC;
+-- Demand by chip and delivery format, across demos, orders and the release-news list
+SELECT 'demo' AS source, chip, analog_format, count(*) FROM demos GROUP BY 2, 3
+UNION ALL SELECT 'order', chip, analog_format, count(*) FROM orders GROUP BY 2, 3
+UNION ALL SELECT 'news', chip, analog_format, count(*) FROM subscribers WHERE status = 'active' GROUP BY 2, 3
+ORDER BY 1, 2, 3;
 
 -- Applicants per role and stage
-SELECT job_title, status, count(*) FROM applications GROUP BY 1, 2 ORDER BY 1, 2;
+SELECT job_slug, status, count(*) FROM applications GROUP BY 1, 2 ORDER BY 1, 2;
 
--- A mailing list: active subscribers plus qualified leads (de-duplicated)
-SELECT email FROM subscribers WHERE status = 'active'
-UNION
-SELECT email FROM contacts WHERE status IN ('qualified', 'won')
-ORDER BY 1;
-
--- What did a lead read before writing? (replace the reference)
-SELECT pv.occurred_at, pv.path, pv.duration_ms
-FROM contacts c JOIN page_views pv ON pv.session_id = c.session_id
-WHERE c.ref = 'ZT-1A2B3C4D' ORDER BY pv.occurred_at;
+-- Mailing list: active release-news subscribers
+SELECT email, name, chip, analog_format FROM subscribers WHERE status = 'active' ORDER BY created_at;
 ```
 
 ## Privacy operations
 
-- **Erase one person's browsing data:** *Leads → a lead → Erase browsing data* in the console (or `DELETE /api/admin/visitors/:id`).
-  The enquiry itself stays, minus the link to the visit.
-- **Delete a lead or application entirely:** the delete buttons in the console; the resume goes with its application.
-- **Retention:** the API deletes sessions (and their page views and events) older than `ANALYTICS_RETENTION_DAYS` every six hours.
-
-
-For Neon, use the password as Rcrush@zenitheum1
+- **Delete a person's records:** the delete buttons in the console (demo, order, question, application, subscriber). Deleting an application removes
+  its row only; also delete the resume from the "Zenitheum applications" folder in Google Drive (`resume_url` links to it).
+- **Backups:** `pg_dump "$DATABASE_URL" | gzip > zenitheum-$(date +%F).sql.gz`. Neon also keeps a short point-in-time history on the free plan.

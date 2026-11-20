@@ -10,28 +10,21 @@ import Icon from "./icons";
 const NAV = [
   { label: "Dashboard", items: [{ to: "/admin", end: true, icon: "overview", text: "Overview" }] },
   {
+    label: "Customers",
+    items: [
+      { to: "/admin/demos", icon: "demos", text: "Demos" },
+      { to: "/admin/orders", icon: "orders", text: "Orders" },
+      { to: "/admin/questions", icon: "questions", text: "Questions" },
+    ],
+  },
+  {
     label: "People",
     items: [
-      { to: "/admin/leads", icon: "leads", text: "Leads" },
       { to: "/admin/applications", icon: "applications", text: "Applications" },
       { to: "/admin/subscribers", icon: "subscribers", text: "Subscribers" },
     ],
   },
-  {
-    label: "Website",
-    items: [
-      { to: "/admin/visitors", icon: "visitors", text: "Visitors" },
-      { to: "/admin/campaigns", icon: "campaigns", text: "Campaigns" },
-      { to: "/admin/audience", icon: "audience", text: "Audience" },
-    ],
-  },
-  {
-    label: "Company",
-    items: [
-      { to: "/admin/roadmap", icon: "roadmap", text: "Roadmap" },
-      { to: "/admin/activity", icon: "history", text: "Activity log" },
-    ],
-  },
+  { label: "Company", items: [{ to: "/admin/roadmap", icon: "roadmap", text: "Roadmap" }] },
 ];
 
 const currentSection = (pathname) => {
@@ -46,7 +39,7 @@ const currentSection = (pathname) => {
 
 function Brand({ compact = false }) {
   return (
-    <NavLink to="/admin" end className="adm-brand" aria-label="Zenitheum admin, go to overview" style={compact ? { padding: 0 } : undefined}>
+    <NavLink to="/admin" end className={`adm-brand${compact ? " adm-brand--compact" : ""}`} aria-label="Zenitheum admin, go to overview">
       <span className="adm-brand__mark" aria-hidden="true">
         Z
       </span>

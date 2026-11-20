@@ -1,14 +1,26 @@
 import nodemailer from "nodemailer";
 
 /**
- * Optional e-mail notifications. With no SMTP_HOST configured the mailer is a
- * no-op, so the API works out of the box and submissions are still stored.
- * A failed send is logged and never fails the visitor's request.
+ * Team notifications. Preference order: the Gmail API (works on free hosts), then SMTP, otherwise a no-op so the API
+ * still works and everything is stored. A failed send is logged and never fails the visitor's request.
  */
-export function createMailer(config, log = console) {
-  if (!config.smtp.host) {
-    return { enabled: false, send: async () => false };
+export function createMailer(config, log = console, google = null) {
+  if (google?.enabled) {
+    return {
+      enabled: true,
+      async send(message) {
+        try {
+          await google.sendMail(message);
+          return true;
+        } catch (error) {
+          log.error?.(`[mail] Gmail send failed: ${error.message}`);
+          return false;
+        }
+      },
+    };
   }
+
+  if (!config.smtp.host) return { enabled: false, send: async () => false };
 
   const transporter = nodemailer.createTransport({
     host: config.smtp.host,
@@ -16,7 +28,6 @@ export function createMailer(config, log = console) {
     secure: config.smtp.port === 465,
     auth: config.smtp.user ? { user: config.smtp.user, pass: config.smtp.pass } : undefined,
   });
-
   return {
     enabled: true,
     async send({ to, subject, text, replyTo, attachments }) {

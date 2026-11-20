@@ -192,7 +192,7 @@ export default function RoadmapPage() {
 
   return (
     <div className="adm-page">
-      <PageHeader eyebrow="Company" title="Roadmap" lede="The milestones behind the public roadmap chart. Change a status or a date here and visitors see it straight away.">
+      <PageHeader eyebrow="Company" title="Roadmap" lede="The milestones shown on the public roadmap. Change a status or a date here and visitors see it straight away.">
         <a className="adm-btn" href="/roadmap" target="_blank" rel="noopener noreferrer">
           <Icon name="external" size={16} /> View public roadmap
         </a>

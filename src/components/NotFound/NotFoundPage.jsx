@@ -12,7 +12,7 @@ function NotFoundPage() {
         eyebrow="Error 404"
         title="Signal"
         accent="lost"
-        description="The page you were routing to does not exist — it may have moved when we rebuilt the site around silicon IP."
+        description="The page you were routing to does not exist — it may have moved when we rebuilt the site."
       >
         <p className="glitch mb-10 font-display text-7xl font-extrabold text-white sm:text-8xl" data-text="404" aria-hidden="true">
           404
@@ -21,8 +21,8 @@ function NotFoundPage() {
           <Link to="/" className="btn-primary">
             Back to home
           </Link>
-          <Link to="/roadmap" className="btn-ghost">
-            See the roadmap
+          <Link to="/#demo" className="btn-ghost">
+            Book a demo
           </Link>
         </div>
       </PageHero>

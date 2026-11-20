@@ -5,20 +5,24 @@ import { rowOpenButton } from "../dom";
 import useLoad from "./useLoad";
 import { useDrawerParam, usePaging, useQueryParams } from "./useQueryParams";
 
+const NO_DEFAULTS = {};
+
 /**
  * Everything a paged, filterable list with a detail drawer needs, with its state in the URL:
- * ?status=new&q=acme&page=2&size=50&open=<id>. `filterKeys` must be a module-level constant array.
+ * ?status=new&q=acme&page=2&size=50&open=<id>. `filterKeys` and `defaults` must be module-level constants.
+ *
+ * `defaults` are filter values that apply while the URL says nothing ({ upcoming: "1" }); they do not count as
+ * "active" filters, and clearing the filters returns to them.
  *
  * Rows changed from the drawer are patched into the list in place (no refetch while the drawer is open);
  * closing the drawer after a change refetches once so counts and filters tell the truth again.
- * `keepOpenParam`: the drawer loads its own data by id, so an ?open= that is not in this page is still valid.
  */
-export default function useListPage({ path, filterKeys, exportKind, keepOpenParam = false }) {
+export default function useListPage({ path, filterKeys, exportKind, defaults = NO_DEFAULTS }) {
   const [params, update] = useQueryParams();
   const { page, size, offset } = usePaging(params);
   const drawer = useDrawerParam("open");
 
-  const filters = useMemo(() => Object.fromEntries([...filterKeys, "q"].map((key) => [key, params.get(key) ?? ""])), [params, filterKeys]);
+  const filters = useMemo(() => Object.fromEntries([...filterKeys, "q"].map((key) => [key, params.get(key) ?? defaults[key] ?? ""])), [params, filterKeys, defaults]);
   const query = useMemo(() => ({ ...filters, limit: size, offset }), [filters, size, offset]);
   const { data, error, loading, reload, mutate } = useLoad((signal) => api.get(path, query, signal), `${path}?${JSON.stringify(query)}`);
 
@@ -34,15 +38,15 @@ export default function useListPage({ path, filterKeys, exportKind, keepOpenPara
 
   // ?open= points at a row that is not in this view (a stale link): drop it quietly.
   useEffect(() => {
-    if (!keepOpenParam && data && !loading && drawer.id && !selected) drawer.clear();
-  }, [keepOpenParam, data, loading, drawer, selected]);
+    if (data && !loading && drawer.id && !selected) drawer.clear();
+  }, [data, loading, drawer, selected]);
 
   const setFilter = useCallback((key, value) => update({ [key]: value }), [update]);
   const clearFilters = useCallback(() => update(Object.fromEntries([...filterKeys, "q"].map((key) => [key, null]))), [update, filterKeys]);
   const setPage = useCallback((next) => update({ page: next > 1 ? next : null }, { keepPage: true }), [update]);
   const setSize = useCallback((next) => update({ size: next === 25 ? null : next, page: null }), [update]);
 
-  const activeCount = filterKeys.filter((key) => filters[key]).length;
+  const activeCount = filterKeys.filter((key) => filters[key] !== (defaults[key] ?? "")).length;
   const anyActive = activeCount > 0 || Boolean(filters.q);
   const exportUrl = exportKind ? exportHref(exportKind, Object.fromEntries(Object.entries(filters).filter(([, value]) => value))) : null;
 

@@ -4,10 +4,10 @@ import { SITE } from "../shared/site.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-// Load .env from the project root if there is one. Real environment variables win.
+// Load .env and .env.local from the project root if present. Real environment variables win.
 for (const name of [".env", ".env.local"]) {
   try {
-    process.loadEnvFile?.(path.join(root, name)); // real environment variables always win
+    process.loadEnvFile?.(path.join(root, name));
   } catch {
     /* file not present — that is fine */
   }
@@ -53,24 +53,40 @@ export function loadConfig(env = process.env, overrides = {}) {
     pgPoolMax: toInt(env.PG_POOL_MAX, 10),
     pgliteDir: env.PGLITE_DIR ? path.resolve(env.PGLITE_DIR) : path.join(dataDir, "pg"),
 
-    // ---- Admin console ---------------------------------------------------------------------
+    // ---- Staff console: one account from the environment, a signed cookie for the session ----------
     admin: {
+      email: (env.ADMIN_EMAIL || "").trim().toLowerCase(),
+      password: env.ADMIN_PASSWORD || "",
+      secret: env.SESSION_SECRET || "", // optional; derived from the password when empty
       sessionHours: toInt(env.ADMIN_SESSION_HOURS, 8),
-      loginLimit: toInt(env.ADMIN_LOGIN_LIMIT, 10), // login attempts per IP per 15 min
-      bootstrapEmail: env.ADMIN_EMAIL || "",
-      bootstrapPassword: env.ADMIN_PASSWORD || "",
+      loginLimit: toInt(env.ADMIN_LOGIN_LIMIT, 10), // attempts per IP per 15 min
       // "auto" = Secure in production or over https; "false" only for trying a production build on http://localhost.
       secureCookie: ["true", "false"].includes(env.ADMIN_COOKIE_SECURE) ? env.ADMIN_COOKIE_SECURE : "auto",
     },
 
-    // ---- Website analytics (first-party, consent-based) -----------------------------------
-    analytics: {
-      enabled: env.ANALYTICS_ENABLED !== "false",
-      retentionDays: toInt(env.ANALYTICS_RETENTION_DAYS, 540),
-      timezone: env.ANALYTICS_TZ || "Asia/Kolkata",
-      collectLimit: toInt(env.COLLECT_RATE_MAX, 240), // collect requests per IP per minute
+    // ---- Demo booking: Mon–Fri, 30-minute slots, in India time (no daylight saving, so a fixed offset) ----
+    demo: {
+      timezone: "Asia/Kolkata",
+      utcOffsetMinutes: 330,
+      weekdays: [1, 2, 3, 4, 5],
+      startHour: toInt(env.DEMO_START_HOUR, 10),
+      endHour: toInt(env.DEMO_END_HOUR, 18),
+      slotMinutes: toInt(env.DEMO_SLOT_MINUTES, 30),
+      noticeHours: toInt(env.DEMO_NOTICE_HOURS, 12),
+      horizonDays: toInt(env.DEMO_HORIZON_DAYS, 21),
     },
 
+    // ---- Google (Calendar + Meet, Drive for resumes, Gmail for notifications). All optional. ----------
+    google: {
+      clientId: env.GOOGLE_CLIENT_ID || "",
+      clientSecret: env.GOOGLE_CLIENT_SECRET || "",
+      refreshToken: env.GOOGLE_REFRESH_TOKEN || "",
+      calendarId: env.GOOGLE_CALENDAR_ID || "primary",
+      driveFolderName: env.GOOGLE_DRIVE_FOLDER || "Zenitheum applications",
+      teamEmail: env.TEAM_EMAIL || SITE.emails.team,
+    },
+
+    // ---- Fallback e-mail over SMTP (note: free hosts such as Render block SMTP; use the Google/Gmail route there) ----
     smtp: {
       host: env.SMTP_HOST || "",
       port: toInt(env.SMTP_PORT, 587),
@@ -78,14 +94,13 @@ export function loadConfig(env = process.env, overrides = {}) {
       pass: env.SMTP_PASS || "",
     },
     mail: {
-      from: env.MAIL_FROM || `${SITE.name} Website <no-reply@zenitheum.com>`,
-      toContact: env.MAIL_TO_CONTACT || SITE.emails.support,
-      toCareers: env.MAIL_TO_CAREERS || SITE.emails.careers,
+      from: env.MAIL_FROM || `${SITE.name} Website <${SITE.emails.team}>`,
+      toTeam: env.MAIL_TO_TEAM || env.TEAM_EMAIL || SITE.emails.team,
     },
   };
 
   const merged = { ...base, ...overrides };
-  for (const key of ["rateLimit", "upload", "admin", "analytics", "smtp", "mail"]) {
+  for (const key of ["rateLimit", "upload", "admin", "demo", "google", "smtp", "mail"]) {
     merged[key] = { ...base[key], ...overrides[key] };
   }
   return merged;

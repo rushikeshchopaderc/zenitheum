@@ -2,51 +2,48 @@ import crypto from "node:crypto";
 
 export const COOKIE = "zt_admin";
 
-// scrypt cost: 64 MiB of memory per hash, comfortably above OWASP's minimums, ~150 ms per login.
-const N = 2 ** 16;
-const R = 8;
-const P = 1;
-const KEYLEN = 64;
-const MAXMEM = 256 * 1024 * 1024;
-
-const scrypt = (password, salt, { n = N, r = R, p = P } = {}) =>
-  new Promise((resolve, reject) =>
-    crypto.scrypt(password.normalize("NFKC"), salt, KEYLEN, { N: n, r, p, maxmem: MAXMEM }, (error, key) =>
-      error ? reject(error) : resolve(key)
-    )
-  );
-
-/** "scrypt$N$r$p$salt$hash" (base64) — self-describing, so the cost can be raised later. */
-export async function hashPassword(password) {
-  const salt = crypto.randomBytes(16);
-  const key = await scrypt(password, salt);
-  return `scrypt$${N}$${R}$${P}$${salt.toString("base64")}$${key.toString("base64")}`;
-}
-
-export async function verifyPassword(password, stored) {
-  const [scheme, n, r, p, salt, hash] = String(stored).split("$");
-  if (scheme !== "scrypt" || !hash) return false;
-  const expected = Buffer.from(hash, "base64");
-  const actual = await scrypt(password, Buffer.from(salt, "base64"), { n: Number(n), r: Number(r), p: Number(p) });
-  return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
-}
-
-let dummy;
-/** Verify against a throw-away hash so an unknown e-mail costs the same time as a wrong password. */
-export async function burnTime(password) {
-  dummy ??= await hashPassword(crypto.randomBytes(12).toString("hex"));
-  await verifyPassword(password, dummy);
-}
-
-export const passwordProblem = (password) =>
-  typeof password !== "string" || password.length < 12
-    ? "Use at least 12 characters."
-    : password.length > 200
-      ? "That password is too long."
-      : null;
-
-export const newToken = () => crypto.randomBytes(32).toString("base64url");
 export const sha256 = (value) => crypto.createHash("sha256").update(value).digest("hex");
+
+/** Constant-time string comparison (compares fixed-length digests, so lengths never leak). */
+export function safeEqual(a, b) {
+  const x = crypto.createHash("sha256").update(String(a)).digest();
+  const y = crypto.createHash("sha256").update(String(b)).digest();
+  return crypto.timingSafeEqual(x, y);
+}
+
+/** Is the staff console switched on? It needs both an e-mail and a password in the environment. */
+export const adminConfigured = (config) => Boolean(config.admin.email && config.admin.password);
+
+/** Check a sign-in against the single account in the environment. Always does both comparisons. */
+export function checkCredentials(config, email, password) {
+  const emailOk = safeEqual(String(email ?? "").trim().toLowerCase(), config.admin.email);
+  const passwordOk = safeEqual(password ?? "", config.admin.password);
+  return adminConfigured(config) && emailOk && passwordOk;
+}
+
+/** The key that signs session cookies: SESSION_SECRET, or one derived from the password (so changing it signs everyone out). */
+const secretOf = (config) => config.admin.secret || sha256(`zenitheum-session:${config.admin.email}:${config.admin.password}`);
+
+const b64 = (value) => Buffer.from(value).toString("base64url");
+const mac = (secret, payload) => crypto.createHmac("sha256", secret).update(payload).digest("base64url");
+
+/** A signed, expiring session token: base64url(json).signature. Nothing is stored server-side. */
+export function signSession(config, now = Date.now()) {
+  const payload = b64(JSON.stringify({ e: config.admin.email, x: now + config.admin.sessionHours * 3_600_000 }));
+  return `${payload}.${mac(secretOf(config), payload)}`;
+}
+
+export function verifySession(config, token, now = Date.now()) {
+  if (!adminConfigured(config) || typeof token !== "string") return null;
+  const [payload, signature] = token.split(".");
+  if (!payload || !signature || !safeEqual(signature, mac(secretOf(config), payload))) return null;
+  try {
+    const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    return data.x > now && data.e === config.admin.email ? { email: data.e } : null;
+  } catch {
+    return null;
+  }
+}
 
 export function readCookie(header, name) {
   if (!header) return null;
@@ -63,3 +60,24 @@ export const sessionCookie = (token, { hours, secure }) =>
 
 export const clearCookie = ({ secure }) =>
   `${COOKIE}=; Path=/api/admin; HttpOnly; SameSite=Strict; Max-Age=0${secure ? "; Secure" : ""}`;
+
+/** Remembers failed sign-ins in memory: 5 failures lock an e-mail or address for 15 minutes. */
+export function createThrottle({ max = 5, lockMs = 15 * 60_000 } = {}) {
+  const map = new Map();
+  const live = (key, now) => {
+    const entry = map.get(key);
+    if (entry && entry.until && entry.until <= now) map.delete(key);
+    return map.get(key);
+  };
+  return {
+    locked: (key, now = Date.now()) => Boolean(live(key, now)?.until),
+    fail(key, now = Date.now()) {
+      const entry = live(key, now) ?? { count: 0, until: 0 };
+      entry.count += 1;
+      if (entry.count >= max) entry.until = now + lockMs;
+      map.set(key, entry);
+      if (map.size > 5000) map.clear(); // bounded memory
+    },
+    clear: (key) => map.delete(key),
+  };
+}

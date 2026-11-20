@@ -1,4 +1,3 @@
-import { channelLabel } from "../labels";
 import { fmtInt } from "../format";
 
 /** A titled block inside a drawer. */
@@ -33,22 +32,6 @@ export function DetailList({ items }) {
         );
       })}
     </dl>
-  );
-}
-
-/** Where a lead came from, as copied onto it when it was created. */
-export function AttributionBlock({ row }) {
-  return (
-    <DetailList
-      items={[
-        { label: "Channel", value: row.channel ? channelLabel(row.channel) : null },
-        { label: "Campaign", value: row.utmCampaign, mono: true },
-        { label: "Source", value: row.utmSource, mono: true },
-        { label: "Medium", value: row.utmMedium, mono: true },
-        { label: "Referrer", value: row.referrerHost },
-        { label: "Landing page", value: row.landingPath, mono: true },
-      ]}
-    />
   );
 }
 

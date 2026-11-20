@@ -75,25 +75,6 @@ export function InputField({ label, value, onChange, type = "text", hint, error,
   );
 }
 
-export function TextareaField({ label, value, onChange, hint, error, className, maxLength, rows = 4, placeholder, disabled }) {
-  return (
-    <Field label={label} hint={hint} error={error} className={className}>
-      {(props) => (
-        <textarea
-          className="adm-textarea"
-          value={value ?? ""}
-          onChange={(event) => onChange(event.target.value)}
-          maxLength={maxLength}
-          rows={rows}
-          placeholder={placeholder}
-          disabled={disabled}
-          {...props}
-        />
-      )}
-    </Field>
-  );
-}
-
 /**
  * A search box for filters. The text is local while typing and committed through `onCommit` after a pause
  * (or at once on Enter / clear). A change from outside (Back button, "Clear filters") flows back in without

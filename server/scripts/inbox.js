@@ -1,41 +1,56 @@
 /**
  * Print what the website has captured, from the terminal.
  *
- *   npm run inbox                       latest contacts, applications and subscribers
- *   npm run inbox -- contacts --limit 50
- *   npm run inbox -- summary            counts only
+ *   npm run inbox                     latest of everything
+ *   npm run inbox -- demos --limit 20
+ *   npm run inbox -- summary          counts only
  */
+import { createDemoRepository } from "../repositories/demos.js";
 import { createLeadRepository } from "../repositories/leads.js";
+import { createOrderRepository } from "../repositories/orders.js";
 import { flag, openDatabase } from "./_boot.js";
 
-const kinds = ["contacts", "applications", "subscribers"];
+const kinds = ["demos", "orders", "contacts", "applications", "subscribers"];
 const what = process.argv[2] && !process.argv[2].startsWith("--") ? process.argv[2] : "all";
 const limit = Math.min(Number.parseInt(String(flag("limit") ?? ""), 10) || 10, 200);
-const when = (d) => new Date(d).toISOString().slice(0, 16).replace("T", " ");
+const when = (d) => new Date(d).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" });
 
 const { db } = await openDatabase({ quiet: true });
 try {
   const leads = createLeadRepository(db);
+  const demos = createDemoRepository(db);
+  const orders = createOrderRepository(db);
   if (what === "summary") {
     for (const table of kinds) {
       const { rows } = await db.query(`SELECT status, count(*)::int AS n FROM ${table} GROUP BY status ORDER BY n DESC`);
       console.log(`${table.padEnd(13)} ${rows.map((r) => `${r.status}: ${r.n}`).join("  ") || "none yet"}`);
     }
   } else {
-    if (what === "all" || what === "contacts") {
-      const { rows, total } = await leads.listContacts({ limit });
-      console.log(`\nCONTACTS (${rows.length} of ${total})`);
-      for (const r of rows) console.log(`  ${when(r.createdAt)}  ${r.ref}  ${r.status.padEnd(9)} ${r.name} <${r.email}>${r.organisation ? ` · ${r.organisation}` : ""} · ${r.topic}${r.segment ? ` · ${r.segment}` : ""}${r.channel ? ` · via ${r.channel}` : ""}`);
+    const show = (kind) => what === "all" || what === kind;
+    if (show("demos")) {
+      const { rows, total } = await demos.list({ upcoming: true, limit });
+      console.log(`\nUPCOMING DEMOS (${rows.length} of ${total})`);
+      for (const r of rows) console.log(`  ${when(r.slotStart)} IST  ${r.ref}  ${r.status.padEnd(9)} ${r.name} · ${r.organisation} · ${r.chip}${r.meetLink ? ` · ${r.meetLink}` : " · (no Meet link yet)"}`);
     }
-    if (what === "all" || what === "applications") {
+    if (show("orders")) {
+      const { rows, total } = await orders.list({ limit });
+      console.log(`\nORDERS (${rows.length} of ${total})`);
+      for (const r of rows) console.log(`  ${when(r.createdAt)}  ${r.ref}  ${r.status.padEnd(10)} ${r.organisation} · ${r.quantity} × ${r.chip}${r.analogFormat ? `/${r.analogFormat}` : ""} · by ${r.deliveryDate} · ${r.deliveryLocation.split("\n")[0]}`);
+    }
+    if (show("contacts")) {
+      const { rows, total } = await leads.listContacts({ limit });
+      console.log(`\nQUESTIONS (${rows.length} of ${total})`);
+      for (const r of rows) console.log(`  ${when(r.createdAt)}  ${r.ref}  ${r.status.padEnd(9)} ${r.name} <${r.email}>${r.organisation ? ` · ${r.organisation}` : ""}`);
+    }
+    if (show("applications")) {
       const { rows, total } = await leads.listApplications({ limit });
       console.log(`\nAPPLICATIONS (${rows.length} of ${total})`);
-      for (const r of rows) console.log(`  ${when(r.createdAt)}  ${r.ref}  ${r.status.padEnd(9)} ${r.name} <${r.email}> · ${r.jobTitle}${r.track ? ` (${r.track})` : ""}${r.hasResume ? " · resume" : ""}`);
+      for (const r of rows) console.log(`  ${when(r.createdAt)}  ${r.ref}  ${r.status.padEnd(9)} ${r.name} <${r.email}> · ${r.jobTitle}${r.track ? ` (${r.track})` : ""}${r.resumeUrl ? ` · ${r.resumeUrl}` : ""}`);
     }
-    if (what === "all" || what === "subscribers") {
+    if (show("subscribers")) {
       const { rows, total } = await leads.listSubscribers({ limit });
-      console.log(`\nSUBSCRIBERS (${rows.length} of ${total})`);
-      for (const r of rows) console.log(`  ${when(r.createdAt)}  ${r.status.padEnd(12)} ${r.email}${r.source ? ` · ${r.source}` : ""}`);
+      console.log(`\nCHIP NEWS SUBSCRIBERS (${rows.length} of ${total})`);
+      for (const r of rows) console.log(`  ${when(r.createdAt)}  ${r.status.padEnd(12)} ${r.email}${r.chip ? ` · ${r.chip}` : ""}${r.analogFormat ? ` · AFE1 ${r.analogFormat}` : ""}`);
     }
   }
 } finally {

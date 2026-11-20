@@ -4,15 +4,16 @@ import { api, errorText } from "../api";
 import { useToast } from "../context/contexts";
 
 /**
- * Save / delete / erase actions for one lead or application, with toasts and busy flags.
- * Each action resolves { ok, error? } so a form can show a field error inline as well.
+ * Save and delete actions for one record (a demo, order, question, application), with toasts and busy flags.
+ * Each action resolves { ok, row?, error? } so a form can show a field error inline as well.
  *
- * @param {{collection: "contacts"|"applications", responseKey: "contact"|"application", noun: string, row: any,
+ * @param {{collection: string, responseKey: string, noun: string, row: any, notesField?: string,
  *          onUpdated: (row:any)=>void, onRemoved: (row:any)=>void}} options
+ *   notesField: the API's name for the staff-notes field ("notes", or "internalNotes" on orders)
  */
-export default function useRecordActions({ collection, responseKey, noun, row, onUpdated, onRemoved }) {
+export default function useRecordActions({ collection, responseKey, noun, row, notesField = "notes", onUpdated, onRemoved }) {
   const toast = useToast();
-  const [busy, setBusy] = useState(null); // "status" | "notes" | "delete" | "erase" | null
+  const [busy, setBusy] = useState(null); // "status" | "notes" | "delete" | null
 
   const patch = useCallback(
     async (kind, body, message) => {
@@ -33,7 +34,7 @@ export default function useRecordActions({ collection, responseKey, noun, row, o
   );
 
   const saveStatus = useCallback((status) => patch("status", { status }, "Status saved"), [patch]);
-  const saveNotes = useCallback((notes) => patch("notes", { notes }, "Notes saved"), [patch]);
+  const saveNotes = useCallback((notes) => patch("notes", { [notesField]: notes }, "Notes saved"), [patch, notesField]);
 
   const remove = useCallback(async () => {
     setBusy("delete");
@@ -50,22 +51,5 @@ export default function useRecordActions({ collection, responseKey, noun, row, o
     }
   }, [collection, noun, row, onRemoved, toast]);
 
-  /** Right to erasure: removes the visitor's browsing data. The record keeps what the person typed. */
-  const erase = useCallback(async () => {
-    if (!row.visitorId) return { ok: false };
-    setBusy("erase");
-    try {
-      const response = await api.remove(`/visitors/${encodeURIComponent(row.visitorId)}`);
-      toast.success(response.erased ? "Browsing data erased" : "Nothing more was stored for that visitor");
-      onUpdated({ ...row, visitorId: null, sessionId: null });
-      return { ok: true };
-    } catch (error) {
-      toast.error(errorText(error));
-      return { ok: false, error };
-    } finally {
-      setBusy(null);
-    }
-  }, [row, onUpdated, toast]);
-
-  return { busy, saveStatus, saveNotes, remove, erase };
+  return { busy, saveStatus, saveNotes, remove };
 }

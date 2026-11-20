@@ -1,14 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
-
-/** `value`, but only after it has stopped changing for `delay` ms (debounced search boxes). */
-export function useDebounced(value, delay = 350) {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const timer = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(timer);
-  }, [value, delay]);
-  return debounced;
-}
+import { useEffect, useState } from "react";
 
 const TITLE_SUFFIX = "Zenitheum admin";
 
@@ -33,25 +23,6 @@ export function useRobotsMeta() {
     document.head.appendChild(meta);
     return () => meta.remove();
   }, []);
-}
-
-/** Current width of an element in px (ResizeObserver), for charts that draw to their container. */
-export function useElementWidth(ref, fallback = 640) {
-  const [width, setWidth] = useState(0);
-  useLayoutEffect(() => {
-    const element = ref.current;
-    if (!element) return undefined;
-    const measure = () => setWidth(Math.round(element.getBoundingClientRect().width));
-    measure();
-    if (typeof ResizeObserver === "undefined") {
-      window.addEventListener("resize", measure);
-      return () => window.removeEventListener("resize", measure);
-    }
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [ref]);
-  return width || fallback;
 }
 
 /** Live result of a CSS media query. */

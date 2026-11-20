@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { after, before, describe, it } from "node:test";
 
-import { MIGRATIONS_DIR, migrate, purgeAnalytics, seedMilestones } from "../db/migrate.js";
+import { migrate, seedMilestones } from "../db/migrate.js";
 import { milestones } from "../../shared/milestones.js";
-import { IOS_UA, beacon, openTestDb, startServer } from "./helpers.js";
+import { openTestDb } from "./helpers.js";
 
 let db;
 before(async () => {
@@ -15,57 +15,49 @@ describe("data tier", () => {
   it("applies each migration once and is safe to run again", async () => {
     assert.deepEqual(await migrate(db), []);
     const { rows } = await db.query("SELECT version FROM schema_migrations ORDER BY version");
-    assert.ok(rows.length >= 1);
-    assert.ok(MIGRATIONS_DIR.endsWith("database/migrations"));
+    assert.deepEqual(rows.map((r) => r.version), ["001_init.sql", "002_simplify.sql"]);
   });
 
-  it("seeds every milestone and keeps ids unique", async () => {
-    const { rows } = await db.query("SELECT count(*)::int AS n FROM milestones");
-    assert.equal(rows[0].n, milestones.length);
-    assert.equal(new Set(milestones.map((m) => m.id)).size, milestones.length);
+  it("keeps only the business tables: no visit tracking, no staff accounts, no resumes", async () => {
+    const tables = (await db.query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY 1")).rows.map((r) => r.table_name);
+    assert.deepEqual(tables.filter((n) => n !== "schema_migrations"), ["applications", "contacts", "demos", "milestones", "orders", "subscribers"]);
   });
 
-  it("re-seeding follows the file for untouched rows but never overwrites an edit", async () => {
-    await db.query("UPDATE milestones SET title = 'stale title' WHERE id = 'C-01'");
-    await db.query("UPDATE milestones SET title = 'edited in console', edited = true WHERE id = 'C-02'");
-    await seedMilestones(db);
-    const title = async (id) => (await db.query("SELECT title FROM milestones WHERE id = $1", [id])).rows[0].title;
-    assert.equal(await title("C-01"), milestones.find((m) => m.id === "C-01").title);
-    assert.equal(await title("C-02"), "edited in console");
+  it("has the columns the forms capture", async () => {
+    const cols = async (table) => (await db.query("SELECT column_name FROM information_schema.columns WHERE table_name = $1", [table])).rows.map((r) => r.column_name);
+    for (const c of ["slot_start", "slot_end", "meet_link", "calendar_event_id", "chip", "analog_format", "phone", "organisation", "status"]) assert.ok((await cols("demos")).includes(c), `demos.${c}`);
+    for (const c of ["quantity", "delivery_date", "delivery_location", "contact_name", "customisation", "analog_format", "chip"]) assert.ok((await cols("orders")).includes(c), `orders.${c}`);
+    for (const c of ["resume_name", "resume_url", "resume_file_id"]) assert.ok((await cols("applications")).includes(c), `applications.${c}`);
+    for (const c of ["chip", "analog_format", "email"]) assert.ok((await cols("subscribers")).includes(c), `subscribers.${c}`);
+    assert.ok(!(await cols("contacts")).includes("utm_source"), "no tracking columns");
   });
 
-  it("drops milestones removed from the file unless someone edited them", async () => {
-    await db.query("INSERT INTO milestones (id, track, title, target_date) VALUES ('X-01', 'company', 'old plan', '2027-01-01'), ('X-02', 'company', 'kept', '2027-01-01')");
+  it("seeds the broad milestones and re-seeding never overwrites an edit", async () => {
+    assert.equal((await db.query("SELECT count(*)::int AS n FROM milestones")).rows[0].n, milestones.length);
+    await db.query("UPDATE milestones SET title = 'stale' WHERE id = 'M-01'");
+    await db.query("UPDATE milestones SET title = 'edited', edited = true WHERE id = 'M-02'");
+    await db.query("INSERT INTO milestones (id, track, title, target_date) VALUES ('X-01', 'company', 'old', '2027-01-01'), ('X-02', 'company', 'kept', '2027-01-01')");
     await db.query("UPDATE milestones SET edited = true WHERE id = 'X-02'");
     await seedMilestones(db);
-    const ids = (await db.query("SELECT id FROM milestones WHERE id LIKE 'X-%'")).rows.map((r) => r.id);
-    assert.deepEqual(ids, ["X-02"]);
+    const title = async (id) => (await db.query("SELECT title FROM milestones WHERE id = $1", [id])).rows[0]?.title;
+    assert.equal(await title("M-01"), milestones[0].title);
+    assert.equal(await title("M-02"), "edited");
+    assert.equal(await title("X-01"), undefined, "dropped from the file");
+    assert.equal(await title("X-02"), "kept", "edited rows are never deleted");
   });
 
-  it("enforces the status vocabularies in the database itself", async () => {
-    await assert.rejects(db.query("INSERT INTO contacts (ref, name, email, topic, message, status) VALUES ('ZT-X', 'n', 'e@x.com', 't', 'm', 'bogus')"), /check/i);
-    await assert.rejects(db.query("UPDATE milestones SET status = 'done' WHERE id = 'C-01'"), /check/i);
-    await assert.rejects(db.query("INSERT INTO subscribers (email) VALUES ('dup@example.com'), ('dup@example.com')"), /unique|duplicate/i);
-  });
-
-  it("retention deletes old raw analytics but leads keep their own attribution", async () => {
-    const t = await startServer({ db });
-    try {
-      const b = beacon();
-      await t.call("POST", "/api/collect", { headers: { "user-agent": IOS_UA }, body: JSON.stringify(b.payload) });
-      await t.call("POST", "/api/contact", { body: { name: "Asha", email: "a@example.com", topic: "other", message: "Hello there, a question.", consent: true, visitorId: b.vid, sessionId: b.sid } });
-      await db.query("UPDATE sessions SET last_activity_at = now() - interval '600 days'");
-      await db.query("UPDATE visitors SET last_seen_at = now() - interval '600 days'");
-      assert.equal(await purgeAnalytics(db, 540), 1);
-      assert.equal((await db.query("SELECT count(*)::int AS n FROM sessions")).rows[0].n, 0);
-      assert.equal((await db.query("SELECT count(*)::int AS n FROM page_views")).rows[0].n, 0, "children cascade");
-      assert.equal((await db.query("SELECT count(*)::int AS n FROM visitors")).rows[0].n, 0);
-      const lead = (await db.query("SELECT * FROM contacts")).rows[0];
-      assert.equal(lead.channel, "social");
-      assert.equal(lead.session_id, null);
-      assert.equal(await purgeAnalytics(db, 0), 0, "0 disables the job");
-    } finally {
-      await t.close();
-    }
+  it("enforces the vocabularies and the one-booking-per-slot rule in the database itself", async () => {
+    const demo = (ref, status, chip = "analog") => db.query(
+      `INSERT INTO demos (ref, name, email, phone, organisation, chip, slot_start, slot_end, status) VALUES ($1, 'n', 'e@x.com', '1234567', 'o', $3, '2027-03-01T10:00:00Z', '2027-03-01T10:30:00Z', $2)`,
+      [ref, status, chip]);
+    await demo("ZT-D1", "scheduled");
+    await assert.rejects(demo("ZT-D2", "requested"), /unique|duplicate/i);
+    await db.query("UPDATE demos SET status = 'cancelled'");
+    await demo("ZT-D3", "scheduled");
+    await assert.rejects(demo("ZT-D4", "bogus"), /check/i);
+    await assert.rejects(demo("ZT-D5", "requested", "quantum"), /check/i);
+    await assert.rejects(db.query("INSERT INTO orders (ref, contact_name, email, phone, organisation, chip, quantity, delivery_date, delivery_location) VALUES ('ZT-O1','n','e@x.com','1','o','analog',0,'2027-01-01','x')"), /check/i);
+    await assert.rejects(db.query("UPDATE milestones SET status = 'done' WHERE id = 'M-01'"), /check/i);
+    await db.exec("TRUNCATE demos");
   });
 });

@@ -9,7 +9,7 @@ const ALLOWED = /\.(pdf|docx?)$/i;
 
 function ApplicationForm({ job }) {
   const initial = { name: "", email: "", phone: "", organisation: "", profile: "", track: "", note: "", consent: false, website: "" };
-  const form = useApiForm(initial, { formName: "application" });
+  const form = useApiForm(initial);
   const { values, setValue, bind, errors, setErrors, status, message, reference, run } = form;
   const [file, setFile] = useState(null);
   const fileRef = useRef(null);

@@ -1,28 +1,46 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
 import Logo from "../../assets/img/Zenitheum_removebg.webp";
 import { totalOpenings } from "@shared/jobs.js";
 
+// The site is one page: these scroll to a section. Careers is a page of its own.
 const navItems = [
-  { label: "Products", to: "/products" },
-  { label: "Customers", to: "/customers" },
-  { label: "Roadmap", to: "/roadmap" },
-  { label: "Technology", to: "/technology" },
-  { label: "About", to: "/about-us" },
+  { label: "Products", to: "/#products", section: "products" },
+  { label: "Customers", to: "/#customers", section: "customers" },
+  { label: "Custom chips", to: "/#custom", section: "custom" },
+  { label: "Milestones", to: "/#milestones", section: "milestones" },
+  { label: "About", to: "/#about", section: "about" },
   { label: "Careers", to: "/careers", badge: totalOpenings },
 ];
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState("");
   const progressRef = useRef(null);
   const location = useLocation();
+  const onHome = location.pathname === "/";
+
+  // Highlight the section being read.
+  useEffect(() => {
+    if (!onHome || typeof IntersectionObserver === "undefined") {
+      setActive("");
+      return undefined;
+    }
+    const sections = navItems.filter((i) => i.section).map((i) => document.getElementById(i.section)).filter(Boolean);
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+      { rootMargin: "-45% 0px -50% 0px" }
+    );
+    sections.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [onHome]);
 
   // Close the drawer whenever the route changes.
   useEffect(() => {
     setMenuOpen(false);
-  }, [location.pathname]);
+  }, [location.pathname, location.hash]);
 
   // Solidify the bar once the page scrolls, and drive the progress line (no re-render per frame).
   useEffect(() => {
@@ -65,9 +83,10 @@ function Navbar() {
     return () => window.removeEventListener("keydown", onKey);
   }, [menuOpen]);
 
-  const linkClasses = ({ isActive }) =>
+  const isActive = (item) => (item.section ? onHome && active === item.section : location.pathname.startsWith(item.to));
+  const linkClasses = (current) =>
     `relative inline-flex min-h-[44px] items-center rounded-full px-3.5 py-2 text-sm font-medium transition duration-200 xl:px-4 ${
-      isActive ? "text-white" : "text-zinc-400 hover:text-white"
+      current ? "text-white" : "text-zinc-400 hover:text-white"
     }`;
 
   return (
@@ -97,31 +116,23 @@ function Navbar() {
 
           {/* Desktop nav */}
           <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main">
-            {navItems.map((item) => (
-              <NavLink key={item.to} to={item.to} className={linkClasses}>
-                {({ isActive }) => (
-                  <>
-                    {item.label}
-                    {item.badge ? (
-                      <span className="ml-1.5 rounded-full bg-accent-600/25 px-1.5 py-0.5 font-mono text-[10px] leading-none text-accent-300">
-                        {item.badge}
-                      </span>
-                    ) : null}
-                    {isActive && (
-                      <span
-                        aria-hidden="true"
-                        className="absolute inset-x-3 -bottom-[1px] h-0.5 rounded-full bg-gradient-to-r from-accent-500 to-cyan-300"
-                      />
-                    )}
-                  </>
-                )}
-              </NavLink>
-            ))}
+            {navItems.map((item) => {
+              const current = isActive(item);
+              return (
+                <Link key={item.to} to={item.to} className={linkClasses(current)} aria-current={current ? "true" : undefined}>
+                  {item.label}
+                  {item.badge ? (
+                    <span className="ml-1.5 rounded-full bg-accent-600/25 px-1.5 py-0.5 font-mono text-[10px] leading-none text-accent-300">{item.badge}</span>
+                  ) : null}
+                  {current && <span aria-hidden="true" className="absolute inset-x-3 -bottom-[1px] h-0.5 rounded-full bg-gradient-to-r from-accent-500 to-cyan-300" />}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link to="/contactus" className="btn-primary hidden min-h-[44px] !px-6 !py-2.5 !text-xs sm:inline-flex">
-              Get in touch
+            <Link to="/#demo" className="btn-primary hidden min-h-[44px] !px-6 !py-2.5 !text-xs sm:inline-flex">
+              Book a demo
             </Link>
             <button
               type="button"
@@ -163,30 +174,26 @@ function Navbar() {
           }`}
         >
           <ul className="flex flex-col gap-1">
-            {[{ label: "Home", to: "/" }, ...navItems].map((item) => (
+            {navItems.map((item) => (
               <li key={item.to}>
-                <NavLink
+                <Link
                   to={item.to}
-                  end={item.to === "/"}
                   tabIndex={menuOpen ? 0 : -1}
-                  className={({ isActive }) =>
-                    `flex items-center justify-between rounded-xl px-4 py-3 text-lg transition ${
-                      isActive ? "bg-accent-600/15 font-semibold text-white" : "text-zinc-400 hover:bg-white/5 hover:text-white"
-                    }`
-                  }
+                  className={`flex min-h-[48px] items-center justify-between rounded-xl px-4 py-3 text-lg transition ${
+                    isActive(item) ? "bg-accent-600/15 font-semibold text-white" : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                  }`}
                 >
                   {item.label}
-                  {item.badge ? (
-                    <span className="rounded-full bg-accent-600/25 px-2 py-0.5 font-mono text-xs text-accent-300">
-                      {item.badge} open
-                    </span>
-                  ) : null}
-                </NavLink>
+                  {item.badge ? <span className="rounded-full bg-accent-600/25 px-2 py-0.5 font-mono text-xs text-accent-300">{item.badge} open</span> : null}
+                </Link>
               </li>
             ))}
           </ul>
-          <Link to="/contactus" tabIndex={menuOpen ? 0 : -1} className="btn-primary mt-8 w-full">
-            Get in touch
+          <Link to="/#demo" tabIndex={menuOpen ? 0 : -1} className="btn-primary mt-8 w-full">
+            Book a demo
+          </Link>
+          <Link to="/#order" tabIndex={menuOpen ? 0 : -1} className="btn-ghost mt-3 w-full">
+            Place an order
           </Link>
         </nav>
       </div>

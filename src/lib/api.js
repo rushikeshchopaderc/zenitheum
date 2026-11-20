@@ -1,5 +1,3 @@
-import { getTrackingIds } from "./analytics";
-
 /**
  * Thin fetch wrapper for the Node API. Every failure surfaces as an ApiError
  * carrying the HTTP status, a stable code and (for 400s) per-field messages,
@@ -44,26 +42,21 @@ async function request(path, options = {}) {
   return body;
 }
 
-/**
- * Public forms also send the visit ids so the server can tie a lead to how the visitor found us.
- * getTrackingIds() is empty unless the visitor accepted analytics.
- */
+export const getJson = (path) => request(path, { headers: { Accept: "application/json" } });
+
 export const postJson = (path, data) =>
   request(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ...data, ...getTrackingIds() }),
+    body: JSON.stringify(data),
   });
 
-export const postForm = (path, formData) => {
-  Object.entries(getTrackingIds()).forEach(([key, value]) => formData.set(key, value));
-  return request(path, { method: "POST", body: formData });
-};
+export const postForm = (path, formData) => request(path, { method: "POST", body: formData });
 
 /** Wake the API (free hosts sleep when idle) while the visitor is still filling in a form. Fire-and-forget. */
 let warmed = false;
 export function warmUp() {
   if (warmed || typeof fetch === "undefined") return;
   warmed = true;
-  fetch("/api/health", { cache: "no-store" }).catch(() => {});
+  fetch("/api/health", { cache: "no-store" }).then((response) => response.text()).catch(() => {});
 }

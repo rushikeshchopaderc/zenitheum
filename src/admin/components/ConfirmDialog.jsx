@@ -6,7 +6,7 @@ import useModal from "../hooks/useModal";
 import Icon from "./icons";
 
 /** A small centred confirmation for destructive actions. Focus starts on Cancel, the safe choice. */
-export default function ConfirmDialog({ title, children, confirmLabel = "Delete", danger = true, busy = false, onConfirm, onCancel, returnFocus }) {
+export default function ConfirmDialog({ title, children, confirmLabel = "Delete", cancelLabel = "Cancel", danger = true, busy = false, onConfirm, onCancel, returnFocus }) {
   const root = useOverlayRoot();
   const panelRef = useRef(null);
   const titleId = useId();
@@ -26,7 +26,7 @@ export default function ConfirmDialog({ title, children, confirmLabel = "Delete"
         </div>
         <div className="adm-dialog__actions">
           <button type="button" className="adm-btn" onClick={onCancel} disabled={busy} data-autofocus>
-            Cancel
+            {cancelLabel}
           </button>
           <button type="button" className={`adm-btn ${danger ? "adm-btn--danger-solid" : "adm-btn--primary"}`} onClick={onConfirm} disabled={busy}>
             {busy ? <Icon name="spinner" size={15} className="adm-spin" /> : null}

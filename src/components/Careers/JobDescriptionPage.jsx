@@ -88,7 +88,7 @@ function JobDescriptionPage() {
       </PageHero>
 
       <Section>
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-14">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-14">
           <div className="space-y-6">
             {/* Phones get a compact grid; the tall sticky card is for desktop (see the aside below). */}
             <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 lg:hidden">
@@ -117,7 +117,7 @@ function JobDescriptionPage() {
               <Reveal>
                 <section className="panel hud p-7 sm:p-8">
                   <h2 className="font-display text-xl font-semibold text-white">Three openings, three tracks</h2>
-                  <ul className="mt-5 grid gap-4 md:grid-cols-3">
+                  <ul className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
                     {job.tracks.map((track, i) => (
                       <li key={track.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
                         <span className="font-mono text-xs tracking-[0.2em] text-accent-400">{String(i + 1).padStart(2, "0")}</span>
@@ -137,7 +137,7 @@ function JobDescriptionPage() {
 
             <Reveal>
               <section className="panel hud p-7 sm:p-8">
-                <h2 className="font-display text-xl font-semibold text-white">Where you plug into the roadmap</h2>
+                <h2 className="font-display text-xl font-semibold text-white">Your first months</h2>
                 <ol className="relative mt-6 space-y-6 border-l border-white/15 pl-7">
                   {job.roadmap.map((item) => (
                     <li key={item.when} className="relative">
@@ -151,13 +151,6 @@ function JobDescriptionPage() {
                     </li>
                   ))}
                 </ol>
-                <p className="mt-6 text-sm text-zinc-500">
-                  See the full programme on the{" "}
-                  <Link to="/roadmap" className="text-accent-300 underline underline-offset-4 hover:text-accent-200">
-                    roadmap
-                  </Link>
-                  .
-                </p>
               </section>
             </Reveal>
 

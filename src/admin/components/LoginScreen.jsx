@@ -5,7 +5,11 @@ import { useDocumentTitle } from "../hooks/useMisc";
 import { Notice } from "./Feedback";
 import Icon from "./icons";
 
-/** Staff sign-in. `notice` explains why we are here ("session expired", "signed out"). */
+/**
+ * Staff sign-in. `notice` explains why we are here ("session expired", "signed out").
+ * A 503 "not_configured" means the server has no admin credentials: that is a setup problem, not a wrong
+ * password, so it is shown as a setup notice with the server's own explanation.
+ */
 export default function LoginScreen({ notice, noticeTone = "info", onSignedIn }) {
   useDocumentTitle("Sign in");
   const [email, setEmail] = useState("");
@@ -13,6 +17,7 @@ export default function LoginScreen({ notice, noticeTone = "info", onSignedIn })
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [needsSetup, setNeedsSetup] = useState(false);
 
   const submit = async (event) => {
     event.preventDefault();
@@ -23,10 +28,12 @@ export default function LoginScreen({ notice, noticeTone = "info", onSignedIn })
     }
     setBusy(true);
     setError("");
+    setNeedsSetup(false);
     try {
       const response = await api.login(email.trim(), password);
       onSignedIn(response.admin);
     } catch (failure) {
+      setNeedsSetup(failure.code === "not_configured");
       setError(failure.message || "Sign-in failed. Try again.");
       setBusy(false);
     }
@@ -104,7 +111,12 @@ export default function LoginScreen({ notice, noticeTone = "info", onSignedIn })
           </div>
 
           <div id="adm-login-error" role="alert" aria-live="assertive">
-            {error ? <div className="adm-banner"><Icon name="alert" size={18} /><div className="adm-banner__text">{error}</div></div> : null}
+            {error ? (
+              <div className={`adm-banner${needsSetup ? " adm-banner--warn" : ""}`}>
+                <Icon name={needsSetup ? "lock" : "alert"} size={18} />
+                <div className="adm-banner__text">{error}</div>
+              </div>
+            ) : null}
           </div>
 
           <button type="submit" className="adm-btn adm-btn--primary adm-btn--block" disabled={busy}>

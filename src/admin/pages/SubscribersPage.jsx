@@ -1,8 +1,8 @@
 import { useCallback, useRef, useState } from "react";
 
 import { api, errorText } from "../api";
-import { ChannelTag } from "../components/Badge";
 import ConfirmDialog from "../components/ConfirmDialog";
+import Delivery from "../components/Delivery";
 import { SearchBox, SelectField } from "../components/Fields";
 import FilterBar from "../components/FilterBar";
 import Icon from "../components/icons";
@@ -13,9 +13,12 @@ import { useToast } from "../context/contexts";
 import { fmtInt } from "../format";
 import useListPage from "../hooks/useListPage";
 import { useDocumentTitle } from "../hooks/useMisc";
-import { SUBSCRIBER_STATUSES, asOptions } from "../labels";
+import { CHIPS, SUBSCRIBER_STATUSES, asOptions } from "../labels";
 
-const FILTER_KEYS = ["status"];
+const FILTER_KEYS = ["status", "chip"];
+
+/** The chip news a person asked for, and for ZT-AFE1 how they want it delivered. */
+const interest = (row) => (row.chip ? <Delivery chip={row.chip} analogFormat={row.analogFormat} /> : <span className="adm-muted">No preference</span>);
 
 function StatusSwitch({ row, busy, onToggle }) {
   const active = row.status === "active";
@@ -94,20 +97,22 @@ export default function SubscribersPage() {
   );
 
   const columns = [
-    { key: "email", header: "Email", minWidth: 240, cell: (row) => <span className="adm-break" style={{ color: "var(--adm-text)", fontWeight: 600 }}>{row.email}</span> },
-    { key: "status", header: "Status", cell: (row) => <StatusSwitch row={row} busy={pending === row.id} onToggle={toggle} /> },
-    { key: "source", header: "Signed up from", cell: (row) => (row.source ? <span className="adm-mono adm-break">{row.source}</span> : <span className="adm-muted">{"–"}</span>) },
     {
-      key: "channel",
-      header: "Channel",
-      minWidth: 140,
+      key: "email",
+      header: "Subscriber",
+      minWidth: 250,
       cell: (row) => (
-        <span className="adm-cellstack">
-          <ChannelTag channel={row.channel} />
-          {row.utmCampaign ? <span className="adm-mono adm-muted adm-break">{row.utmCampaign}</span> : null}
-        </span>
+        <>
+          <span className="adm-break" style={{ color: "var(--adm-text)", fontWeight: 600 }}>
+            {row.email}
+          </span>
+          {row.name ? <span className="adm-cell2">{row.name}</span> : null}
+        </>
       ),
     },
+    { key: "interest", header: "Interested in", minWidth: 180, cell: interest },
+    { key: "status", header: "Status", cell: (row) => <StatusSwitch row={row} busy={pending === row.id} onToggle={toggle} /> },
+    { key: "source", header: "Signed up from", cell: (row) => (row.source ? <span className="adm-mono adm-break">{row.source}</span> : <span className="adm-muted">{"\u2013"}</span>) },
     {
       key: "created",
       header: "Subscribed",
@@ -127,25 +132,23 @@ export default function SubscribersPage() {
   ];
 
   const card = {
-    title: (row) => <span className="adm-break">{row.email}</span>,
+    title: (row) => (
+      <>
+        <span className="adm-break">{row.email}</span>
+        {row.name ? <span className="adm-cell2">{row.name}</span> : null}
+      </>
+    ),
     badge: removeButton,
-    meta: (row) => [
-      row.source ? `From ${row.source}` : null,
-      <span key="src">
-        {row.channel ? <ChannelTag channel={row.channel} /> : "Unattributed"}
-        {row.utmCampaign ? <span className="adm-mono"> {row.utmCampaign}</span> : null}
-      </span>,
-      <Time key="t" value={row.createdAt} />,
-    ],
+    meta: (row) => [interest(row), row.source ? `From ${row.source}` : null, <Time key="t" value={row.createdAt} />],
     foot: (row) => <StatusSwitch row={row} busy={pending === row.id} onToggle={toggle} />,
   };
 
   return (
     <div className="adm-page">
-      <PageHeader eyebrow="People" title="Subscribers" lede="People on the early-access list. Switching someone off keeps their record; deleting removes it." />
+      <PageHeader eyebrow="People" title="Subscribers" lede="People who asked for news about a chip. Switching someone off keeps their record; deleting removes it." />
 
       <FilterBar
-        search={<SearchBox label="Search subscribers" value={filters.q} onCommit={(value) => setFilter("q", value)} placeholder="Search email or where they signed up" />}
+        search={<SearchBox label="Search subscribers" value={filters.q} onCommit={(value) => setFilter("q", value)} placeholder="Search email, name or where they signed up" />}
         panelActive={activeCount}
         anyActive={anyActive}
         onClear={clearFilters}
@@ -157,6 +160,7 @@ export default function SubscribersPage() {
         }
       >
         <SelectField label="Status" value={filters.status} onChange={(value) => setFilter("status", value)} options={asOptions(SUBSCRIBER_STATUSES)} allLabel="Any status" />
+        <SelectField label="Chip" value={filters.chip} onChange={(value) => setFilter("chip", value)} options={asOptions(CHIPS)} allLabel="Any chip" />
       </FilterBar>
 
       <ListView
@@ -167,7 +171,7 @@ export default function SubscribersPage() {
         noun="subscribers"
         emptyIcon="subscribers"
         emptyTitle="No subscribers yet"
-        emptyText="Sign-ups from the early-access form on the public site will appear here."
+        emptyText="People who sign up for chip news on the public site will appear here."
       />
 
       {removing ? (

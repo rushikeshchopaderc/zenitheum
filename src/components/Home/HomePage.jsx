@@ -1,36 +1,26 @@
 import PageShell from "../layout/PageShell";
 import usePageMeta from "../../hooks/usePageMeta";
-import CTABand from "../common/CTABand";
-import Hero from "./Hero";
-import SegmentsStrip from "./SegmentsStrip";
-import ChipsSection from "./ChipsSection";
-import ClientPitch from "./ClientPitch";
-import HowWeBuild from "./HowWeBuild";
-import MilestonesSection from "./MilestonesSection";
-import EcosystemSection from "./EcosystemSection";
-import HiringStrip from "./HiringStrip";
-import LeadershipStrip from "./LeadershipStrip";
 import { SITE } from "@shared/site.js";
+import Hero from "./Hero";
+import Products from "./Products";
+import Customers from "./Customers";
+import CustomChip from "./CustomChip";
+import Milestones from "./Milestones";
+import Start from "./Start";
+import About from "./About";
 
+/** The whole marketing site on one page. */
 function HomePage() {
-  usePageMeta({
-    title: null,
-    description: SITE.description,
-    path: "/",
-  });
-
+  usePageMeta({ title: null, description: SITE.description, path: "/" });
   return (
     <PageShell>
       <Hero />
-      <SegmentsStrip />
-      <ChipsSection />
-      <ClientPitch />
-      <MilestonesSection />
-      <HowWeBuild />
-      <EcosystemSection />
-      <HiringStrip />
-      <LeadershipStrip />
-      <CTABand />
+      <Products />
+      <Customers />
+      <CustomChip />
+      <Milestones />
+      <Start />
+      <About />
     </PageShell>
   );
 }

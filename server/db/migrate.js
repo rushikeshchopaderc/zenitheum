@@ -54,14 +54,3 @@ export async function seedMilestones(db) {
   // A milestone dropped from the file disappears too, unless someone edited it in the console.
   await db.query("DELETE FROM milestones WHERE edited = false AND id <> ALL($1::text[])", [milestones.map((m) => m.id)]);
 }
-
-/** Raw analytics older than the retention window are deleted; leads keep their own attribution copy. */
-export async function purgeAnalytics(db, retentionDays) {
-  if (!retentionDays || retentionDays < 1) return 0;
-  const result = await db.query(
-    "DELETE FROM sessions WHERE last_activity_at < now() - make_interval(days => $1::int)",
-    [retentionDays]
-  );
-  await db.query("DELETE FROM visitors v WHERE v.last_seen_at < now() - make_interval(days => $1::int) AND NOT EXISTS (SELECT 1 FROM sessions s WHERE s.visitor_id = v.id)", [retentionDays]);
-  return result.rowCount;
-}

@@ -7,7 +7,7 @@ export const SITE = {
   tagline: "Fabless semiconductor company",
   url: "https://www.zenitheum.com",
   description:
-    "Zenitheum is a fabless semiconductor startup in Khamgaon, Maharashtra, designing two chips with the customers who will use them: ZT-AFE1, a 24-bit analog sensor front-end for instruments and meters, and ZT-SEC1, a digital secure-authentication chip.",
+    "Zenitheum is an end-to-end fabless chip company. Two chips built to drop into your product: ZT-AFE1, a 24-bit analog sensor front-end (soft or hard IP), and ZT-SEC1, a digital secure-authentication core (soft IP), both customisable to your product.",
   location: "Khamgaon, Maharashtra, India",
   locality: "Khamgaon",
   region: "Maharashtra",
@@ -15,9 +15,7 @@ export const SITE = {
   address: ["Dipali Nagar,", "Khamgaon, Maharashtra, India"],
   phone: { label: "+91 70664 97023", href: "tel:+917066497023" },
   emails: {
-    support: "support@zenitheum.com",
-    careers: "careers@zenitheum.com",
-    admin: "admin@zenitheum.com",
+    team: "zenitheumsolutions@gmail.com",
   },
   social: {
     linkedin: "https://www.linkedin.com/company/zenitheum",

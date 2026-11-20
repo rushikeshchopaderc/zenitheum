@@ -2,7 +2,6 @@ import { createApp } from "../app.js";
 import { loadConfig } from "../config.js";
 import { createDb } from "../db/index.js";
 import { migrate, seedMilestones } from "../db/migrate.js";
-import { hashPassword } from "../services/auth.js";
 
 const quiet = { info() {}, warn() {}, error() {} };
 
@@ -19,20 +18,42 @@ export async function openTestDb() {
   return db;
 }
 
-const TRUNCATE = `TRUNCATE contacts, applications, application_files, subscribers, page_views, events, sessions, visitors,
-                           admin_sessions, audit_log, admin_users RESTART IDENTITY CASCADE`;
+const TRUNCATE = "TRUNCATE contacts, applications, subscribers, demos, orders RESTART IDENTITY CASCADE";
+
+/** A stand-in for the Google integration that records what the API asked of it. */
+export function fakeGoogle({ enabled = true, failMeeting = false, failUpload = false } = {}) {
+  const calls = { meetings: [], uploads: [], cancelled: [] };
+  return {
+    enabled,
+    calls,
+    async createMeeting(input) {
+      if (failMeeting) throw new Error("calendar down");
+      calls.meetings.push(input);
+      return { meetLink: "https://meet.google.com/abc-defg-hij", eventId: `evt-${calls.meetings.length}`, htmlLink: "https://calendar.google.com/x" };
+    },
+    async cancelMeeting(id) {
+      calls.cancelled.push(id);
+    },
+    async uploadResume(input) {
+      if (failUpload) throw new Error("drive down");
+      calls.uploads.push(input);
+      return { fileId: `file-${calls.uploads.length}`, url: `https://drive.google.com/file/d/file-${calls.uploads.length}/view` };
+    },
+    async sendMail() {},
+  };
+}
 
 /**
- * Boot the whole API on an ephemeral port against `db`, with a recording mailer.
- * `reset()` empties every table except the milestone seed, so each test starts clean.
+ * Boot the whole API on an ephemeral port against `db`, with a recording mailer and a fake Google.
+ * `reset()` empties every business table except the milestone seed, so each test starts clean.
  */
-export async function startServer({ db, overrides = {} } = {}) {
+export async function startServer({ db, overrides = {}, google = fakeGoogle() } = {}) {
   const ownDb = !db;
   db ??= await openTestDb();
-  const config = loadConfig({ NODE_ENV: "test" }, { databaseUrl: "", pgliteDir: "", rateLimit: { limit: 1000 }, admin: { loginLimit: 1000 }, analytics: { collectLimit: 100000 }, ...overrides });
+  const config = loadConfig({ NODE_ENV: "test" }, { databaseUrl: "", pgliteDir: "", rateLimit: { limit: 1000 }, admin: { ...ADMIN, loginLimit: 1000 }, ...overrides });
   const mails = [];
   const mailer = { enabled: true, send: async (mail) => (mails.push(mail), true) };
-  const { app, repos } = createApp({ config, db, log: quiet, mailer });
+  const { app, repos } = createApp({ config, db, log: quiet, mailer, google });
   const server = await new Promise((resolve) => {
     const s = app.listen(0, "127.0.0.1", () => resolve(s));
   });
@@ -55,22 +76,26 @@ export async function startServer({ db, overrides = {} } = {}) {
     return { status: response.status, data, headers: response.headers, raw };
   }
 
-  async function createAdmin({ email = ADMIN.email, password = ADMIN.password } = {}) {
-    return repos.admin.createUser({ email, name: "Test Admin", passwordHash: await hashPassword(password) });
-  }
-
-  /** Create the admin (if needed), sign in, and return the cookie header value. */
+  /** Sign in to the console and return the cookie header value. */
   async function login({ email = ADMIN.email, password = ADMIN.password } = {}) {
-    if (!(await repos.admin.findByEmail(email))) await createAdmin({ email, password });
     const response = await call("POST", "/api/admin/login", { admin: true, body: { email, password } });
     if (response.status !== 200) throw new Error(`login failed: ${response.status} ${JSON.stringify(response.data)}`);
     return response.headers.get("set-cookie").split(";")[0];
   }
 
+  /** The first free demo slot (an ISO string). */
+  async function freeSlot(skip = 0) {
+    const { data } = await call("GET", "/api/demos/slots");
+    return data.slots.filter((s) => s.available)[skip].start;
+  }
+
   return {
-    base, db, repos, config, mails, call, createAdmin, login,
+    base, db, repos, config, mails, google, call, login, freeSlot,
     reset: async () => {
       mails.length = 0;
+      google.calls.meetings.length = 0;
+      google.calls.uploads.length = 0;
+      google.calls.cancelled.length = 0;
       await db.exec(TRUNCATE);
     },
     close: async () => {
@@ -79,8 +104,6 @@ export async function startServer({ db, overrides = {} } = {}) {
     },
   };
 }
-
-export const uuid = () => crypto.randomUUID();
 
 export const PDF = Buffer.from("%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<< /Root 1 0 R >>\n%%EOF\n");
 export const DOCX = Buffer.concat([Buffer.from([0x50, 0x4b, 0x03, 0x04]), Buffer.alloc(64, 7)]);
@@ -93,17 +116,35 @@ export function applicationForm(fields = {}, file = { name: "resume.pdf", type: 
   return form;
 }
 
-export const IOS_UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1";
+export const demoBody = (slot, extra = {}) => ({
+  name: "Asha Rao",
+  email: "Asha@Example.com",
+  phone: "+91 98765 43210",
+  organisation: "Acme Meters",
+  jobTitle: "Head of Hardware",
+  segment: "energy-metering",
+  chip: "both",
+  analogFormat: "hard",
+  message: "We ship 50,000 meters a year and want a custom variant.",
+  visitorTimezone: "Asia/Kolkata",
+  slot,
+  consent: true,
+  ...extra,
+});
 
-/** A well-formed analytics beacon. */
-export function beacon({ vid = uuid(), sid = uuid(), path = "/products", extra = [], ctx = {} } = {}) {
-  return {
-    vid,
-    sid,
-    payload: {
-      v: 1, vid, sid,
-      ctx: { start: Date.now(), landing: path, ref: "https://www.linkedin.com/feed/", utm: { source: "linkedin", medium: "social", campaign: "launch" }, lang: "en-IN", tz: "Asia/Kolkata", sw: 390, sh: 844, vw: 390, dpr: 3, tp: 5, ...ctx },
-      ev: [{ t: "pv", ts: Date.now(), p: path, ti: "Products" }, ...extra],
-    },
-  };
-}
+export const orderBody = (extra = {}) => ({
+  contactName: "Ravi Kumar",
+  email: "Ravi@Example.com",
+  phone: "+91 98765 43210",
+  organisation: "Kumar Instruments",
+  jobTitle: "Purchase manager",
+  chip: "analog",
+  analogFormat: "both",
+  quantity: 500,
+  deliveryDate: new Date(Date.now() + 60 * 86_400_000).toISOString().slice(0, 10),
+  deliveryLocation: "Plot 12, MIDC, Nashik, Maharashtra",
+  customisation: "8 channels, QFN-32 pin-out",
+  notes: "Please confirm lead time.",
+  consent: true,
+  ...extra,
+});
