@@ -13,7 +13,7 @@
  * To change a role, edit it here — nothing else needs touching.
  */
 
-const LOCATION = "Khamgaon, Maharashtra · On-site / hybrid";
+const LOCATION = "Remote";
 
 export const jobs = [
   {
@@ -294,7 +294,7 @@ export const jobs = [
     openings: 1,
     level: "Engineer",
     experience: "2–5 years in applications or field engineering",
-    location: `${LOCATION} · Customer visits`,
+    location: "Remote · Occasional customer visits",
     start: "From 1 March 2027",
     reportsTo: "CTO",
     track: "applications",
@@ -350,7 +350,7 @@ export const jobs = [
     openings: 1,
     level: "Mid-level",
     experience: "3–6 years",
-    location: "Khamgaon, Maharashtra · Hybrid",
+    location: LOCATION,
     start: "From 1 February 2027",
     reportsTo: "CTO",
     track: "infra",
@@ -407,7 +407,7 @@ export const jobs = [
     openings: 1,
     level: "Student / recent graduate",
     experience: "Students & recent graduates",
-    location: "Remote-friendly",
+    location: LOCATION,
     start: "1 February 2027",
     duration: "2 months (1 Feb – 31 Mar 2027), extendable into a full-time role",
     stipend: "₹10,000 per month",
@@ -462,7 +462,7 @@ export const jobs = [
     openings: 1,
     level: "Student / recent graduate",
     experience: "Students & recent graduates",
-    location: "Remote-friendly",
+    location: LOCATION,
     start: "1 February 2027",
     duration: "2 months (1 Feb – 31 Mar 2027), extendable into a full-time role",
     stipend: "₹10,000 per month",
